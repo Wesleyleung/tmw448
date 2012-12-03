@@ -1,5 +1,17 @@
 var map;
 
+var heatMapData = {locations : [{coords: {lat: 37.782, lng: -122.447}, weight: 0.5},
+					             {coords: {lat: 37.782, lng: -122.443}, weight: 1},
+					             {coords: {lat: 37.782, lng: -122.441}, weight: 2},
+					             {coords: {lat: 37.782, lng: -122.439}, weight: 3},
+					             {coords: {lat: 37.782, lng: -122.437}, weight: 2},
+					             {coords: {lat: 37.782, lng: -122.435}, weight: 1},
+					             {coords: {lat: 37.785, lng: -122.447}, weight: 0.5},
+					             {coords: {lat: 37.785, lng: -122.445}, weight: 3},
+					             {coords: {lat: 37.785, lng: -122.441}, weight: 2},
+					             {coords: {lat: 37.785, lng: -122.437}, weight: 1},
+					             {coords: {lat: 37.785, lng: -122.435}, weight: 3}]};
+
 // var heatMapData = [
 //   {location: new google.maps.LatLng(37.782, -122.447), weight: 0.5},
 //   new google.maps.LatLng(37.782, -122.445),
@@ -64,10 +76,10 @@ var options = {
 var infowindow = new google.maps.InfoWindow(options);
 map.setCenter(options.position);
 
-console.log("before function");
+// console.log("before function");
 
-$.getJSON('js/locations.json', function(json) {
-	console.log("in function");
+// $.getJSON('js/locations.json', function(json) {
+// 	console.log("in function");
 	// console.log(json);
 	// var heatMapData = [];
 	// for (var i = 0; i < json.locations.length; i++) {
@@ -80,9 +92,21 @@ $.getJSON('js/locations.json', function(json) {
 	//   data: heatMapData
 	// });
 	// heatmap.setMap(map);
-});
+// });
 
-console.log("after function");
+var dataArray = [];
+for (var i = 0; i < heatMapData.locations.length; i++) {
+	var location = heatMapData.locations[i];
+	var dict = {location: new google.maps.LatLng(location.coords.lat, location.coords.lng), weight: location.weight};
+	dataArray.push(dict);
+};
+console.log(heatMapData);
+var heatmap = new google.maps.visualization.HeatmapLayer({
+  data: dataArray
+});
+heatmap.setMap(map);
+
+// console.log("after function");
 
 }
 
