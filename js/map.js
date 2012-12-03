@@ -104,6 +104,10 @@ console.log(heatMapData);
 var heatmap = new google.maps.visualization.HeatmapLayer({
   data: dataArray
 });
+heatmap.setOptions({
+	opacity:0.5,
+	radius:20
+});
 heatmap.setMap(map);
 
 // console.log("after function");
