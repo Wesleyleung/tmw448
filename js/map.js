@@ -67,6 +67,10 @@ map.setCenter(options.position);
 var heatmap = new google.maps.visualization.HeatmapLayer({
   data: heatMapData
 });
+heatmap.setOptions({
+	opacity:0.5,
+	radius:20
+});
 heatmap.setMap(map);
 
 }
