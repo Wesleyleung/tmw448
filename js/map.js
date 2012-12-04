@@ -104,28 +104,26 @@ function loadPath() {
 	}
 
 	animationLoop();
-
-	// for (var i = 0; i < pathLocations.length; i++) {
-
-	// 	var coords = pathLocations[i];
-		
-	// 	balls(pathPolyline);
-	// 	// setTimeout(function(){balls(pathPolyline)}, 2000);
-	// }
 }
 
+// Called on mouse over for a poly path.
+// Colors it to a highlight color.
 function polyMouseover (event, path) {
-	console.log(event);
 	path.setOptions({
 		strokeColor : hoverStrokeColor
 	});
 }
 
+// Called on mouse over for a poly path.
+// Resets to the default color.
 function polyMouseout (event, path) {
-	console.log(event);
 	path.setOptions({
 		strokeColor : pathStrokeColor
 	});
+}
+
+function polyClick (event, path) {
+
 }
 
 function generateHeatMap() {
