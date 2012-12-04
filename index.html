@@ -11,7 +11,8 @@
     <script type="text/javascript"
       src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA0fbVwcr2LQZho14TG7BgNq3x5Cx53kw0&sensor=true&libraries=visualization">
     </script>
-    <script type="text/javascript"src="js/map.js"></script>  
+    <script type="text/javascript"src="js/map.js"></script>
+    <script type="text/javascript"src="js/tray.js"></script>   
   </head>
   <body>
     <div id="tray">
@@ -25,5 +26,10 @@
       </p>
     </div>
     <div id="map_canvas" style="width:100%; height:100%"></div>
+    <script type="text/javascript">
+      var tray = new Tray ({
+        tray: $("#tray")
+      });
+    </script>
   </body>
 </html>
