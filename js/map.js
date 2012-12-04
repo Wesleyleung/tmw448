@@ -2,6 +2,7 @@ var map;
 var pathStrokeColor = "#FF0000";
 var hoverStrokeColor = "#7EE569";
 var infowindow;
+var isPaused = true;
 
 function initialize() {
 	var mapOptions = {
