@@ -6,7 +6,8 @@
     <link rel="stylesheet" type="text/css" href="css/style.css">
 
    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
-
+   <link href="https://netdna.bootstrapcdn.com/twitter-bootstrap/2.2.1/css/bootstrap-combined.min.css" rel="stylesheet">
+   <script src="https://netdna.bootstrapcdn.com/twitter-bootstrap/2.2.1/js/bootstrap.min.js"></script>
 
     <script type="text/javascript"
       src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA0fbVwcr2LQZho14TG7BgNq3x5Cx53kw0&sensor=true&libraries=visualization">
@@ -17,6 +18,10 @@
   <body>
     <div id="tray">
       <div id="tray-handle">+</div>
+      <a id="tray-play" href="#"><i class="icon-play-circle icon-white"></i></a>
+      <div class="progress progress-success">
+        <div id="tray-progress-bar" class="bar" style="width: 50%"></div>
+      </div>
       <p>
         <a href=# onclick="loadPath()">Load Paths</a>
       </p>

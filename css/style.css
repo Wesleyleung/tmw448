@@ -9,6 +9,12 @@ body {
 	overflow: hidden; 
 }
 
+.btn-circle {
+	border-radius: 25px;
+	width: 15px;
+	height: 15px;
+}
+
 #map_canvas { 
 	height: 100%;
 	z-index: 1;
