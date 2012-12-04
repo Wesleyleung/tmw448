@@ -38,6 +38,7 @@ Tray.prototype =  {
 		//icon-pause
 		isPaused = !isPaused;
 		if (!isPaused) {
+			loadPath();
 			this.playButton.removeClass('icon-play-circle');
 			this.playButton.addClass('icon-pause');
 		} else {

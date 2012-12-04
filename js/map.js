@@ -3,6 +3,10 @@ var pathStrokeColor = "#FF0000";
 var hoverStrokeColor = "#7EE569";
 var infowindow;
 var isPaused = true;
+//These three need to be reset whenever the view port is changed
+var pathLocationsLoaded = false;
+var pausedPathLocations = [];
+var pathsAlreadyGraphed = [];
 
 function initialize() {
 	var mapOptions = {
@@ -51,29 +55,36 @@ function handleNoGeolocation(errorFlag) {
 function loadPath() {
 	$.getJSON("js/runs.json", function(json) {
 		for (var i = 0; i < json.runs.length; i++) {
-			var pathLocations = [];
-			var pathPolyline;
-			var totalFuel = 0;
-			for (var j = 0; j < json.runs[i].intervals.length; j++) {
-				var interval = json.runs[i].intervals[j];
-				totalFuel = totalFuel + interval.fuel;
-				var dict = {lat: interval.lat, lng: interval.lng, fuel: totalFuel};
-				pathLocations.push(dict);
+			if (!pathLocationsLoaded) {
+				var pathLocations = [];
+				var pathPolyline;
+				var totalFuel = 0;
+				for (var j = 0; j < json.runs[i].intervals.length; j++) {
+					var interval = json.runs[i].intervals[j];
+					totalFuel = totalFuel + interval.fuel;
+					var dict = {lat: interval.lat, lng: interval.lng, fuel: totalFuel};
+					pathLocations.push(dict);
+				}
+			} else {
+				pathLocations = pausedPathLocations[i];
 			}
+			pausedPathLocations[i] = [];
+			pathsAlreadyGraphed[i] = [];
 			pathPolyline = new google.maps.Polyline({
 				map: map,
 				strokeColor: "#FF0000",
 				strokeOpacity: 1.0,
 				strokeWeight: 2
 			});
-			drawPath(pathLocations, pathPolyline);	
+			drawPath(pathLocations, pathPolyline, i);	
 		}
+		pathLocationsLoaded = true;
 	});
 }
 
-function drawPath(pathLocations, pathPolyline) {
+function drawPath(pathLocations, pathPolyline, pathNum) {
 	var animationTimeout = 500;
-	pathPolyline.text = pathLocations[pathLocations.length-1].fuel + " total fuel";
+	pathPolyline.text = pathLocations[pathLocations.length - 1].fuel + " total fuel";
 	console.log(pathPolyline);
 
 	google.maps.event.addListener(pathPolyline, 'mouseover', function(event) {
@@ -94,14 +105,23 @@ function drawPath(pathLocations, pathPolyline) {
 
 	var animationIndex = 0;
 	function animationLoop() {
-		var coords = pathLocations[animationIndex];
-		addNextPoint(coords);
-		setTimeout(function() {
-			animationIndex++;
-			if (animationIndex < pathLocations.length) {
-				animationLoop();
-			};
-		}, animationTimeout);
+		if (!isPaused) {
+			var coords = pathLocations[animationIndex];
+			addNextPoint(coords);
+			pathsAlreadyGraphed[pathNum].push(coords);
+			pathLocations.splice(animationIndex, 1);
+			//console.log(animationIndex);
+			setTimeout(function() {
+				//animationIndex++;
+				if (animationIndex < pathLocations.length) {
+					animationLoop();
+				};
+			}, animationTimeout);
+		} else {
+			pathLocations.splice(0, 0, pathsAlreadyGraphed[pathNum][pathsAlreadyGraphed[pathNum].length - 1]);
+			pausedPathLocations[pathNum] = pathLocations;
+			console.log(pathLocations);
+		}
 	}
 	animationLoop();
 }
