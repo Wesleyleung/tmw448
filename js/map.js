@@ -1,5 +1,8 @@
 var map;
 
+var pathArray;
+var pathPolyline;
+
 var heatMapData = {locations : [{coords: {lat: 37.782, lng: -122.447}, weight: 0.5},
 					             {coords: {lat: 37.782, lng: -122.443}, weight: 1},
 					             {coords: {lat: 37.782, lng: -122.441}, weight: 2},
@@ -110,8 +113,43 @@ heatmap.setOptions({
 });
 heatmap.setMap(map);
 
-// console.log("after function");
+console.log("end of initialize");
+
+setTimeout(loadPath(), 2000);
 
 }
 
-google.maps.event.addDomListener(window, 'load', initialize);
+google.maps.event.addDomListener(window, 'load', function () {
+	initialize();
+});
+
+function loadPath() {
+
+	// Create the MVC array to hold the path points, push an object on
+	// to make the path polyline happy.
+	pathArray = new google.maps.MVCArray();
+	pathArray.push(new google.maps.LatLng());
+	console.log("initialized path array");
+
+	pathPolyline = new google.maps.Polyline({
+		map: map,
+		strokeColor: "#FF0000",
+	    strokeOpacity: 1.0,
+	    strokeWeight: 2
+	});
+
+	// After setting the path to the polyline, pop the filler object off.
+	pathPolyline.setPath(pathArray);
+	pathArray.pop();
+
+	// dummy JSON
+var pathLocations = [{lat: 37.424106, lng: -122.166076},
+					 {lat: 37.77493, lng: -122.419415},
+					 {lat: 37.339386, lng: -121.894955}];
+
+for (var i = 0; i < pathLocations.length; i++) {
+	console.log(pathLocations);
+	var coords = pathLocations[i];
+	setTimeout(pathArray.push(new google.maps.LatLng(coords.lat, coords.lng)), 2000);
+}
+}
