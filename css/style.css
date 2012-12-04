@@ -50,5 +50,20 @@ body {
 	-moz-user-select: none;
 	-ms-user-select: none;
 	user-select: none;
-
 }
+
+#tray-play {
+	text-align: center;
+	padding-left: 25px;
+}
+
+#tray-progress-wrapper {
+	position: relative;
+	top: 13px;
+}
+
+.centered {
+  display: inline-block;
+  vertical-align: middle;
+ }​
+
