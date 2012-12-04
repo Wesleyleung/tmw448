@@ -3,6 +3,9 @@ var map;
 var pathArray;
 var pathPolyline;
 
+var pathStrokeColor = "#FF0000";
+var hoverStrokeColor = "#7EE569";
+
 function initialize() {
 	var mapOptions = {
 		zoom: 8,
@@ -58,9 +61,16 @@ function loadPath() {
 
 	pathPolyline = new google.maps.Polyline({
 		map: map,
-		strokeColor: "#FF0000",
+		strokeColor: pathStrokeColor,
 		strokeOpacity: 1.0,
-		strokeWeight: 2
+		strokeWeight: 4.0
+	});
+
+	google.maps.event.addListener(pathPolyline, 'mouseover', function(event) {
+		polyMouseover(event, this);
+	});
+	google.maps.event.addListener(pathPolyline, 'mouseout', function(event) {
+		polyMouseout(event, this);
 	});
 
 	// After setting the path to the polyline, pop the filler object off.
@@ -104,6 +114,20 @@ function loadPath() {
 	// }
 }
 
+function polyMouseover (event, path) {
+	console.log(event);
+	path.setOptions({
+		strokeColor : hoverStrokeColor
+	});
+}
+
+function polyMouseout (event, path) {
+	console.log(event);
+	path.setOptions({
+		strokeColor : pathStrokeColor
+	});
+}
+
 function generateHeatMap() {
 	$.getJSON("js/locations.json", function(json) {
 		console.log(json);
@@ -127,3 +151,4 @@ function generateHeatMap() {
 google.maps.event.addDomListener(window, 'load', function () {
 	initialize();
 });
+
