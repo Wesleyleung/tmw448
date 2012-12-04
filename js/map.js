@@ -12,23 +12,23 @@ function initialize() {
 	map = new google.maps.Map(document.getElementById('map_canvas'), mapOptions);
 
 	//Try HTML5 geolocation
-	if(navigator.geolocation) {
-		navigator.geolocation.getCurrentPosition(function(position) {
-		var pos = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
-		var infowindow = new google.maps.InfoWindow({
-			map: map,
-			position: pos,
-			content: 'Location found using HTML5.'
-		});
+	// if(navigator.geolocation) {
+	// 	navigator.geolocation.getCurrentPosition(function(position) {
+	// 	var pos = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+	// 	var infowindow = new google.maps.InfoWindow({
+	// 		map: map,
+	// 		position: pos,
+	// 		content: 'Location found using HTML5.'
+	// 	});
 
-		map.setCenter(pos);
-	}, function() {
-		handleNoGeolocation(true);
-		});
-	} else {
-	// Browser doesn't support Geolocation
-		handleNoGeolocation(false);
-	}
+	// 	map.setCenter(pos);
+	// }, function() {
+	// 	handleNoGeolocation(true);
+	// 	});
+	// } else {
+	// // Browser doesn't support Geolocation
+	// 	handleNoGeolocation(false);
+	// }
 
 	generateHeatMap();
 	console.log("end of initialize");
