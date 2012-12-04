@@ -64,7 +64,7 @@ function loadPath() {
 	});
 
 	// After setting the path to the polyline, pop the filler object off.
-	pathPolyline.setPath(pathArray);
+	// pathPolyline.setPath(pathArray);
 	pathArray.pop();
 
 	// dummy JSON
@@ -72,14 +72,36 @@ function loadPath() {
 					 {lat: 37.77493, lng: -122.419415},
 					 {lat: 37.339386, lng: -121.894955}];
 
-	for (var i = 0; i < pathLocations.length; i++) {
-		var coords = pathLocations[i];
-		// function balls() {
-			pathArray.push(new google.maps.LatLng(coords.lat, coords.lng));
-			console.log(pathArray);
-		// };
-		// setTimeout(function(){balls()}, 2000);
+	var animationTimeout = 500;
+
+	function addNextPoint(coords) {
+		var thisPathArray = pathPolyline.getPath();
+		thisPathArray.push(new google.maps.LatLng(coords.lat, coords.lng));
+		pathPolyline.setPath(thisPathArray);
+		console.log(thisPathArray);
+	};
+
+	var animationIndex = 0;
+	function animationLoop() {
+		var coords = pathLocations[animationIndex];
+		addNextPoint(coords);
+		setTimeout(function() {
+			animationIndex++;
+			if (animationIndex < pathLocations.length) {
+				animationLoop();
+			};
+		}, animationTimeout);
 	}
+
+	animationLoop();
+
+	// for (var i = 0; i < pathLocations.length; i++) {
+
+	// 	var coords = pathLocations[i];
+		
+	// 	balls(pathPolyline);
+	// 	// setTimeout(function(){balls(pathPolyline)}, 2000);
+	// }
 }
 
 function generateHeatMap() {
