@@ -66,11 +66,17 @@ function loadPath() {
 		strokeWeight: 4.0
 	});
 
+	pathPolyline.text = "hello";
+	console.log(pathPolyline);
+
 	google.maps.event.addListener(pathPolyline, 'mouseover', function(event) {
 		polyMouseover(event, this);
 	});
 	google.maps.event.addListener(pathPolyline, 'mouseout', function(event) {
 		polyMouseout(event, this);
+	});
+	google.maps.event.addListener(pathPolyline, 'click', function(event) {
+		polyClick(event, this);
 	});
 
 	// After setting the path to the polyline, pop the filler object off.
@@ -123,7 +129,14 @@ function polyMouseout (event, path) {
 }
 
 function polyClick (event, path) {
-
+	var contentString = "Hello " + path.text;
+	var infowindow = new google.maps.InfoWindow({
+	    content: contentString,
+	    position: event.latLng
+	});
+	console.log(event);
+	console.log(infowindow);
+	infowindow.open(map);
 }
 
 function generateHeatMap() {
