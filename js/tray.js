@@ -2,7 +2,7 @@ function Tray (params) {
 	this.tray = params.tray;
 	this.trayButton = this.tray.find('#tray-handle');
 	this.isOpen = false;
-	this.playButton = this.tray.find('#tray-play').find('i');
+	this.playButton = this.tray.find('#tray-play');
 	this.prograssBar = this.tray.find('#tray-progress-bar');
 
 	this.trayButton.bind('click', function() {
