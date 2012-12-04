@@ -1,10 +1,7 @@
 var map;
-
-var pathArray;
-var pathPolyline;
-
 var pathStrokeColor = "#FF0000";
 var hoverStrokeColor = "#7EE569";
+var infowindow;
 
 function initialize() {
 	var mapOptions = {
@@ -32,9 +29,7 @@ function initialize() {
 	// // Browser doesn't support Geolocation
 	// 	handleNoGeolocation(false);
 	// }
-
 	generateHeatMap();
-	console.log("end of initialize");
 }
 
 function handleNoGeolocation(errorFlag) {
@@ -53,20 +48,31 @@ function handleNoGeolocation(errorFlag) {
 }
 
 function loadPath() {
-	// Create the MVC array to hold the path points, push an object on
-	// to make the path polyline happy.
-	pathArray = new google.maps.MVCArray();
-	pathArray.push(new google.maps.LatLng());
-	console.log("initialized path array");
-
-	pathPolyline = new google.maps.Polyline({
-		map: map,
-		strokeColor: pathStrokeColor,
-		strokeOpacity: 1.0,
-		strokeWeight: 4.0
+	$.getJSON("js/runs.json", function(json) {
+		for (var i = 0; i < json.runs.length; i++) {
+			var pathLocations = [];
+			var pathPolyline;
+			var totalFuel = 0;
+			for (var j = 0; j < json.runs[i].intervals.length; j++) {
+				var interval = json.runs[i].intervals[j];
+				totalFuel = totalFuel + interval.fuel;
+				var dict = {lat: interval.lat, lng: interval.lng, fuel: totalFuel};
+				pathLocations.push(dict);
+			}
+			pathPolyline = new google.maps.Polyline({
+				map: map,
+				strokeColor: "#FF0000",
+				strokeOpacity: 1.0,
+				strokeWeight: 2
+			});
+			drawPath(pathLocations, pathPolyline);	
+		}
 	});
+}
 
-	pathPolyline.text = "hello";
+function drawPath(pathLocations, pathPolyline) {
+	var animationTimeout = 500;
+	pathPolyline.text = pathLocations[pathLocations.length-1].fuel + " total fuel";
 	console.log(pathPolyline);
 
 	google.maps.event.addListener(pathPolyline, 'mouseover', function(event) {
@@ -79,22 +85,10 @@ function loadPath() {
 		polyClick(event, this);
 	});
 
-	// After setting the path to the polyline, pop the filler object off.
-	// pathPolyline.setPath(pathArray);
-	pathArray.pop();
-
-	// dummy JSON
-	var pathLocations = [{lat: 37.424106, lng: -122.166076},
-					 {lat: 37.77493, lng: -122.419415},
-					 {lat: 37.339386, lng: -121.894955}];
-
-	var animationTimeout = 500;
-
 	function addNextPoint(coords) {
 		var thisPathArray = pathPolyline.getPath();
 		thisPathArray.push(new google.maps.LatLng(coords.lat, coords.lng));
 		pathPolyline.setPath(thisPathArray);
-		console.log(thisPathArray);
 	};
 
 	var animationIndex = 0;
@@ -108,7 +102,6 @@ function loadPath() {
 			};
 		}, animationTimeout);
 	}
-
 	animationLoop();
 }
 
@@ -130,15 +123,20 @@ function polyMouseout (event, path) {
 
 function polyClick (event, path) {
 	var contentString = "Hello " + path.text;
-	var infowindow = new google.maps.InfoWindow({
-	    content: contentString,
+
+	if (infowindow) {
+		infowindow.close();
+		infowindow.content = contentString;
+		infowindow.position = event.latLng;
+	} else {
+		infowindow = new google.maps.InfoWindow({
+		content: contentString,
 	    position: event.latLng
-	});
-	console.log(event);
-	console.log(infowindow);
+		});
+	}
 	infowindow.open(map);
 }
-
+	
 function generateHeatMap() {
 	$.getJSON("js/locations.json", function(json) {
 		console.log(json);
