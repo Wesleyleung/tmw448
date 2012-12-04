@@ -32,7 +32,6 @@ function initialize() {
 
 	generateHeatMap();
 	console.log("end of initialize");
-	setTimeout("loadPath()", 2000);
 }
 
 function handleNoGeolocation(errorFlag) {
@@ -74,9 +73,12 @@ function loadPath() {
 					 {lat: 37.339386, lng: -121.894955}];
 
 	for (var i = 0; i < pathLocations.length; i++) {
-		console.log(pathLocations);
 		var coords = pathLocations[i];
-		setTimeout("pathArray.push(new google.maps.LatLng(" + coords.lat + ", " + coords.lng + "))", 2000);
+		// function balls() {
+			pathArray.push(new google.maps.LatLng(coords.lat, coords.lng));
+			console.log(pathArray);
+		// };
+		// setTimeout(function(){balls()}, 2000);
 	}
 }
 
