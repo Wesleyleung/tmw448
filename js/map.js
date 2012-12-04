@@ -3,6 +3,9 @@ var map;
 var pathArray;
 var pathPolyline;
 
+var pathStrokeColor = "#FF0000";
+var hoverStrokeColor = "#7EE569";
+
 function initialize() {
 	var mapOptions = {
 		zoom: 8,
@@ -58,9 +61,22 @@ function loadPath() {
 
 	pathPolyline = new google.maps.Polyline({
 		map: map,
-		strokeColor: "#FF0000",
+		strokeColor: pathStrokeColor,
 		strokeOpacity: 1.0,
-		strokeWeight: 2
+		strokeWeight: 4.0
+	});
+
+	pathPolyline.text = "hello";
+	console.log(pathPolyline);
+
+	google.maps.event.addListener(pathPolyline, 'mouseover', function(event) {
+		polyMouseover(event, this);
+	});
+	google.maps.event.addListener(pathPolyline, 'mouseout', function(event) {
+		polyMouseout(event, this);
+	});
+	google.maps.event.addListener(pathPolyline, 'click', function(event) {
+		polyClick(event, this);
 	});
 
 	// After setting the path to the polyline, pop the filler object off.
@@ -94,14 +110,33 @@ function loadPath() {
 	}
 
 	animationLoop();
+}
 
-	// for (var i = 0; i < pathLocations.length; i++) {
+// Called on mouse over for a poly path.
+// Colors it to a highlight color.
+function polyMouseover (event, path) {
+	path.setOptions({
+		strokeColor : hoverStrokeColor
+	});
+}
 
-	// 	var coords = pathLocations[i];
-		
-	// 	balls(pathPolyline);
-	// 	// setTimeout(function(){balls(pathPolyline)}, 2000);
-	// }
+// Called on mouse over for a poly path.
+// Resets to the default color.
+function polyMouseout (event, path) {
+	path.setOptions({
+		strokeColor : pathStrokeColor
+	});
+}
+
+function polyClick (event, path) {
+	var contentString = "Hello " + path.text;
+	var infowindow = new google.maps.InfoWindow({
+	    content: contentString,
+	    position: event.latLng
+	});
+	console.log(event);
+	console.log(infowindow);
+	infowindow.open(map);
 }
 
 function generateHeatMap() {
@@ -127,3 +162,4 @@ function generateHeatMap() {
 google.maps.event.addDomListener(window, 'load', function () {
 	initialize();
 });
+
