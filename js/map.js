@@ -170,24 +170,40 @@ function polyClick (event, path) {
 	}
 	infowindow.open(map);
 }
-	
+
 function generateHeatMap() {
 	$.getJSON("js/locations.json", function(json) {
 		console.log(json);
 		var heatMapData = [];
+		var added = {}
 		for (var i = 0; i < json.locations.length; i++) {
 			var location = json.locations[i];
-			var dict = {location: new google.maps.LatLng(location.coords.lat, location.coords.lng), weight: location.weight};
-			heatMapData.push(dict);
+			var LatLng = new google.maps.LatLng(location.coords.lat, location.coords.lng)
+			if (!added[LatLng]) {
+				//added additional points for testing purposes
+				// var delta = 0.0025;
+				// var dictne = {location: new google.maps.LatLng(location.coords.lat+delta, location.coords.lng+delta), weight: location.weight};
+				// var dictse = {location: new google.maps.LatLng(location.coords.lat+delta, location.coords.lng-delta), weight: location.weight};
+				// var dictnw = {location: new google.maps.LatLng(location.coords.lat-delta, location.coords.lng+delta), weight: location.weight};
+				// var dictsw = {location: new google.maps.LatLng(location.coords.lat-delta, location.coords.lng-delta), weight: location.weight};
+				// heatMapData.push(dictne);
+				// heatMapData.push(dictse);
+				// heatMapData.push(dictnw);
+				// heatMapData.push(dictsw);
+
+				var dict = {location: LatLng , weight: location.weight};
+				heatMapData.push(dict);
+				added[LatLng] = true;
+			}
 		};
 		var heatmap = new google.maps.visualization.HeatmapLayer({
 			data: heatMapData
 		});
 		 heatmap.setOptions({
-			opacity:0.5,
+			dissipating: true,
+			opacity:0.75,
 			radius:20
 		 });
 		heatmap.setMap(map);
 	 });
 }
-
