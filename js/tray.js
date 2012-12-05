@@ -3,21 +3,24 @@ function Tray (params) {
 	this.trayButton = this.tray.find('#tray-handle');
 	this.isOpen = false;
 	this.playButton = this.tray.find('#tray-play');
-	this.prograssBar = this.tray.find('#tray-progress-bar');
+	this.progressBarWrapper = this.tray.find('#tray-progress-wrapper');
+	this.progressBar = this.tray.find('#tray-progress-bar');
 
 	this.trayButton.bind('click', function() {
-		this.trayShowAndHide();
+		this.showAndHide();
 	}.bind(this));
 
 	this.playButton.bind('click', function() {
-		this.trayPlayAndPause();
+		this.playAndPause();
 	}.bind(this));
+
+	this.setProgressBarPercentage(80);
 }
 
 Tray.prototype =  {
 	//Define functions here
 
-	trayShowAndHide: function () {
+	showAndHide: function () {
 		this.isOpen = !this.isOpen;
 		if (this.isOpen) {
 			this.trayButton.text("-");
@@ -33,19 +36,28 @@ Tray.prototype =  {
 	},
 
 	//Takes an optional argument true or false to set isPaused to
-	trayPlayAndPause: function() {
+	playAndPause: function() {
 		//If an argument is passed in, use it to set isPaused
 		if (arguments.length == 0) isPaused = !isPaused;
 		else isPaused = arguments[0];
 
 		if (!isPaused) {
-			this.playButton.removeClass('icon-play-circle');
-			this.playButton.addClass('icon-pause');
+			this.playButton.html('<img src="img/pausebutton.png" />');
 			//loadPath from map.js
 			loadPath();
 		} else {
-			this.playButton.addClass('icon-play-circle');
-			this.playButton.removeClass('icon-pause');
+			this.playButton.html('<img src="img/playbutton.png" />');
 		}
+	},
+
+	//Takes a value between 0 to 100 to set the progress bar to
+	setProgressBarPercentage: function(percentage) {
+		this.progressBar.width(percentage + "%");
+	},
+
+	//Takes a value true or false and sets the progress bar's activity state
+	setProgressBarActiveState: function(isActive) {
+		if (isActive) this.progressBarWrapper.addClass('active');
+		else this.progressBarWrapper.removeClass('active');
 	}
 };

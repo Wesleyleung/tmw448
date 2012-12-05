@@ -132,7 +132,7 @@ function drawPath(pathLocations, pathPolyline, runNum) {
 					if (runVisualizationsEnded == totalRuns) {
 						//All runs have ended
 						//set tray's play button to be paused
-						tray.trayPlayAndPause(true);
+						tray.playAndPause(true);
 					}
 				}
 			}, animationTimeout);
