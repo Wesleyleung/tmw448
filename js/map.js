@@ -4,10 +4,11 @@ var pathStrokeColor = "#FF0000";
 var hoverStrokeColor = "#7EE569";
 var infowindow;
 var isPaused = true;
-//These six need to be reset whenever we get new data
+//These eight need to be reset whenever we get new data
 var pathLocationsLoaded = false;
 var coordsToBeGraphed = [];
 var coordsAlreadyGraphed = [];
+var polyLineArray = [];
 var totalRuns = 0;
 var runVisualizationsEnded = 0;
 var numProgressIntervals = 0;
@@ -42,7 +43,6 @@ function initialize() {
 	// // Browser doesn't support Geolocation
 	// 	handleNoGeolocation(false);
 	// }
-
 	generateHeatMap();
 }
 
@@ -67,6 +67,8 @@ function calculateStats(json) {
 			numProgressIntervals ++;
 		}
 	}
+	//number of polylines = num coordinates - 1
+	numProgressIntervals --;
 	tray.setNumProgressIntervals(numProgressIntervals);
 	tray.setCurrentProgressInterval(0);
 }
@@ -88,10 +90,8 @@ function loadPath() {
 				}
 			} else {
 				pathLocations = coordsToBeGraphed[i];
+				//if(!coordsAlreadyGraphed[i].length) clearPolylines();
 			}
-			//Instantiate empty arrays in each
-			coordsToBeGraphed[i] = [];
-			coordsAlreadyGraphed[i] = [];
 
 			pathPolyline = new google.maps.Polyline({
 				map: map,
@@ -99,10 +99,26 @@ function loadPath() {
 				strokeOpacity: 1.0,
 				strokeWeight: 2
 			});
+
+			if (polyLineArray[i] != null && !coordsAlreadyGraphed[i].length) {
+				polyLineArray[i].setMap(null);
+			}
+
+			//Instantiate empty arrays in each
+			coordsToBeGraphed[i] = [];
+			coordsAlreadyGraphed[i] = [];
+
+			polyLineArray[i] = pathPolyline;
 			drawPath(pathLocations, pathPolyline, i);	
 		}
 		pathLocationsLoaded = true;
 	});
+}
+
+function clearPolylines() {
+	for (var i = 0; i < polyLineArray.length; i++) {
+		polyLineArray[i].setMap(null);
+	}
 }
 
 function drawPath(pathLocations, pathPolyline, runNum) {
@@ -129,23 +145,28 @@ function drawPath(pathLocations, pathPolyline, runNum) {
 		tray.animateProgressBarByInterval(1);
 	};
 
-	var animationIndex = 0;
 	function animationLoop() {
 		if (!isPaused) {
 			//"pop" off of pathLocations
-			var coords = pathLocations.splice(animationIndex, 1)[0];
+			var coords = pathLocations.splice(0, 1)[0];
 			addNextPoint(coords);
 			//"push" onto stack of paths that were graphed
 			coordsAlreadyGraphed[runNum].push(coords);
 			setTimeout(function() {
-				if (animationIndex < pathLocations.length) {
+				if (pathLocations.length) {
 					animationLoop();
 				} else {
 					runVisualizationsEnded ++;
+					coordsToBeGraphed[runNum] = coordsAlreadyGraphed[runNum];
+					coordsAlreadyGraphed[runNum] = [];
+					console.log(coordsToBeGraphed[runNum]);
 					if (runVisualizationsEnded == totalRuns) {
 						//All runs have ended
 						//set tray's play button to be paused
 						tray.playAndPause(true);
+						tray.setNumProgressIntervals(numProgressIntervals);
+						tray.setCurrentProgressInterval(0);
+						runVisualizationsEnded = 0;
 					}
 				}
 			}, animationTimeout);
@@ -160,6 +181,7 @@ function drawPath(pathLocations, pathPolyline, runNum) {
 			coordsToBeGraphed[runNum] = pathLocations;
 		}
 	}
+	tray.setProgressBarPercentage(0);
 	animationLoop();
 }
 

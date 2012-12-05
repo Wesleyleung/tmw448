@@ -67,12 +67,17 @@ Tray.prototype =  {
 	//Only use this if numProgressIntervals and currentProgressInterval have been set
 	animateProgressBarByInterval: function(interval) {
 		this.currentProgressInterval += interval;
+		if (this.currentProgressInterval <= 1) return;
 		var percentage = Math.round(this.currentProgressInterval / this.numProgressIntervals * 100);
 		this.setProgressBarPercentage(percentage);
 	},
 
 	//Takes a value between 0 to 100 to set the progress bar to
 	setProgressBarPercentage: function(percentage) {
+		/*this.progressBar.animate({
+			width: percentage + "%"
+		}, 10);*/
+		console.log(percentage);
 		this.progressBar.width(percentage + "%");
 	},
 
