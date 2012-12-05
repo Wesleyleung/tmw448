@@ -4,12 +4,13 @@ var pathStrokeColor = "#FF0000";
 var hoverStrokeColor = "#7EE569";
 var infowindow;
 var isPaused = true;
-//These five need to be reset whenever we get new data
+//These six need to be reset whenever we get new data
 var pathLocationsLoaded = false;
 var coordsToBeGraphed = [];
 var coordsAlreadyGraphed = [];
 var totalRuns = 0;
 var runVisualizationsEnded = 0;
+var numProgressIntervals = 0;
 
 google.maps.event.addDomListener(window, 'load', function () {
 	initialize();
@@ -60,9 +61,20 @@ function handleNoGeolocation(errorFlag) {
 	map.setCenter(options.position);
 }
 
+function calculateStats(json) {
+	for (var i = 0; i < json.runs.length; i++) {
+		for(var j = 0; j < json.runs[i].intervals.length; j++) {
+			numProgressIntervals ++;
+		}
+	}
+	tray.setNumProgressIntervals(numProgressIntervals);
+	tray.setCurrentProgressInterval(0);
+}
+
 function loadPath() {
 	$.getJSON("js/runs.json", function(json) {
 		totalRuns = json.runs.length;
+		if (!pathLocationsLoaded) calculateStats(json);
 		for (var i = 0; i < totalRuns; i++) {
 			if (!pathLocationsLoaded) {
 				var pathLocations = [];
@@ -114,6 +126,7 @@ function drawPath(pathLocations, pathPolyline, runNum) {
 		var thisPathArray = pathPolyline.getPath();
 		thisPathArray.push(new google.maps.LatLng(coords.lat, coords.lng));
 		pathPolyline.setPath(thisPathArray);
+		tray.animateProgressBarByInterval(1);
 	};
 
 	var animationIndex = 0;
