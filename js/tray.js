@@ -15,9 +15,7 @@ function Tray (params) {
 }
 
 Tray.prototype =  {
-	fn: function(args) {
-		//this is a template for a function
-	},
+	//Define functions here
 
 	trayShowAndHide: function () {
 		this.isOpen = !this.isOpen;
@@ -30,17 +28,21 @@ Tray.prototype =  {
 			this.trayButton.text("+");
 			this.tray.animate({
 			   bottom: this.tray.height() * -1
-			}, 350);	
+			}, 350);
 		}
 	},
 
+	//Takes an optional argument true or false to set isPaused to
 	trayPlayAndPause: function() {
-		//icon-pause
-		isPaused = !isPaused;
+		//If an argument is passed in, use it to set isPaused
+		if (arguments.length == 0) isPaused = !isPaused;
+		else isPaused = arguments[0];
+
 		if (!isPaused) {
-			loadPath();
 			this.playButton.removeClass('icon-play-circle');
 			this.playButton.addClass('icon-pause');
+			//loadPath from map.js
+			loadPath();
 		} else {
 			this.playButton.addClass('icon-play-circle');
 			this.playButton.removeClass('icon-pause');

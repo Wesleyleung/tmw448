@@ -5,8 +5,12 @@ var infowindow;
 var isPaused = true;
 //These three need to be reset whenever the view port is changed
 var pathLocationsLoaded = false;
-var pausedPathLocations = [];
-var pathsAlreadyGraphed = [];
+var coordsToBeGraphed = [];
+var coordsAlreadyGraphed = [];
+
+google.maps.event.addDomListener(window, 'load', function () {
+	initialize();
+});
 
 function initialize() {
 	var mapOptions = {
@@ -34,6 +38,7 @@ function initialize() {
 	// // Browser doesn't support Geolocation
 	// 	handleNoGeolocation(false);
 	// }
+
 	generateHeatMap();
 }
 
@@ -66,10 +71,12 @@ function loadPath() {
 					pathLocations.push(dict);
 				}
 			} else {
-				pathLocations = pausedPathLocations[i];
+				pathLocations = coordsToBeGraphed[i];
 			}
-			pausedPathLocations[i] = [];
-			pathsAlreadyGraphed[i] = [];
+			//Instantiate empty arrays in each
+			coordsToBeGraphed[i] = [];
+			coordsAlreadyGraphed[i] = [];
+
 			pathPolyline = new google.maps.Polyline({
 				map: map,
 				strokeColor: "#FF0000",
@@ -82,7 +89,7 @@ function loadPath() {
 	});
 }
 
-function drawPath(pathLocations, pathPolyline, pathNum) {
+function drawPath(pathLocations, pathPolyline, runNum) {
 	var animationTimeout = 500;
 	pathPolyline.text = pathLocations[pathLocations.length - 1].fuel + " total fuel";
 	console.log(pathPolyline);
@@ -97,6 +104,8 @@ function drawPath(pathLocations, pathPolyline, pathNum) {
 		polyClick(event, this);
 	});
 
+	//Adds the coord to the pathArray
+	//automatically graphs it when push is called
 	function addNextPoint(coords) {
 		var thisPathArray = pathPolyline.getPath();
 		thisPathArray.push(new google.maps.LatLng(coords.lat, coords.lng));
@@ -106,21 +115,25 @@ function drawPath(pathLocations, pathPolyline, pathNum) {
 	var animationIndex = 0;
 	function animationLoop() {
 		if (!isPaused) {
-			var coords = pathLocations[animationIndex];
+			//"pop" off of pathLocations
+			var coords = pathLocations.splice(animationIndex, 1)[0];
 			addNextPoint(coords);
-			pathsAlreadyGraphed[pathNum].push(coords);
-			pathLocations.splice(animationIndex, 1);
-			//console.log(animationIndex);
+			//"push" onto stack of paths that were graphed
+			coordsAlreadyGraphed[runNum].push(coords);
 			setTimeout(function() {
-				//animationIndex++;
 				if (animationIndex < pathLocations.length) {
 					animationLoop();
 				};
 			}, animationTimeout);
 		} else {
-			pathLocations.splice(0, 0, pathsAlreadyGraphed[pathNum][pathsAlreadyGraphed[pathNum].length - 1]);
-			pausedPathLocations[pathNum] = pathLocations;
-			console.log(pathLocations);
+			//The last coordinate added to coordsAlreadyGraphed will be graphed because of the timeout.
+			//We also need that coordinate in the coordsToBeGraphed so we have a start point that is 
+			//the end point of the last graphed coordinate
+			var coordsNotGraphed = coordsAlreadyGraphed[runNum][coordsAlreadyGraphed[runNum].length - 1];
+			//Add it back to pathLocations
+			pathLocations.splice(0, 0, coordsNotGraphed);	
+			//Set coordsToBeGraphed to the pathLocations that have not yet been graphed
+			coordsToBeGraphed[runNum] = pathLocations;
 		}
 	}
 	animationLoop();
@@ -177,8 +190,4 @@ function generateHeatMap() {
 		heatmap.setMap(map);
 	 });
 }
-
-google.maps.event.addDomListener(window, 'load', function () {
-	initialize();
-});
 
