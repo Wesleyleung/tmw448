@@ -1,12 +1,15 @@
+/** GLOBAL VARIABLES **/
 var map;
 var pathStrokeColor = "#FF0000";
 var hoverStrokeColor = "#7EE569";
 var infowindow;
 var isPaused = true;
-//These three need to be reset whenever the view port is changed
+//These five need to be reset whenever we get new data
 var pathLocationsLoaded = false;
 var coordsToBeGraphed = [];
 var coordsAlreadyGraphed = [];
+var totalRuns = 0;
+var runVisualizationsEnded = 0;
 
 google.maps.event.addDomListener(window, 'load', function () {
 	initialize();
@@ -59,7 +62,8 @@ function handleNoGeolocation(errorFlag) {
 
 function loadPath() {
 	$.getJSON("js/runs.json", function(json) {
-		for (var i = 0; i < json.runs.length; i++) {
+		totalRuns = json.runs.length;
+		for (var i = 0; i < totalRuns; i++) {
 			if (!pathLocationsLoaded) {
 				var pathLocations = [];
 				var pathPolyline;
@@ -123,7 +127,14 @@ function drawPath(pathLocations, pathPolyline, runNum) {
 			setTimeout(function() {
 				if (animationIndex < pathLocations.length) {
 					animationLoop();
-				};
+				} else {
+					runVisualizationsEnded ++;
+					if (runVisualizationsEnded == totalRuns) {
+						//All runs have ended
+						//set tray's play button to be paused
+						tray.playAndPause(true);
+					}
+				}
 			}, animationTimeout);
 		} else {
 			//The last coordinate added to coordsAlreadyGraphed will be graphed because of the timeout.
