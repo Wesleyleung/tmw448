@@ -4,12 +4,14 @@ var pathStrokeColor = "#FF0000";
 var hoverStrokeColor = "#7EE569";
 var infowindow;
 var isPaused = true;
-//These five need to be reset whenever we get new data
+//These eight need to be reset whenever we get new data
 var pathLocationsLoaded = false;
 var coordsToBeGraphed = [];
 var coordsAlreadyGraphed = [];
+var polyLineArray = [];
 var totalRuns = 0;
 var runVisualizationsEnded = 0;
+var numProgressIntervals = 0;
 
 google.maps.event.addDomListener(window, 'load', function () {
 	initialize();
@@ -41,9 +43,8 @@ function initialize() {
 	// // Browser doesn't support Geolocation
 	// 	handleNoGeolocation(false);
 	// }
-
 	generateHeatMap();
-	generateBoundaries();
+	//generateBoundaries();
 }
 
 function handleNoGeolocation(errorFlag) {
@@ -61,6 +62,18 @@ function handleNoGeolocation(errorFlag) {
 	map.setCenter(options.position);
 }
 
+function calculateStats(json) {
+	for (var i = 0; i < json.runs.length; i++) {
+		for(var j = 0; j < json.runs[i].intervals.length; j++) {
+			numProgressIntervals ++;
+		}
+	}
+	//number of polylines = num coordinates - 1
+	numProgressIntervals --;
+	tray.setNumProgressIntervals(numProgressIntervals);
+	tray.setCurrentProgressInterval(0);
+}
+
 function loadPath() {
 
 	//json is acquired based on zipcode or address search
@@ -69,6 +82,7 @@ function loadPath() {
 	var maxFuel = 100;
 	$.getJSON("js/runs.json", function(json) {
 		totalRuns = json.runs.length;
+		if (!pathLocationsLoaded) calculateStats(json);
 		for (var i = 0; i < totalRuns; i++) {
 			if (!pathLocationsLoaded) {
 				var pathLocations = [];
@@ -82,11 +96,19 @@ function loadPath() {
 				}
 			} else {
 				pathLocations = coordsToBeGraphed[i];
+				//if(!coordsAlreadyGraphed[i].length) clearPolylines();
 			}
+
+			if (polyLineArray[i] != null && !coordsAlreadyGraphed[i].length) {
+				polyLineArray[i].setMap(null);
+			}
+
 			//Instantiate empty arrays in each
 			coordsToBeGraphed[i] = [];
 			coordsAlreadyGraphed[i] = [];
+			polyLineArray[i] = pathPolyline;
 			drawPath(pathLocations, i, minFuel, maxFuel);	
+
 		}
 		pathLocationsLoaded = true;
 	});
@@ -120,6 +142,13 @@ function generatePathColor(i, minFuel, maxFuel) {
         
 	return gradient[i];
 }
+
+function clearPolylines() {
+	for (var i = 0; i < polyLineArray.length; i++) {
+		polyLineArray[i].setMap(null);
+	}
+}
+
 
 function drawPath(pathLocations, runNum, minFuel, maxFuel) {
 	var animationTimeout = 500;
@@ -159,25 +188,31 @@ function drawPath(pathLocations, runNum, minFuel, maxFuel) {
 		var thisPathArray = pathPolyline.getPath();
 		thisPathArray.push(new google.maps.LatLng(coords.lat, coords.lng));
 		pathPolyline.setPath(thisPathArray);
+		tray.animateProgressBarByInterval(1);
 	};
 
-	var animationIndex = 0;
 	function animationLoop() {
 		if (!isPaused) {
 			//"pop" off of pathLocations
-			var coords = pathLocations.splice(animationIndex, 1)[0];
+			var coords = pathLocations.splice(0, 1)[0];
 			addNextPoint(coords);
 			//"push" onto stack of paths that were graphed
 			coordsAlreadyGraphed[runNum].push(coords);
 			setTimeout(function() {
-				if (animationIndex < pathLocations.length) {
+				if (pathLocations.length) {
 					animationLoop();
 				} else {
 					runVisualizationsEnded ++;
+					coordsToBeGraphed[runNum] = coordsAlreadyGraphed[runNum];
+					coordsAlreadyGraphed[runNum] = [];
+					console.log(coordsToBeGraphed[runNum]);
 					if (runVisualizationsEnded == totalRuns) {
 						//All runs have ended
 						//set tray's play button to be paused
 						tray.playAndPause(true);
+						tray.setNumProgressIntervals(numProgressIntervals);
+						tray.setCurrentProgressInterval(0);
+						runVisualizationsEnded = 0;
 					}
 				}
 			}, animationTimeout);
@@ -192,6 +227,7 @@ function drawPath(pathLocations, runNum, minFuel, maxFuel) {
 			coordsToBeGraphed[runNum] = pathLocations;
 		}
 	}
+	tray.setProgressBarPercentage(0);
 	animationLoop();
 }
 

@@ -5,6 +5,7 @@ function Tray (params) {
 	this.playButton = this.tray.find('#tray-play');
 	this.progressBarWrapper = this.tray.find('#tray-progress-wrapper');
 	this.progressBar = this.tray.find('#tray-progress-bar');
+	this.trayPlayControlsWrapper = this.tray.find('#tray-play-wrapper');
 
 	this.trayButton.bind('click', function() {
 		this.showAndHide();
@@ -14,11 +15,24 @@ function Tray (params) {
 		this.playAndPause();
 	}.bind(this));
 
-	this.setProgressBarPercentage(80);
+	this.initTray();
 }
 
 Tray.prototype =  {
 	//Define functions here
+	initTray: function() {
+		this.tray.css('bottom', this.tray.height() * -1 + this.trayPlayControlsWrapper.height());
+		this.numProgressIntervals = 0;
+		this.currentProgressInterval = 0;
+	},
+
+	setNumProgressIntervals: function(num) {
+		this.numProgressIntervals = num;
+	},
+
+	setCurrentProgressInterval: function(num) {
+		this.currentProgressInterval = num;
+	},
 
 	showAndHide: function () {
 		this.isOpen = !this.isOpen;
@@ -30,7 +44,7 @@ Tray.prototype =  {
 		} else {
 			this.trayButton.text("+");
 			this.tray.animate({
-			   bottom: this.tray.height() * -1
+			   bottom: this.tray.height() * -1 + this.trayPlayControlsWrapper.height()
 			}, 350);
 		}
 	},
@@ -40,7 +54,7 @@ Tray.prototype =  {
 		//If an argument is passed in, use it to set isPaused
 		if (arguments.length == 0) isPaused = !isPaused;
 		else isPaused = arguments[0];
-
+		this.setProgressBarActiveState(isPaused);
 		if (!isPaused) {
 			this.playButton.html('<img src="img/pausebutton.png" />');
 			//loadPath from map.js
@@ -50,14 +64,31 @@ Tray.prototype =  {
 		}
 	},
 
+	//Only use this if numProgressIntervals and currentProgressInterval have been set
+	animateProgressBarByInterval: function(interval) {
+		this.currentProgressInterval += interval;
+		if (this.currentProgressInterval <= 1) return;
+		var percentage = Math.round(this.currentProgressInterval / this.numProgressIntervals * 100);
+		this.setProgressBarPercentage(percentage);
+	},
+
 	//Takes a value between 0 to 100 to set the progress bar to
 	setProgressBarPercentage: function(percentage) {
+		/*this.progressBar.animate({
+			width: percentage + "%"
+		}, 10);*/
+		console.log(percentage);
 		this.progressBar.width(percentage + "%");
 	},
 
 	//Takes a value true or false and sets the progress bar's activity state
-	setProgressBarActiveState: function(isActive) {
-		if (isActive) this.progressBarWrapper.addClass('active');
-		else this.progressBarWrapper.removeClass('active');
+	setProgressBarActiveState: function(isPaused) {
+		if (!isPaused) {
+			this.progressBarWrapper.addClass('progress-striped');
+			this.progressBarWrapper.addClass('active');
+		} else {
+			this.progressBarWrapper.removeClass('progress-striped');
+			this.progressBarWrapper.removeClass('active');
+		}
 	}
 };
