@@ -12,6 +12,7 @@ var polyLineArray = [];
 var totalRuns = 0;
 var runVisualizationsEnded = 0;
 var numProgressIntervals = 0;
+var visFullyComplete = false;
 
 google.maps.event.addDomListener(window, 'load', function () {
 	initialize();
@@ -64,21 +65,52 @@ function handleNoGeolocation(errorFlag) {
 function calculateStats(json) {
 	for (var i = 0; i < json.runs.length; i++) {
 		for(var j = 0; j < json.runs[i].intervals.length; j++) {
-			numProgressIntervals ++;
+			/*If a run only has one point, it does not have a progress interval
+			because it will be a point and not a line.  This also means that one
+			point in each run should not count as a progress interval */
+			if (j != 0) numProgressIntervals ++;
 		}
 	}
-	//number of polylines = num coordinates - 1
-	numProgressIntervals --;
 	tray.setNumProgressIntervals(numProgressIntervals);
 	tray.setCurrentProgressInterval(0);
 }
 
+function resetAfterFullyVisualized() {
+	resetPolylines();
+	tray.setNumProgressIntervals(numProgressIntervals);
+	tray.setCurrentProgressInterval(0);
+	tray.setProgressBarPercentage(0);
+	runVisualizationsEnded = 0;
+	visFullyComplete = false;
+}
+
+function resetPolylines() {
+	for (var i = 0; i < polyLineArray.length; i++) {
+		polyLineArray[i].setMap(null);
+		polyLineArray[i] = new google.maps.Polyline({
+			map: map,
+			strokeColor: "#FF0000",
+			strokeOpacity: 1.0,
+			strokeWeight: 2
+		});
+	}
+}
+
 function loadPath() {
-	$.getJSON("js/runs.json", function(json) {
-		totalRuns = json.runs.length;
-		if (!pathLocationsLoaded) calculateStats(json);
+	if (pathLocationsLoaded) {
+		if (visFullyComplete) resetAfterFullyVisualized();
+		console.log("paths loaded already");
 		for (var i = 0; i < totalRuns; i++) {
-			if (!pathLocationsLoaded) {
+			pathLocations = coordsToBeGraphed[i];
+			pathPolyline = polyLineArray[i];
+			drawPath(pathLocations, pathPolyline, i);	
+		}
+	} else {
+		console.log("paths loading");
+		$.getJSON("js/runs.json", function(json) {
+			totalRuns = json.runs.length;
+			if (!pathLocationsLoaded) calculateStats(json);
+			for (var i = 0; i < totalRuns; i++) {
 				var pathLocations = [];
 				var pathPolyline;
 				var totalFuel = 0;
@@ -88,31 +120,27 @@ function loadPath() {
 					var dict = {lat: interval.lat, lng: interval.lng, fuel: totalFuel};
 					pathLocations.push(dict);
 				}
-			} else {
-				pathLocations = coordsToBeGraphed[i];
-				//if(!coordsAlreadyGraphed[i].length) clearPolylines();
+
+				pathPolyline = new google.maps.Polyline({
+					map: map,
+					strokeColor: "#FF0000",
+					strokeOpacity: 1.0,
+					strokeWeight: 2
+				});
+
+				//This only executes when the vis has been fully played through
+				//Clears all the polylines on the map
+
+				//Instantiate empty arrays
+				coordsToBeGraphed[i] = [];
+				coordsAlreadyGraphed[i] = [];
+				polyLineArray[i] = pathPolyline;
+
+				drawPath(pathLocations, pathPolyline, i);	
 			}
-
-			pathPolyline = new google.maps.Polyline({
-				map: map,
-				strokeColor: "#FF0000",
-				strokeOpacity: 1.0,
-				strokeWeight: 2
-			});
-
-			if (polyLineArray[i] != null && !coordsAlreadyGraphed[i].length) {
-				polyLineArray[i].setMap(null);
-			}
-
-			//Instantiate empty arrays in each
-			coordsToBeGraphed[i] = [];
-			coordsAlreadyGraphed[i] = [];
-
-			polyLineArray[i] = pathPolyline;
-			drawPath(pathLocations, pathPolyline, i);	
-		}
-		pathLocationsLoaded = true;
-	});
+			pathLocationsLoaded = true;
+		});
+	}
 }
 
 function clearPolylines() {
@@ -124,7 +152,7 @@ function clearPolylines() {
 function drawPath(pathLocations, pathPolyline, runNum) {
 	var animationTimeout = 500;
 	pathPolyline.text = pathLocations[pathLocations.length - 1].fuel + " total fuel";
-	console.log(pathPolyline);
+	//console.log(pathPolyline);
 
 	google.maps.event.addListener(pathPolyline, 'mouseover', function(event) {
 		polyMouseover(event, this);
@@ -142,7 +170,9 @@ function drawPath(pathLocations, pathPolyline, runNum) {
 		var thisPathArray = pathPolyline.getPath();
 		thisPathArray.push(new google.maps.LatLng(coords.lat, coords.lng));
 		pathPolyline.setPath(thisPathArray);
-		tray.animateProgressBarByInterval(1);
+		var incr = 1;
+		if (thisPathArray.length < 2) incr = 0;
+		tray.animateProgressBarByInterval(incr);
 	};
 
 	function animationLoop() {
@@ -150,7 +180,7 @@ function drawPath(pathLocations, pathPolyline, runNum) {
 			//"pop" off of pathLocations
 			var coords = pathLocations.splice(0, 1)[0];
 			addNextPoint(coords);
-			//"push" onto stack of paths that were graphed
+			//"push" onto stack of coords that were graphed
 			coordsAlreadyGraphed[runNum].push(coords);
 			setTimeout(function() {
 				if (pathLocations.length) {
@@ -159,24 +189,15 @@ function drawPath(pathLocations, pathPolyline, runNum) {
 					runVisualizationsEnded ++;
 					coordsToBeGraphed[runNum] = coordsAlreadyGraphed[runNum];
 					coordsAlreadyGraphed[runNum] = [];
-					console.log(coordsToBeGraphed[runNum]);
 					if (runVisualizationsEnded == totalRuns) {
 						//All runs have ended
 						//set tray's play button to be paused
 						tray.playAndPause(true);
-						tray.setNumProgressIntervals(numProgressIntervals);
-						tray.setCurrentProgressInterval(0);
-						runVisualizationsEnded = 0;
+						visFullyComplete = true;
 					}
 				}
 			}, animationTimeout);
 		} else {
-			//The last coordinate added to coordsAlreadyGraphed will be graphed because of the timeout.
-			//We also need that coordinate in the coordsToBeGraphed so we have a start point that is 
-			//the end point of the last graphed coordinate
-			var coordsNotGraphed = coordsAlreadyGraphed[runNum][coordsAlreadyGraphed[runNum].length - 1];
-			//Add it back to pathLocations
-			pathLocations.splice(0, 0, coordsNotGraphed);	
 			//Set coordsToBeGraphed to the pathLocations that have not yet been graphed
 			coordsToBeGraphed[runNum] = pathLocations;
 		}
@@ -219,7 +240,7 @@ function polyClick (event, path) {
 
 function generateHeatMap() {
 	$.getJSON("js/locations.json", function(json) {
-		console.log(json);
+		//console.log(json);
 		var heatMapData = [];
 		var added = {}
 		for (var i = 0; i < json.locations.length; i++) {

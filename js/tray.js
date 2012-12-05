@@ -27,8 +27,10 @@ Tray.prototype =  {
 	},
 
 	setNumProgressIntervals: function(num) {
+		console.log(num);
 		this.numProgressIntervals = num;
 	},
+
 
 	setCurrentProgressInterval: function(num) {
 		this.currentProgressInterval = num;
