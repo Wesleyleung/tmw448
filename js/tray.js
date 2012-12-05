@@ -5,6 +5,7 @@ function Tray (params) {
 	this.playButton = this.tray.find('#tray-play');
 	this.progressBarWrapper = this.tray.find('#tray-progress-wrapper');
 	this.progressBar = this.tray.find('#tray-progress-bar');
+	this.trayPlayControlsWrapper = this.tray.find('#tray-play-wrapper');
 
 	this.trayButton.bind('click', function() {
 		this.showAndHide();
@@ -15,10 +16,15 @@ function Tray (params) {
 	}.bind(this));
 
 	this.setProgressBarPercentage(80);
+
+	this.initTray();
 }
 
 Tray.prototype =  {
 	//Define functions here
+	initTray: function() {
+		this.tray.css('bottom', this.tray.height() * -1 + this.trayPlayControlsWrapper.height());
+	},
 
 	showAndHide: function () {
 		this.isOpen = !this.isOpen;
@@ -30,7 +36,7 @@ Tray.prototype =  {
 		} else {
 			this.trayButton.text("+");
 			this.tray.animate({
-			   bottom: this.tray.height() * -1
+			   bottom: this.tray.height() * -1 + this.trayPlayControlsWrapper.height()
 			}, 350);
 		}
 	},

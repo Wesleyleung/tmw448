@@ -23,14 +23,20 @@ body {
 
 #tray {
 	width: 100%;
-	height: 100px;
+	height: 200px;
 	background-color: rgba(0, 0, 0, 0.7);
-	bottom: -100px;
 	position: absolute;
 	z-index: 2;
 }
 
 #tray-content-wrapper {
+
+}
+
+#tray-play-wrapper {
+	position: relative;
+	/* to compensate for 30px tray handle */
+	top:-30px;
 
 }
 
