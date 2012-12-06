@@ -98,7 +98,36 @@ function resetPolylines() {
 	//polyLineArray = [];
 }
 
-function loadPath() {
+function loadPathsFromJSON(path, minFuel, maxFuel) {
+	$.getJSON(path, function(json) {
+		totalRuns = json.runs.length;
+		if (!pathLocationsLoaded) calculateStats(json);
+		for (var i = 0; i < totalRuns; i++) {
+			var pathLocations = [];
+			polyLineArray[i] = new google.maps.Polyline({
+				map: map,
+	 	    	strokeOpacity: 1.0,
+	 	 	    strokeWeight: 2
+			});
+			var totalFuel = 0;
+			for (var j = 0; j < json.runs[i].intervals.length; j++) {
+				var interval = json.runs[i].intervals[j];
+				totalFuel = totalFuel + interval.fuel;  //can be reworked serverside
+				var dict = {lat: interval.lat, lng: interval.lng, fuel: totalFuel};
+				pathLocations.push(dict);
+			}
+			
+			//Instantiate empty arrays
+			coordsToBeGraphed[i] = [];
+			coordsAlreadyGraphed[i] = [];
+
+			drawPath(pathLocations, i, minFuel, maxFuel);	
+		}
+		pathLocationsLoaded = true;
+	});
+}
+
+function graphPaths() {
 	var minFuel = 0;
 	var maxFuel = 100;
 	if (pathLocationsLoaded) {
@@ -108,35 +137,7 @@ function loadPath() {
 			drawPath(pathLocations, i, minFuel, maxFuel);	
 		}
 	} else {
-		$.getJSON("js/runs.json", function(json) {
-			totalRuns = json.runs.length;
-			if (!pathLocationsLoaded) calculateStats(json);
-			for (var i = 0; i < totalRuns; i++) {
-				var pathLocations = [];
-				polyLineArray[i] = new google.maps.Polyline({
-					map: map,
-		 	    	strokeOpacity: 1.0,
-		 	 	    strokeWeight: 2
-				});
-				var totalFuel = 0;
-				for (var j = 0; j < json.runs[i].intervals.length; j++) {
-					var interval = json.runs[i].intervals[j];
-					totalFuel = totalFuel + interval.fuel;  //can be reworked serverside
-					var dict = {lat: interval.lat, lng: interval.lng, fuel: totalFuel};
-					pathLocations.push(dict);
-				}
-
-				//This only executes when the vis has been fully played through
-				//Clears all the polylines on the map
-
-				//Instantiate empty arrays
-				coordsToBeGraphed[i] = [];
-				coordsAlreadyGraphed[i] = [];
-
-				drawPath(pathLocations, i, minFuel, maxFuel);	
-			}
-			pathLocationsLoaded = true;
-		});
+		loadPathsFromJSON("js/runs.json", minFuel, maxFuel);
 	}
 }
 
