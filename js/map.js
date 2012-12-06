@@ -94,6 +94,16 @@ function resetPolylines() {
  	    	strokeOpacity: 1.0,
  	 	    strokeWeight: 2
 		});
+
+		google.maps.event.addListener(polyLineArray[i], 'mouseover', function(event) {
+			polyMouseover(event, this);
+		});
+		google.maps.event.addListener(polyLineArray[i], 'mouseout', function(event) {
+			polyMouseout(event, this);
+		});
+		google.maps.event.addListener(polyLineArray[i], 'click', function(event) {
+			polyClick(event, this);
+		});
 	}
 	//polyLineArray = [];
 }
@@ -109,6 +119,17 @@ function loadPathsFromJSON(path, minFuel, maxFuel) {
 	 	    	strokeOpacity: 1.0,
 	 	 	    strokeWeight: 2
 			});
+
+			google.maps.event.addListener(polyLineArray[i], 'mouseover', function(event) {
+				polyMouseover(event, this);
+			});
+			google.maps.event.addListener(polyLineArray[i], 'mouseout', function(event) {
+				polyMouseout(event, this);
+			});
+			google.maps.event.addListener(polyLineArray[i], 'click', function(event) {
+				polyClick(event, this);
+			});
+
 			var totalFuel = 0;
 			for (var j = 0; j < json.runs[i].intervals.length; j++) {
 				var interval = json.runs[i].intervals[j];
@@ -116,7 +137,7 @@ function loadPathsFromJSON(path, minFuel, maxFuel) {
 				var dict = {lat: interval.lat, lng: interval.lng, fuel: totalFuel};
 				pathLocations.push(dict);
 			}
-			
+
 			//Instantiate empty arrays
 			coordsToBeGraphed[i] = [];
 			coordsAlreadyGraphed[i] = [];
@@ -186,16 +207,6 @@ function drawPath(pathLocations, runNum, minFuel, maxFuel) {
 	pathPolyline.setOptions({strokeColor: thisColor});
 
 	pathPolyline.text = pathLocations[pathLocations.length - 1].fuel + " total fuel";
-
-	google.maps.event.addListener(pathPolyline, 'mouseover', function(event) {
-		polyMouseover(event, this);
-	});
-	google.maps.event.addListener(pathPolyline, 'mouseout', function(event) {
-		polyMouseout(event, this);
-	});
-	google.maps.event.addListener(pathPolyline, 'click', function(event) {
-		polyClick(event, this);
-	});
 
 	//Adds the coord to the pathArray
 	//automatically graphs it when push is called
