@@ -89,8 +89,13 @@ function resetPolylines() {
 	console.log(map);
 	for (var i = 0; i < polyLineArray.length; i++) {
 		polyLineArray[i].setMap(null);
+		polyLineArray[i] = new google.maps.Polyline({
+			map: map,
+ 	    	strokeOpacity: 1.0,
+ 	 	    strokeWeight: 2
+		});
 	}
-	polyLineArray = [];
+	//polyLineArray = [];
 }
 
 function loadPath() {
@@ -98,19 +103,21 @@ function loadPath() {
 	var maxFuel = 100;
 	if (pathLocationsLoaded) {
 		if (visFullyComplete) resetAfterFullyVisualized();
-		console.log("paths loaded already");
 		for (var i = 0; i < totalRuns; i++) {
 			pathLocations = coordsToBeGraphed[i];
 			drawPath(pathLocations, i, minFuel, maxFuel);	
 		}
 	} else {
-		console.log("paths loading");
 		$.getJSON("js/runs.json", function(json) {
 			totalRuns = json.runs.length;
 			if (!pathLocationsLoaded) calculateStats(json);
 			for (var i = 0; i < totalRuns; i++) {
 				var pathLocations = [];
-				var pathPolyline;
+				polyLineArray[i] = new google.maps.Polyline({
+					map: map,
+		 	    	strokeOpacity: 1.0,
+		 	 	    strokeWeight: 2
+				});
 				var totalFuel = 0;
 				for (var j = 0; j < json.runs[i].intervals.length; j++) {
 					var interval = json.runs[i].intervals[j];
@@ -174,15 +181,10 @@ function drawPath(pathLocations, runNum, minFuel, maxFuel) {
 	var thisColor = rgbForGradientValue(minFuel, maxFuel, pathLocations[pathLocations.length - 1].fuel, {r: 255, g: 0, b: 0}, {r: 0, g: 0, b: 255});
 	console.log("this color: " + thisColor);
 
-	var pathPolyline = new google.maps.Polyline({
-		map: map,
-		strokeColor: thisColor,
-		strokeOpacity: 1.0,
-		strokeWeight: 2
-	});
+	var pathPolyline = polyLineArray[runNum];
+	pathPolyline.setOptions({strokeColor: thisColor});
 
 	pathPolyline.text = pathLocations[pathLocations.length - 1].fuel + " total fuel";
-	polyLineArray.push(pathPolyline);
 
 	google.maps.event.addListener(pathPolyline, 'mouseover', function(event) {
 		polyMouseover(event, this);
@@ -228,12 +230,6 @@ function drawPath(pathLocations, runNum, minFuel, maxFuel) {
 				}
 			}, animationTimeout);
 		} else {
-			//The last coordinate added to coordsAlreadyGraphed will be graphed because of the timeout.
-			//We also need that coordinate in the coordsToBeGraphed so we have a start point that is 
-			//the end point of the last graphed coordinate
-			var coordsNotGraphed = coordsAlreadyGraphed[runNum][coordsAlreadyGraphed[runNum].length - 1];
-			//Add it back to pathLocations
-			pathLocations.splice(0, 0, coordsNotGraphed);	
 			//Set coordsToBeGraphed to the pathLocations that have not yet been graphed
 			coordsToBeGraphed[runNum] = pathLocations;
 		}
