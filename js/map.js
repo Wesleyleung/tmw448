@@ -1,5 +1,6 @@
 /** GLOBAL VARIABLES **/
 var map;
+var heatmap;
 var pathStrokeColor = "#FF0000";
 var hoverStrokeColor = "#7EE569";
 var infowindow;
@@ -111,6 +112,7 @@ function resetPolylines() {
 function loadPathsFromJSON(path, minFuel, maxFuel) {
 	$.getJSON(path, function(json) {
 		totalRuns = json.runs.length;
+		console.log("total runs:" + totalRuns);
 		if (!pathLocationsLoaded) calculateStats(json);
 		for (var i = 0; i < totalRuns; i++) {
 			var pathLocations = [];
@@ -150,7 +152,7 @@ function loadPathsFromJSON(path, minFuel, maxFuel) {
 
 function graphPaths() {
 	var minFuel = 0;
-	var maxFuel = 100;
+	var maxFuel = 600;
 	if (pathLocationsLoaded) {
 		if (visFullyComplete) resetAfterFullyVisualized();
 		for (var i = 0; i < totalRuns; i++) {
@@ -158,7 +160,7 @@ function graphPaths() {
 			drawPath(pathLocations, i, minFuel, maxFuel);	
 		}
 	} else {
-		loadPathsFromJSON("js/runs.json", minFuel, maxFuel);
+		loadPathsFromJSON("js/randomRuns.json", minFuel, maxFuel);
 	}
 }
 
@@ -300,6 +302,13 @@ function polyClick (event, path) {
 // 		}
 // 	});
 // }
+ function toggleHeatmap() {
+ 		console.log("heat map toggled");
+
+        heatmap.setMap(heatmap.getMap() ? null : map);
+      
+ }
+
 
 function generateHeatMap() {
 	$.getJSON("js/locations.json", function(json) {
@@ -326,7 +335,7 @@ function generateHeatMap() {
 				added[LatLng] = true;
 			}
 		};
-		var heatmap = new google.maps.visualization.HeatmapLayer({
+		heatmap = new google.maps.visualization.HeatmapLayer({
 			data: heatMapData
 		});
 		 heatmap.setOptions({
