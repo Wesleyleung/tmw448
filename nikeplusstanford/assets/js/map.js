@@ -160,7 +160,7 @@ function graphPaths() {
 			drawPath(pathLocations, i, minFuel, maxFuel);	
 		}
 	} else {
-		loadPathsFromJSON(static_file_url + "js/randomRuns.json", minFuel, maxFuel);
+		loadPathsFromJSON("loadStaticJSON?json_file=randomRuns.json", minFuel, maxFuel);
 	}
 }
 
@@ -309,7 +309,7 @@ function polyClick (event, path) {
 
 
 function generateHeatMap() {
-	$.getJSON(static_file_url + "js/locations.json", function(json) {
+	$.getJSON("loadStaticJSON?json_file=locations.json", function(json) {
 		//console.log(json);
 		var heatMapData = [];
 		var added = {}
