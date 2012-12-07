@@ -58,11 +58,11 @@ Tray.prototype =  {
 		else isPaused = arguments[0];
 		this.setProgressBarActiveState(isPaused);
 		if (!isPaused) {
-			this.playButton.html('<img src="/static/img/pausebutton.png" />');
+			this.playButton.html('<img src="' + static_file_url + 'img/pausebutton.png" />');
 			//graphPaths from map.js
 			graphPaths();
 		} else {
-			this.playButton.html('<img src="/static/img/playbutton.png" />');
+			this.playButton.html('<img src="' + static_file_url + 'img/playbutton.png" />');
 		}
 	},
 
