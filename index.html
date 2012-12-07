@@ -36,9 +36,16 @@
       <div id="tray-content-wrapper" class="row-fluid">
         <div class="row-fluid">
           <div class="span12">
-            <form class="navbar-search pull-left">
-              <input type="text" class="search-query" placeholder="Search">
-            </form>
+            <div id="search_wrapper">
+              <form class="navbar-search pull-left">
+                <input type="text" class="search-query" placeholder="Search">
+              </form>
+            </div>
+            
+            <div id="heatmaptoggle_wrapper">
+              <button class="btn btn-primary" type="button" onclick="toggleHeatmap()">Toggle Heatmap</button>
+            </div>
+
           </div>
         </div>
       </div>

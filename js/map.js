@@ -1,5 +1,6 @@
 /** GLOBAL VARIABLES **/
 var map;
+var heatmap;
 var pathStrokeColor = "#FF0000";
 var hoverStrokeColor = "#7EE569";
 var infowindow;
@@ -91,7 +92,7 @@ function resetPolylines() {
 		polyLineArray[i].setMap(null);
 		polyLineArray[i] = new google.maps.Polyline({
 			map: map,
- 	    	strokeOpacity: 1.0,
+ 	    	strokeOpacity: 0.5,
  	 	    strokeWeight: 2
 		});
 
@@ -111,12 +112,13 @@ function resetPolylines() {
 function loadPathsFromJSON(path, minFuel, maxFuel) {
 	$.getJSON(path, function(json) {
 		totalRuns = json.runs.length;
+		console.log("total runs:" + totalRuns);
 		if (!pathLocationsLoaded) calculateStats(json);
 		for (var i = 0; i < totalRuns; i++) {
 			var pathLocations = [];
 			polyLineArray[i] = new google.maps.Polyline({
 				map: map,
-	 	    	strokeOpacity: 1.0,
+	 	    	strokeOpacity: 0.5,
 	 	 	    strokeWeight: 2
 			});
 
@@ -150,7 +152,7 @@ function loadPathsFromJSON(path, minFuel, maxFuel) {
 
 function graphPaths() {
 	var minFuel = 0;
-	var maxFuel = 100;
+	var maxFuel = 600;
 	if (pathLocationsLoaded) {
 		if (visFullyComplete) resetAfterFullyVisualized();
 		for (var i = 0; i < totalRuns; i++) {
@@ -158,7 +160,7 @@ function graphPaths() {
 			drawPath(pathLocations, i, minFuel, maxFuel);	
 		}
 	} else {
-		loadPathsFromJSON("js/runs.json", minFuel, maxFuel);
+		loadPathsFromJSON("js/randomRuns.json", minFuel, maxFuel);
 	}
 }
 
@@ -193,12 +195,6 @@ function generatePathColor(i, minFuel, maxFuel) {
 
 function drawPath(pathLocations, runNum, minFuel, maxFuel) {
 	var animationTimeout = 500;
-	// var pathPolyline = new google.maps.Polyline({
-	// 			map: map,
-	// 			strokeColor: "#FF0000",
-	// 			strokeOpacity: 1.0,
-	// 			strokeWeight: 2
-	// });
 
 	var thisColor = rgbForGradientValue(minFuel, maxFuel, pathLocations[pathLocations.length - 1].fuel, {r: 255, g: 0, b: 0}, {r: 0, g: 0, b: 255});
 	console.log("this color: " + thisColor);
@@ -254,15 +250,19 @@ function drawPath(pathLocations, runNum, minFuel, maxFuel) {
 // Colors it to a highlight color.
 function polyMouseover (event, path) {
 	path.setOptions({
-		strokeColor : hoverStrokeColor
+		strokeOpacity: 1.0,
+    	strokeWeight: 4
 	});
 }
 
 // Called on mouse over for a poly path.
 // Resets to the default color.
 function polyMouseout (event, path) {
+	console.log("this path: " + path);
 	path.setOptions({
-		strokeColor : pathStrokeColor
+		strokeOpacity: 0.5,
+    	strokeWeight: 2
+		
 	});
 }
 
@@ -300,6 +300,13 @@ function polyClick (event, path) {
 // 		}
 // 	});
 // }
+ function toggleHeatmap() {
+ 		console.log("heat map toggled");
+
+        heatmap.setMap(heatmap.getMap() ? null : map);
+      
+ }
+
 
 function generateHeatMap() {
 	$.getJSON("js/locations.json", function(json) {
@@ -326,7 +333,7 @@ function generateHeatMap() {
 				added[LatLng] = true;
 			}
 		};
-		var heatmap = new google.maps.visualization.HeatmapLayer({
+		heatmap = new google.maps.visualization.HeatmapLayer({
 			data: heatMapData
 		});
 		 heatmap.setOptions({
