@@ -309,7 +309,7 @@ function polyClick (event, path) {
 
 
 function generateHeatMap() {
-	$.getJSON("js/locations.json", function(json) {
+	$.getJSON("{{ STATIC_URL }}js/locations.json", function(json) {
 		//console.log(json);
 		var heatMapData = [];
 		var added = {}

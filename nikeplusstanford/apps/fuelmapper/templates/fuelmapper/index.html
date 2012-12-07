@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+{% load compress %}
+<html>
+  <head>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+    <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/style.css">
+
+   <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+   <link href="https://netdna.bootstrapcdn.com/twitter-bootstrap/2.2.1/css/bootstrap-combined.min.css" rel="stylesheet">
+   <script src="https://netdna.bootstrapcdn.com/twitter-bootstrap/2.2.1/js/bootstrap.min.js"></script>
+
+    <script type="text/javascript"
+      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA0fbVwcr2LQZho14TG7BgNq3x5Cx53kw0&sensor=true&libraries=visualization">
+    </script>
+	    <script type="text/javascript"src="{{ STATIC_URL }}js/map.js"></script>
+	    <script type="text/javascript"src="{{ STATIC_URL }}js/tray.js"></script>
+	    <script type="text/javascript"src="{{ STATIC_URL }}js/rgb.js"></script>
+  </head>
+  <body>
+    <div id="tray">
+      <div id="tray-handle">+</div>
+      <div id="tray-play-wrapper" class="row-fluid">
+        <div class="row-fluid">
+          <div class="span12">
+            <div class="span1" style="text-align: center">
+              <a id="tray-play" href="#"><img src="{{ STATIC_URL }}img/playbutton.png" /></a>
+            </div>
+            <div class="span10">
+              <div id="tray-progress-wrapper" class="progress">
+                <div id="tray-progress-bar" class="bar"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id="tray-content-wrapper" class="row-fluid">
+        <div class="row-fluid">
+          <div class="span12">
+            <div id="search_wrapper">
+              <form class="navbar-search pull-left">
+                <input type="text" class="search-query" placeholder="Search">
+              </form>
+            </div>
+            
+            <div id="heatmaptoggle_wrapper">
+              <button class="btn btn-primary" type="button" onclick="toggleHeatmap()">Toggle Heatmap</button>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="map_canvas"></div>
+    <script type="text/javascript">
+      var tray = new Tray ({
+        tray: $("#tray")
+      });
+    </script>
+  </body>
+</html>
