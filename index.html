@@ -30,9 +30,12 @@
               <a id="tray-play" href="#"><img src="img/playbutton.png" /></a>
             </div>
             <div class="span10">
-              <div id="slider-wrapper">
-                <div id="slider"></div>
+              <div id="tray-progress-wrapper" class="progress">
+                <div id="tray-progress-bar" class="bar"></div>
               </div>
+              <!--<div id="slider-wrapper">
+                <div id="slider"></div>
+              </div>-->
             </div>
           </div>
         </div>
@@ -60,7 +63,7 @@
         tray: $("#tray")
       });
       var slider = new Slider ({
-        slider: $("#slider")
+        slider: $("slider")
       });
     </script>
   </body>
