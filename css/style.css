@@ -67,9 +67,9 @@ body {
 	padding-left: 25px;
 }
 
-#tray-progress-wrapper {
+#slider-wrapper {
 	position: relative;
-	top: 13px;
+	top: 16px;
 }
 
 .centered {

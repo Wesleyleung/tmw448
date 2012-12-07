@@ -18,6 +18,7 @@
     <script type="text/javascript"src="js/map.js"></script>
     <script type="text/javascript"src="js/tray.js"></script>
     <script type="text/javascript"src="js/rgb.js"></script>
+    <script type="text/javascript"src="js/slider.js"></script>
   </head>
   <body>
     <div id="tray">
@@ -29,8 +30,8 @@
               <a id="tray-play" href="#"><img src="img/playbutton.png" /></a>
             </div>
             <div class="span10">
-              <div id="tray-progress-wrapper" class="progress">
-                <div id="tray-progress-bar" class="bar"></div>
+              <div id="slider-wrapper">
+                <div id="slider"></div>
               </div>
             </div>
           </div>
@@ -57,6 +58,9 @@
     <script type="text/javascript">
       var tray = new Tray ({
         tray: $("#tray")
+      });
+      var slider = new Slider ({
+        slider: $("#slider")
       });
     </script>
   </body>
