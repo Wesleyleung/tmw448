@@ -33,6 +33,13 @@ DATABASES = {
         'PORT': '',
     }
 }
+
+# DATABASES = {
+#    'default' : {
+#       'ENGINE' : 'django_mongodb_engine',
+#       'NAME' : 'nikeplusstanford'
+#    }
+# }
 ########## END DATABASE CONFIGURATION
 
 
