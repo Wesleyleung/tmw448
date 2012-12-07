@@ -30,6 +30,9 @@
               <div id="tray-progress-wrapper" class="progress">
                 <div id="tray-progress-bar" class="bar"></div>
               </div>
+              <!--<div id="slider-wrapper">
+                <div id="slider"></div>
+              </div>-->
             </div>
           </div>
         </div>
@@ -55,6 +58,9 @@
     <script type="text/javascript">
       var tray = new Tray ({
         tray: $("#tray")
+      });
+      var slider = new Slider ({
+        slider: $("slider")
       });
     </script>
   </body>
