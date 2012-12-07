@@ -72,6 +72,11 @@ body {
 	top: 13px;
 }
 
+#slider-wrapper {
+	position: relative;
+	top: 16px;
+}
+
 .centered {
   display: inline-block;
   vertical-align: middle;
