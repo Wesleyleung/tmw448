@@ -36,23 +36,23 @@ class NikeRun(models.Model):
         return self.nike_id
 
 class NikeSportActivity(models.Model):
-	sport_activity_id = models.CharField(max_length=40, unique=True)
-	upm_user_id = models.CharField(max_length=40)
-	nike_plus_user_id = models.CharField(max_length=40)
+	sport_activity_id = models.CharField(max_length=200, unique=True)
+	upm_user_id = models.CharField(max_length=200, null=True, default='')
+	nike_plus_user_id = models.CharField(max_length=200, null=True, default='')
 	nike_user = models.ForeignKey(NikeUser, null=True, on_delete=models.SET_NULL, default=None)
 	activity_type_id = models.IntegerField()
-	tz_offset = models.CharField(max_length=20)
+	tz_offset = models.CharField(max_length=200)
 	start_time_local = models.DateTimeField()
 	duration = models.IntegerField()
 	calories = models.IntegerField()
 	distance = models.FloatField()
 	steps = models.IntegerField()
 	fuel_amt = models.IntegerField()
-	dst_offset = models.CharField(max_length=20)
-	timezone_name = models.CharField(max_length=120)
+	dst_offset = models.CharField(max_length=200)
+	timezone_name = models.CharField(max_length=200)
 	active_time_secs = models.FloatField()
-	postal_code = models.CharField(max_length=24)
-	country = models.CharField(max_length=40)
+	postal_code = models.CharField(max_length=200)
+	country = models.CharField(max_length=200)
 
 	def get_fields(self):
 		return [(field.name, field.value_to_string(self)) for field in NikeSportActivity._meta.fields]
