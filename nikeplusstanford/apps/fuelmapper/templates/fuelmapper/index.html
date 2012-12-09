@@ -36,38 +36,60 @@
       </script>
   </head>
   <body>
+    <div id="top-nav">
+      <div id="search_wrapper">
+        <form class="navbar-search pull-left" onsubmit="searchLocation()">
+          <input id="search-input" type="text" class="search-query" placeholder="Search">
+        </form>
+      </div>
+    </div>
     <div id="tray">
       <div id="tray-handle">+</div>
-      <div id="tray-play-wrapper" class="row-fluid">
-        <div class="row-fluid">
-          <div class="span12">
-            <div class="span1" style="text-align: center">
-              <a id="tray-play" href="#"><img src="{{ STATIC_URL }}img/playbutton.png" /></a>
-            </div>
-            <div class="span10">
-              <div id="tray-progress-wrapper" class="progress">
-                <div id="tray-progress-bar" class="bar"></div>
+      <div id="tray-full-wrapper">
+        <div id="tray-play-wrapper" class="row-fluid">
+          <div class="row-fluid">
+            <div class="span12">
+              <div class="span1" style="text-align: center">
+                <a id="tray-play" href="#"><img src="{{ STATIC_URL }}img/playbutton.png" /></a>
               </div>
-              <!--<div id="slider-wrapper">
-                <div id="slider"></div>
-              </div>-->
+              <div class="span10">
+                <div id="tray-progress-wrapper" class="progress">
+                  <div id="tray-progress-bar" class="bar"></div>
+                </div>
+                <!--<div id="slider-wrapper">
+                  <div id="slider"></div>
+                </div>-->
+              </div>
             </div>
           </div>
         </div>
-      </div>
-      <div id="tray-content-wrapper" class="row-fluid">
-        <div class="row-fluid">
-          <div class="span12">
-            <div id="search_wrapper">
-              <form class="navbar-search pull-left">
-                <input type="text" class="search-query" placeholder="Search">
-              </form>
-            </div>
-            
+        <div id="tray-content-wrapper" class="row-fluid">
+          <div class="row-fluid">
             <div id="heatmaptoggle_wrapper">
               <button class="btn btn-primary" type="button" onclick="toggleHeatmap()">Toggle Heatmap</button>
             </div>
-
+            <div id="pathtoggle_wrapper">
+              <button class="btn btn-primary" type="button" onclick="">Toggle Paths</button>
+            </div>
+          </div>
+          <div class="row-fluid">
+            <div class="span5" id="stats-box">
+              <div class="row-fluid" id="stats-content">
+                <div class="span6">
+                  <b>Location: San Francisco, CA</b>
+                  <p>Average Age: 33.67</p>
+                  <p>Total Fuel: 89,302</p>
+                  <p>Total Distance: 214,047 mi</p>
+                </div>
+                <div class="span6">
+                  <p>Total Time Spent: 5,322 hrs</p>
+                  <p>Total Runs: 4,216</p>
+                </div>
+              </div>
+            </div>
+            <div class="span7" id="graph-box">
+              <img src="{{ STATIC_URL }}img/graph.png" />
+            </div>
           </div>
         </div>
       </div>
@@ -75,7 +97,7 @@
     <div id="map_canvas"></div>
     <script type="text/javascript">
       var tray = new Tray ({
-        tray: $("#tray")
+        tray: $("#tray"),
       });
       // var slider = new Slider ({
       //   slider: $("slider")

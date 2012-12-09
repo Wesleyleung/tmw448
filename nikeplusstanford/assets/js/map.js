@@ -300,12 +300,30 @@ function polyClick (event, path) {
 // 		}
 // 	});
 // }
- function toggleHeatmap() {
+function toggleHeatmap() {
  		console.log("heat map toggled");
 
         heatmap.setMap(heatmap.getMap() ? null : map);
       
- }
+}
+
+
+function searchLocation() {
+	if (!this.searchInput) this.searchInput = $('#search-input');
+	console.log(this.searchInput.val());
+	var geocoder = new google.maps.Geocoder();
+	geocoder.geocode({'address':this.searchInput.val()}, function (results, status) {
+		if (status == google.maps.GeocoderStatus.OK) {
+			var res = results[0].geometry.location;
+			var LatLng = new google.maps.LatLng(res.lat(), res.lng())
+			setLocationOnMap(LatLng);
+		}
+	})
+}
+
+function setLocationOnMap(latLng) {
+	map.setCenter(latLng);
+}
 
 
 function generateHeatMap() {
@@ -336,11 +354,11 @@ function generateHeatMap() {
 		heatmap = new google.maps.visualization.HeatmapLayer({
 			data: heatMapData
 		});
-		 heatmap.setOptions({
+		heatmap.setOptions({
 			dissipating: true,
 			opacity:0.75,
 			radius:20
-		 });
+		});
 		heatmap.setMap(map);
 	 });
 }
