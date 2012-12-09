@@ -37,8 +37,8 @@ class NikeRun(models.Model):
 
 class NikeSportActivity(models.Model):
 	sport_activity_id = models.CharField(max_length=200, unique=True)
-	upm_user_id = models.CharField(max_length=200)
-	nike_plus_user_id = models.CharField(max_length=200)
+	upm_user_id = models.CharField(max_length=200, null=True, default='')
+	nike_plus_user_id = models.CharField(max_length=200, null=True, default='')
 	nike_user = models.ForeignKey(NikeUser, null=True, on_delete=models.SET_NULL, default=None)
 	activity_type_id = models.IntegerField()
 	tz_offset = models.CharField(max_length=200)
