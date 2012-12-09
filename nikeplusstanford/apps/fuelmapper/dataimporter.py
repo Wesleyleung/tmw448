@@ -2,6 +2,7 @@ import csv
 from apps.fuelmapper.models import NikeUser, NikeSportActivity
 from datetime import datetime
 from django.db import IntegrityError
+from django.db.utils import DatabaseError
 
 def oracleTimeToDateTime(timeString):
 	'07-APR-12 12.00.00.000000000 AM'
@@ -19,6 +20,7 @@ def importActivitiesFromCSV(filepath):
 	print 'Field names converted: %s' % str(csvDict.fieldnames)
 	count = 0
 	existingCount = 0
+	errorCount = 0
 	for line in csvDict:
 		newTime = oracleTimeToDateTime(line['start_time_local'])
 		line['start_time_local'] = newTime
@@ -28,6 +30,8 @@ def importActivitiesFromCSV(filepath):
 			count += 1
 		except IntegrityError:
 			existingCount += 1
+		except DatabaseError:
+			errorCount += 1
 		if count % 10000 == 0:
 			print '%d rows completed.' % count
-	print 'Completed import of %d lines. %d objects already existed.' % (count, existingCount)
+	print 'Completed import of %d lines. %d objects already existed. Error count: %d' % (count, existingCount, errorCount)
