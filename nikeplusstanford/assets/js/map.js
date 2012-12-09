@@ -5,6 +5,7 @@ var pathStrokeColor = "#FF0000";
 var hoverStrokeColor = "#7EE569";
 var infowindow;
 var isPaused = true;
+var marker = null;
 //These eight need to be reset whenever we get new data
 var pathLocationsLoaded = false;
 var coordsToBeGraphed = [];
@@ -314,15 +315,98 @@ function searchLocation() {
 	var geocoder = new google.maps.Geocoder();
 	geocoder.geocode({'address':this.searchInput.val()}, function (results, status) {
 		if (status == google.maps.GeocoderStatus.OK) {
+			var resType = results[0].geometry.location_type;
+			var res = results[0].geometry.location;
+			var LatLng = new google.maps.LatLng(res.lat(), res.lng());
+			//If it's a rooftop location, set zoom to fairly high
+			if (resType == 'ROOFTOP') {
+				setLocationOnMapByLatLng(LatLng);
+				var maxZoomService = new google.maps.MaxZoomService();
+				maxZoomService.getMaxZoomAtLatLng(LatLng, function(response) {
+				    if (response.status != google.maps.MaxZoomStatus.OK) {
+						return;
+					} else {
+						setMapZoom(response.zoom - 2);
+					}
+				});
+			//if not, just set by the boundaries
+			} else {
+				setLocationOnMapByBounds(results[0].geometry.bounds);
+			}
+			//Set a marker on the location searched
+			//clear old marker
+			if (marker) marker.setMap(null);
+			//set marker to location
+			marker = new google.maps.Marker({
+				map:map,
+				draggable:false,
+				clickable:false,
+				animation: google.maps.Animation.DROP,
+				position: LatLng
+			});
+		} else {
+			if (!results.length) {
+				showModal("Location Not Found", '<p>Your search for "' + this.searchInput.val() + '" did not return any results.  Please search for another location.</p>');
+			}
+		}
+	});
+	geocoder = null;
+	/*var geocoder = new google.maps.Geocoder();
+	geocoder.geocode({'address':this.searchInput.val()}, function (results, status) {
+		if (status == google.maps.GeocoderStatus.OK) {
+			console.log(results[0].geometry.bounds);
+			setLocationOnMapByBounds(results[0].geometry.bounds);
 			var res = results[0].geometry.location;
 			var LatLng = new google.maps.LatLng(res.lat(), res.lng())
-			setLocationOnMap(LatLng);
+			setLocationOnMapByLatLng(LatLng);
+		} else {
+			if (!results.length) {
+				console.log("here");
+				showModal("Location Not Found", '<p>Your search for "' + this.searchInput.val() + '" did not return any results.  Please search for another location.</p>');
+			}
 		}
-	})
+	});*/
 }
 
-function setLocationOnMap(latLng) {
+/*
+headerText is only text and bodyText can include html
+*/
+function showModal(headerText, bodyText, includeFooter) {
+	this.modal = $('#myModal');
+	this.modalHeader = this.modal.find('.modal-header h3');
+	this.modalBody = this.modal.find('.modal-body');
+	this.modalFooter = this.modal.find('.modal-footer');
+	this.modalHeader.html(headerText);
+	this.modalBody.html(bodyText);
+
+	//defaults to true
+	if (typeof(includeFooter) === 'undefined' || includeFooter) {
+		if (!this.modalFooter.length) {
+			this.modalBody.after(
+				'<div class="modal-footer">\
+        			<button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>\
+     			 </div>'
+			)
+		}
+	} else if (!includeFooter) {
+		this.modalFooter.remove();
+	}
+
+	//show modal
+	this.modal.modal();
+}
+
+function setLocationOnMapByBounds(bounds) {
+	map.setCenter(bounds.getCenter());
+	map.fitBounds(bounds);
+}
+
+function setLocationOnMapByLatLng(latLng) {
 	map.setCenter(latLng);
+}
+
+function setMapZoom(zoom) {
+	map.setZoom(zoom);
 }
 
 
