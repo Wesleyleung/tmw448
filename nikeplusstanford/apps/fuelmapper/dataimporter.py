@@ -21,6 +21,7 @@ def importActivitiesFromCSV(filepath):
 	count = 0
 	existingCount = 0
 	errorCount = 0
+	print 'Starting line iteration.'
 	for line in csvDict:
 		newTime = oracleTimeToDateTime(line['start_time_local'])
 		line['start_time_local'] = newTime
@@ -32,6 +33,10 @@ def importActivitiesFromCSV(filepath):
 			existingCount += 1
 		except DatabaseError:
 			errorCount += 1
-		if count % 10000 == 0:
-			print '%d rows completed.' % count
+		print '%d rows completed. %d existing rows skipped. Error count: %d                      \r' % (count, existingCount, errorCount),
+		# if count % 10000 == 0 and count > 0:
+		# 	print '%d rows completed.' % count
+		# if existingCount % 10000 == 0 and existingCount > 0:
+		# 	print '%d existing rows skipped.' % existingCount
+	print ''
 	print 'Completed import of %d lines. %d objects already existed. Error count: %d' % (count, existingCount, errorCount)
