@@ -4,7 +4,7 @@ from datetime import datetime
 from django.db import IntegrityError
 from django.db.utils import DatabaseError
 import urllib2
-from os import tmpfile
+from os import remove
 
 def oracleTimeToDateTime(timeString):
 	'07-APR-12 12.00.00.000000000 AM'
@@ -18,7 +18,7 @@ def importActivitiesFromCSV(url):
 
 	file_name = url.split('/')[-1]
 	u = urllib2.urlopen(url)
-	f = tmpfile()
+	f = open(file_name, 'wb')
 	meta = u.info()
 	file_size = int(meta.getheaders("Content-Length")[0])
 	print "Downloading: %s Bytes: %s" % (file_name, file_size)
@@ -36,7 +36,12 @@ def importActivitiesFromCSV(url):
 	    status = status + chr(8)*(len(status)+1)
 	    print status,
 
+	f.close()
+	f = open(file_name, 'rb')
 	csvDict = csv.DictReader(f)
+	print csvDict
+	print f
+	print csvDict.fieldnames
 	print 'File opened.'
 	csvDict.fieldnames = [field.strip().lower() for field in csvDict.fieldnames]
 	print 'Field names converted: %s' % str(csvDict.fieldnames)
@@ -63,3 +68,4 @@ def importActivitiesFromCSV(url):
 	print ''
 	print 'Completed import of %d lines. %d objects already existed. Error count: %d' % (count, existingCount, errorCount)
 	f.close()
+	remove(file_name)
