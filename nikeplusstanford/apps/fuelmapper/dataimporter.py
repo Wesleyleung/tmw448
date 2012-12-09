@@ -3,6 +3,8 @@ from apps.fuelmapper.models import NikeUser, NikeSportActivity
 from datetime import datetime
 from django.db import IntegrityError
 from django.db.utils import DatabaseError
+import urllib2
+from os import tmpfile
 
 def oracleTimeToDateTime(timeString):
 	'07-APR-12 12.00.00.000000000 AM'
@@ -12,9 +14,29 @@ def oracleTimeToDateTime(timeString):
 	returnTime = datetime.strptime(fixed, '%d-%m-%y %I.%M.%S %p')
 	return returnTime
 
-def importActivitiesFromCSV(filepath):
-	print 'Importing CSV: %s' % filepath
-	csvDict = csv.DictReader(open(filepath, 'rU'))
+def importActivitiesFromCSV(url):
+
+	file_name = url.split('/')[-1]
+	u = urllib2.urlopen(url)
+	f = tmpfile()
+	meta = u.info()
+	file_size = int(meta.getheaders("Content-Length")[0])
+	print "Downloading: %s Bytes: %s" % (file_name, file_size)
+
+	file_size_dl = 0
+	block_sz = 8192
+	while True:
+	    buffer = u.read(block_sz)
+	    if not buffer:
+	        break
+
+	    file_size_dl += len(buffer)
+	    f.write(buffer)
+	    status = r"%10d  [%3.2f%%]" % (file_size_dl, file_size_dl * 100. / file_size)
+	    status = status + chr(8)*(len(status)+1)
+	    print status,
+
+	csvDict = csv.DictReader(f)
 	print 'File opened.'
 	csvDict.fieldnames = [field.strip().lower() for field in csvDict.fieldnames]
 	print 'Field names converted: %s' % str(csvDict.fieldnames)
@@ -40,3 +62,4 @@ def importActivitiesFromCSV(filepath):
 		# 	print '%d existing rows skipped.' % existingCount
 	print ''
 	print 'Completed import of %d lines. %d objects already existed. Error count: %d' % (count, existingCount, errorCount)
+	f.close()
