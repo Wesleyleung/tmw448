@@ -308,6 +308,20 @@ function toggleHeatmap() {
       
 }
 
+function setMarkerAtLatLng(ll) {
+	//Set a marker on the location searched
+	//clear old marker
+	if (marker) marker.setMap(null);
+	//set marker to location
+	marker = new google.maps.Marker({
+		map:map,
+		draggable:false,
+		clickable:false,
+		animation: google.maps.Animation.DROP,
+		position: ll
+	});
+}
+
 
 function searchLocation() {
 	if (!this.searchInput) this.searchInput = $('#search-input');
@@ -328,22 +342,14 @@ function searchLocation() {
 					} else {
 						setMapZoom(response.zoom - 2);
 					}
+					setMarkerAtLatLng(LatLng);
 				});
 			//if not, just set by the boundaries
 			} else {
 				setLocationOnMapByBounds(results[0].geometry.bounds);
+				setMarkerAtLatLng(LatLng);
 			}
-			//Set a marker on the location searched
-			//clear old marker
-			if (marker) marker.setMap(null);
-			//set marker to location
-			marker = new google.maps.Marker({
-				map:map,
-				draggable:false,
-				clickable:false,
-				animation: google.maps.Animation.DROP,
-				position: LatLng
-			});
+			
 		} else {
 			if (!results.length) {
 				showModal("Location Not Found", '<p>Your search for "' + this.searchInput.val() + '" did not return any results.  Please search for another location.</p>');
