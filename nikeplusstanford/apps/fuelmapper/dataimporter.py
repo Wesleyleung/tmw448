@@ -1,10 +1,11 @@
 import csv
-from apps.fuelmapper.models import NikeSportUser, NikeSportActivity
+from apps.fuelmapper.models import NikeUserSport, NikeSportActivity
 from datetime import datetime
 from django.db import IntegrityError
 from django.db.utils import DatabaseError
 import urllib2
 from os import remove
+from django.db import connection
 
 def oracleTimeToDateTime(timeString):
 	'07-APR-12 12.00.00.000000000 AM'
@@ -72,9 +73,13 @@ def importActivitiesFromCSV(url):
 		try:
 			newActivity.save()
 			count += 1
-		except IntegrityError:
+		except IntegrityError, e:
+			# print e
+			connection.close()
 			existingCount += 1
-		except DatabaseError:
+		except DatabaseError, e:
+			# print e
+			connection.close()
 			errorCount += 1
 		print '%d rows completed. %d existing rows skipped. Error count: %d                      \r' % (count, existingCount, errorCount),
 		# if count % 10000 == 0 and count > 0:
@@ -122,8 +127,7 @@ def importUsersFromCSV(url):
 	    print status,
 
 	f.close()
-	from django.db import connection
-	connection._rollback()
+	
 	f = open(file_name, 'rb')
 	csvDict = csv.DictReader(f)
 	print csvDict
@@ -151,14 +155,17 @@ def importUsersFromCSV(url):
 			line['gender'] = 0
 		elif line['gender'] == '1' or line['gender'] == '2':
 			line['gender'] = int(line['gender'])
-		newUser = NikeSportUser(**line)
+		newUser = NikeUserSport(**line)
 		try:
 			newUser.save()
 			count += 1
 		except IntegrityError:
+			connection.close()
 			existingCount += 1
 		except DatabaseError, e:
-			print e
+			
+			connection.close()
+			# print e
 			errorCount += 1
 		print '%d rows completed. %d existing rows skipped. Error count: %d                      \r' % (count, existingCount, errorCount),
 	print ''
