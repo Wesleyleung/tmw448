@@ -8,7 +8,7 @@ import argparse
 
 def main():
 	parser = argparse.ArgumentParser(description="File importer for activities from a csv file")
-	parser.add_argument('type', help='Model type. Can be NikeUser or NikeSportActivity')
+	parser.add_argument('type', help='Model type. Can be NikeSportUser or NikeSportActivity')
 	parser.add_argument('filename', help='Name of the file to be imported')
 	args = parser.parse_args()
 	if environ.get('HEROKU', '') is 'yes':
@@ -16,7 +16,7 @@ def main():
 	else:
 		setup_environ(nikeplusstanford.settings.dev)
 	print args.type
-	if args.type == 'NikeUser':
+	if args.type == 'NikeSportUser':
 		from apps.fuelmapper import dataimporter
 		dataimporter.importUsersFromCSV(args.filename)
 	elif args.type == 'NikeSportActivity':

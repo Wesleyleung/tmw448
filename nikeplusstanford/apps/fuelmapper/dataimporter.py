@@ -1,5 +1,5 @@
 import csv
-from apps.fuelmapper.models import NikeUser, NikeSportActivity
+from apps.fuelmapper.models import NikeSportUser, NikeSportActivity
 from datetime import datetime
 from django.db import IntegrityError
 from django.db.utils import DatabaseError
@@ -99,29 +99,31 @@ def importActivitiesFromCSV(url):
 	f.close()
 	remove(file_name)
 
-def importUsersFromCSV(url):
+def importUsersFromCSV(file_name):
 
-	file_name = url.split('/')[-1]
-	u = urllib2.urlopen(url)
-	f = open(file_name, 'wb')
-	meta = u.info()
-	file_size = int(meta.getheaders("Content-Length")[0])
-	print "Downloading: %s Bytes: %s" % (file_name, file_size)
+	# file_name = url.split('/')[-1]
+	# u = urllib2.urlopen(url)
+	# f = open(file_name, 'wb')
+	# meta = u.info()
+	# file_size = int(meta.getheaders("Content-Length")[0])
+	# print "Downloading: %s Bytes: %s" % (file_name, file_size)
 
-	file_size_dl = 0
-	block_sz = 8192
-	while True:
-	    buffer = u.read(block_sz)
-	    if not buffer:
-	        break
+	# file_size_dl = 0
+	# block_sz = 8192
+	# while True:
+	#     buffer = u.read(block_sz)
+	#     if not buffer:
+	#         break
 
-	    file_size_dl += len(buffer)
-	    f.write(buffer)
-	    status = r"%10d  [%3.2f%%]" % (file_size_dl, file_size_dl * 100. / file_size)
-	    status = status + chr(8)*(len(status)+1)
-	    print status,
+	#     file_size_dl += len(buffer)
+	#     f.write(buffer)
+	#     status = r"%10d  [%3.2f%%]" % (file_size_dl, file_size_dl * 100. / file_size)
+	#     status = status + chr(8)*(len(status)+1)
+	#     print status,
 
-	f.close()
+	# f.close()
+	from django.db import connection
+	connection._rollback()
 	f = open(file_name, 'rb')
 	csvDict = csv.DictReader(f)
 	print csvDict
@@ -141,17 +143,23 @@ def importUsersFromCSV(url):
 		line['year_birthdate'] = new_year
 		if line['height'] == '':
 			line['height'] = 0
+		line['height'] = float(line['height'])
 		if line['weight'] == '':
 			line['weight'] = 0
-		if line['height'] == '':
-			line['height'] = 0
-		newUser = NikeUser(**line)
+		line['weight'] = float(line['weight'])
+		if line['gender'] == '':
+			line['gender'] = 0
+		elif line['gender'] == '1' or line['gender'] == '2':
+			line['gender'] = int(line['gender'])
+		print line
+		newUser = NikeSportUser(**line)
 		try:
 			newUser.save()
 			count += 1
 		except IntegrityError:
 			existingCount += 1
-		except DatabaseError:
+		except DatabaseError, e:
+			print e
 			errorCount += 1
 		print '%d rows completed. %d existing rows skipped. Error count: %d                      \r' % (count, existingCount, errorCount),
 	print ''
