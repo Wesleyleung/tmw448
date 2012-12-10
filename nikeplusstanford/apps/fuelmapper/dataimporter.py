@@ -51,9 +51,10 @@ def importActivitiesFromCSV(url):
 	objects_to_bulk_create = []
 	print 'Starting line iteration.'
 	for line in csvDict:
-		newTime = oracleTimeToDateTime(line['start_time_local'])
-		line['start_time_local'] = newTime
-		newActivity = NikeSportActivity(**line)
+		unicode_line = dict([(k.encode('utf8'), v.encode('utf8')) for k, v in line.items()])
+		newTime = oracleTimeToDateTime(unicode_line['start_time_local'])
+		unicode_line['start_time_local'] = newTime
+		newActivity = NikeSportActivity(**unicode_line)
 		objects_to_bulk_create.append(newActivity)
 		if len(objects_to_bulk_create) >= 10:
 			try:
@@ -62,9 +63,11 @@ def importActivitiesFromCSV(url):
 				objects_to_bulk_create = []
 			except IntegrityError, e:
 				existingCount += len(objects_to_bulk_create)
+				objects_to_bulk_create = []
 				print 'IntegrityError during bulk save: %s' % str(e)
 			except DatabaseError, e:
 				errorCount += len(objects_to_bulk_create)
+				objects_to_bulk_create = []
 				print 'DatabaseError during bulk save: %s' % str(e)
 			print '%d rows completed. %d existing rows skipped. Error count: %d' % (count, existingCount, errorCount)
 		# try:
@@ -86,9 +89,11 @@ def importActivitiesFromCSV(url):
 				objects_to_bulk_create = []
 			except IntegrityError, e:
 				existingCount += len(objects_to_bulk_create)
+				objects_to_bulk_create = []
 				print 'IntegrityError during bulk save: %s' % str(e)
 			except DatabaseError, e:
 				errorCount += len(objects_to_bulk_create)
+				objects_to_bulk_create = []
 				print 'DatabaseError during bulk save: %s' % str(e)
 	print ''
 	print 'Completed import of %d lines. %d objects already existed. Error count: %d' % (count, existingCount, errorCount)
