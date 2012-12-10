@@ -13,7 +13,7 @@ class Migration(SchemaMigration):
         db.alter_column('fuelmapper_nikeuser', 'weight', self.gf('django.db.models.fields.FloatField')(null=True))
 
         # Changing field 'NikeUser.year_birthdate'
-        db.alter_column('fuelmapper_nikeuser', 'year_birthdate', self.gf('django.db.models.fields.IntegerField')(null=True))
+        # db.alter_column('fuelmapper_nikeuser', 'year_birthdate', self.gf('django.db.models.fields.IntegerField')(null=True))
 
         # Changing field 'NikeUser.gender'
         db.alter_column('fuelmapper_nikeuser', 'gender', self.gf('django.db.models.fields.IntegerField')(null=True))
@@ -30,7 +30,7 @@ class Migration(SchemaMigration):
         db.alter_column('fuelmapper_nikeuser', 'weight', self.gf('django.db.models.fields.FloatField')(default=0))
 
         # Changing field 'NikeUser.year_birthdate'
-        db.alter_column('fuelmapper_nikeuser', 'year_birthdate', self.gf('django.db.models.fields.IntegerField')())
+        # db.alter_column('fuelmapper_nikeuser', 'year_birthdate', self.gf('django.db.models.fields.IntegerField')())
 
         # Changing field 'NikeUser.gender'
         db.alter_column('fuelmapper_nikeuser', 'gender', self.gf('django.db.models.fields.IntegerField')(default=0))
