@@ -8,12 +8,12 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-
+        pass
         # Changing field 'NikeUser.year_birthdate'
         # db.alter_column('fuelmapper_nikeuser', 'year_birthdate', self.gf('django.db.models.fields.IntegerField')())
 
     def backwards(self, orm):
-
+        pass
         # Changing field 'NikeUser.year_birthdate'
         # db.alter_column('fuelmapper_nikeuser', 'year_birthdate', self.gf('django.db.models.fields.DateField')())
 
