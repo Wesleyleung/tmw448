@@ -51,10 +51,10 @@ def importActivitiesFromCSV(url):
 	objects_to_bulk_create = []
 	print 'Starting line iteration.'
 	for line in csvDict:
-		unicode_line = dict([(k.encode('utf8'), v.encode('utf8')) for k, v in line.items()])
-		newTime = oracleTimeToDateTime(unicode_line['start_time_local'])
-		unicode_line['start_time_local'] = newTime
-		newActivity = NikeSportActivity(**unicode_line)
+		# unicode_line = dict([(k.encode('utf8'), v.encode('utf8')) for k, v in line.items()])
+		newTime = oracleTimeToDateTime(line['start_time_local'])
+		line['start_time_local'] = newTime
+		newActivity = NikeSportActivity(**line)
 		objects_to_bulk_create.append(newActivity)
 		# if len(objects_to_bulk_create) >= 10:
 		# 	try:
