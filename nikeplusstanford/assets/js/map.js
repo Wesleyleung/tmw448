@@ -332,15 +332,17 @@ function searchLocation() {
 			var resType = results[0].geometry.location_type;
 			var res = results[0].geometry.location;
 			var LatLng = new google.maps.LatLng(res.lat(), res.lng());
+			console.log(results[0]);
 			//If it's a rooftop location, set zoom to fairly high
-			if (resType == 'ROOFTOP') {
+			if (resType == 'ROOFTOP' || !results[0].geometry.bounds) {
 				setLocationOnMapByLatLng(LatLng);
 				var maxZoomService = new google.maps.MaxZoomService();
 				maxZoomService.getMaxZoomAtLatLng(LatLng, function(response) {
 				    if (response.status != google.maps.MaxZoomStatus.OK) {
 						return;
 					} else {
-						setMapZoom(response.zoom - 2);
+						if (results[0].geometry.bounds) setMapZoom(response.zoom - 2);
+						else setMapZoom(response.zoom - 5);
 					}
 					setMarkerAtLatLng(LatLng);
 				});
@@ -357,21 +359,6 @@ function searchLocation() {
 		}
 	});
 	geocoder = null;
-	/*var geocoder = new google.maps.Geocoder();
-	geocoder.geocode({'address':this.searchInput.val()}, function (results, status) {
-		if (status == google.maps.GeocoderStatus.OK) {
-			console.log(results[0].geometry.bounds);
-			setLocationOnMapByBounds(results[0].geometry.bounds);
-			var res = results[0].geometry.location;
-			var LatLng = new google.maps.LatLng(res.lat(), res.lng())
-			setLocationOnMapByLatLng(LatLng);
-		} else {
-			if (!results.length) {
-				console.log("here");
-				showModal("Location Not Found", '<p>Your search for "' + this.searchInput.val() + '" did not return any results.  Please search for another location.</p>');
-			}
-		}
-	});*/
 }
 
 /*
