@@ -3,13 +3,13 @@ import httplib2
 import json
 
 class NikeUser(models.Model):
-    nike_id = models.CharField(max_length=200, unique=True)
+    upm_user_id = models.CharField(max_length=200, unique=True)
     gender = models.IntegerField(default=None)
     postal_code = models.CharField(max_length=24, default=None)
     height = models.FloatField(default=None)
     weight = models.FloatField(default=None)
     country = models.CharField(max_length=40, default=None)
-    birth_date = models.DateField(default=None)
+    year_birthdate = models.DateField(default=None)
 
     def calculate_age(born):
 	    today = date.today()
@@ -27,7 +27,7 @@ class NikeUser(models.Model):
     	return [(field.name, field.value_to_string(self)) for field in NikeSportActivity._meta.fields]
 
     def __unicode__(self):
-    	return self.get_fields()
+    	return self.upm_user_id
 
 class NikeRun(models.Model):
     nike_id = models.CharField(max_length=200)
