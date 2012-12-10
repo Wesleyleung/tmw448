@@ -4,12 +4,12 @@ import json
 
 class NikeUser(models.Model):
     upm_user_id = models.CharField(max_length=200, unique=True)
-    gender = models.IntegerField(default=None)
+    gender = models.IntegerField(default=None, null=True)
     postal_code = models.CharField(max_length=24, default=None)
-    height = models.FloatField(default=None)
-    weight = models.FloatField(default=None)
-    country = models.CharField(max_length=40, default=None)
-    year_birthdate = models.DateField(default=None)
+    height = models.FloatField(default=None, null=True)
+    weight = models.FloatField(default=None, null=True)
+    country = models.CharField(max_length=40, default=None, null=True)
+    year_birthdate = models.IntegerField(default=0, null=True)
 
     def calculate_age(born):
 	    today = date.today()
