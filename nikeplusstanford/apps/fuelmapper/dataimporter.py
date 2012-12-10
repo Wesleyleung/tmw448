@@ -48,23 +48,48 @@ def importActivitiesFromCSV(url):
 	count = 0
 	existingCount = 0
 	errorCount = 0
+	objects_to_bulk_create = []
 	print 'Starting line iteration.'
 	for line in csvDict:
 		newTime = oracleTimeToDateTime(line['start_time_local'])
 		line['start_time_local'] = newTime
 		newActivity = NikeSportActivity(**line)
-		try:
-			newActivity.save()
-			count += 1
-		except IntegrityError:
-			existingCount += 1
-		except DatabaseError:
-			errorCount += 1
-		print '%d rows completed. %d existing rows skipped. Error count: %d                      \r' % (count, existingCount, errorCount),
+		objects_to_bulk_create.append(newActivity)
+		if len(objects_to_bulk_create) >= 10:
+			try:
+				NikeSportActivity.objects.bulk_create(objects_to_bulk_create)
+				count += len(objects_to_bulk_create)
+				objects_to_bulk_create = []
+			except IntegrityError, e:
+				existingCount += len(objects_to_bulk_create)
+				print 'IntegrityError during bulk save: %s' % str(e)
+			except DatabaseError, e:
+				errorCount += len(objects_to_bulk_create)
+				print 'DatabaseError during bulk save: %s' % str(e)
+			print '%d rows completed. %d existing rows skipped. Error count: %d' % (count, existingCount, errorCount)
+		# try:
+		# 	newActivity.save()
+		# 	count += 1
+		# except IntegrityError:
+		# 	existingCount += 1
+		# except DatabaseError:
+		# 	errorCount += 1
+		# print '%d rows completed. %d existing rows skipped. Error count: %d                      \r' % (count, existingCount, errorCount),
 		# if count % 10000 == 0 and count > 0:
 		# 	print '%d rows completed.' % count
 		# if existingCount % 10000 == 0 and existingCount > 0:
 		# 	print '%d existing rows skipped.' % existingCount
+	if len(objects_to_bulk_create) > 0:
+			try:
+				NikeSportActivity.objects.bulk_create(objects_to_bulk_create)
+				count += len(objects_to_bulk_create)
+				objects_to_bulk_create = []
+			except IntegrityError, e:
+				existingCount += len(objects_to_bulk_create)
+				print 'IntegrityError during bulk save: %s' % str(e)
+			except DatabaseError, e:
+				errorCount += len(objects_to_bulk_create)
+				print 'DatabaseError during bulk save: %s' % str(e)
 	print ''
 	print 'Completed import of %d lines. %d objects already existed. Error count: %d' % (count, existingCount, errorCount)
 	f.close()
