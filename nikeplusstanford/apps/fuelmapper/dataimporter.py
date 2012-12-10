@@ -145,7 +145,6 @@ def importUsersFromCSV(url):
 			line['weight'] = 0
 		if line['height'] == '':
 			line['height'] = 0
-		print line
 		newUser = NikeUser(**line)
 		try:
 			newUser.save()
