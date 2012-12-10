@@ -151,7 +151,6 @@ def importUsersFromCSV(url):
 			line['gender'] = 0
 		elif line['gender'] == '1' or line['gender'] == '2':
 			line['gender'] = int(line['gender'])
-		print line
 		newUser = NikeSportUser(**line)
 		try:
 			newUser.save()
