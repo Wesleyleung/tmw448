@@ -436,38 +436,28 @@ function generateHeatMap(data) {
 function getHeatMapModel(callback) {
 	var start_time = new Date($("#start_date").val()).getTime()/1000;
 	var end_time = new Date($("#end_date").val()).getTime()/1000;
-	var center = map.getCenter();
-
-    var maxRows = 20;
 
     var neLat = map.getBounds().getNorthEast().lat()
     var neLng = map.getBounds().getNorthEast().lng()
     var swLat = map.getBounds().getSouthWest().lat()
     var swLng = map.getBounds().getSouthWest().lng()
 
-    console.log(neLat);
-
-  //  var radius = (bounds.getNorthEast().lng() - bounds.getSouthWest().lng()) * 55.6;
-    var radius = 30;
-    if(global_heat_data.length > 0) {
-    	console.log(global_heat_data.length);
+    //check if heatmap is present. delete and redraw
+    console.log(heatmap.getData().length);
+    if(heatmap.getData().length > 0) {
     	global_heat_data = [];
     	heatmap.setData(global_heat_data);  
     }
    
-
 	//loadHeatmapData(start_time, end_time, center, radius, maxRows, 0, callback);
     $.get( "loadSportFromZipcodeViewJSON",
-    	{lat: center.lat(), lng: center.lng(), neLat: neLat, neLng: neLng, swLat: swLat, swLng: swLng, maxRows: maxRows, startTime: start_time, endTime: end_time, limit: 1000},
+    	{neLat: neLat, neLng: neLng, swLat: swLat, swLng: swLng, startTime: start_time, endTime: end_time, limit: 1000},
     	function(data) {
     		if(data.success == "OK" && data.data.count > 0) {  
     			console.log(data['data']['activities']); 	
 	    		var activities = data['data']['activities'];
 	    		for (var i = 0; i < activities.length; i++) {
-	    			console.log(i);
-
 	    			var curActivity = activities[i];
-	    			console.log(curActivity);
     				var fuel_amt = curActivity.fuel_amt;
     				
     				var nelat = curActivity.postal_code.geometry.bounds.northeast.lat;
@@ -482,7 +472,6 @@ function getHeatMapModel(callback) {
 
 					var LatLng = new google.maps.LatLng(randomLat, randomLng);
 					var dict = {location: LatLng, weight: fuel_amt};
-					console.log(dict);
 	    			global_heat_data.push(dict);
 	    		};
 	    		callback(data);
