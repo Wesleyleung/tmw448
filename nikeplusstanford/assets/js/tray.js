@@ -56,11 +56,11 @@ Tray.prototype =  {
 		var end_input = $("#end_date").val()
 
 		if(!start_input|| !end_input) {
-				alert("Please enter a date range");
-				return false;
+			modal.showModal("Not a Valid Date", '<p>Please enter a date range.</p>');
+			return false;
 		}
-		start_date = new Date(start_input)
-		end_date = new Date(end_input)	
+		start_date = new Date(start_input);
+		end_date = new Date(end_input);
 		if(start_date >= end_date) {
 			modal.showModal("Not a Valid Date", '<p>Please select a start date after the end date.</p>');
 			return false;
@@ -79,6 +79,16 @@ Tray.prototype =  {
 		} else {
 			this.playButton.html('<img src="' + static_file_url + 'img/playbutton.png" />');
 		}
+	},
+
+	//Returns in unixtime
+	getStartDate: function() {
+		return new Date($("#start_date").val()).getTime()/1000;
+	},
+
+	//Returns in unixtime
+	getEndDate: function() {
+		return new Date($("#end_date").val()).getTime()/1000;
 	},
 
 	//Only use this if numProgressIntervals and currentProgressInterval have been set
