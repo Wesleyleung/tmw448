@@ -48,8 +48,8 @@ def responseGenerator(request):
 	endTime = float(request.GET['endTime'])
 	
 	yield ' '
-
-	zipcodes_found = PostalCode.objects.filter(lat__gte=swLat).filter(lng__gte=swLng).filter(lat__lte=neLat).filter(lng__lte=neLng)
+	zip_limit = 20
+	zipcodes_found = PostalCode.objects.filter(lat__gte=swLat).filter(lng__gte=swLng).filter(lat__lte=neLat).filter(lng__lte=neLng)[:20]
 	zipcode_strings = []
 	zipcode_objects = {}
 	for zipcode in zipcodes_found:
