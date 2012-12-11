@@ -72,9 +72,9 @@ def responseGenerator(request):
 		zipcode_objects[obj['postalCode']] = PostalCode.find_or_create_code(obj['postalCode'])
 
 	#LOCAL DEV ONLY
-	if environ.get('HEROKU') is not 'yes':
-		zipcodes_found.append('60448')
-		zipcode_objects['60448'] = PostalCode.find_or_create_code('60448')
+	# if environ.get('HEROKU') is not 'yes':
+	# 	zipcodes_found.append('60448')
+	# 	zipcode_objects['60448'] = PostalCode.find_or_create_code('60448')
 
 	nike_hour_offset = 7 * 3600
 	startTime_timedate = datetime.fromtimestamp(startTime, utc)
@@ -131,10 +131,14 @@ def responseGenerator(request):
 		day['zipcodes'][zip_index][activity.postal_code] = day['zipcodes'][zip_index][activity.postal_code] + activity.fuel_amt
 
 		activities_array.append(activity_JSON)
-
-	aggregates['maxFuelInRange'] = max_fuel_in_range
-	aggregates['startDate'] = days[0]
-	aggregates['endDate'] = days.pop()
+	if len(days) > 0:
+		aggregates['maxFuelInRange'] = max_fuel_in_range
+		aggregates['startDate'] = days[0]
+		aggregates['endDate'] = days.pop()
+	else:
+		aggregates['maxFuelInRange'] = 0
+		aggregates['startDate'] = 0
+		aggregates['endDate'] = 0
 	responseDict = {'success' : 'OK',
 						'parameters' : {'zipCodes' : zipcodes_found,
 										'limit' : limit,
