@@ -39,10 +39,10 @@ def loadSportFromZipcodeViewJSON(request):
 	data = json.loads(content)
 	zipcodeParams = []
 	for obj in data['postalCodes']:
-
 		zipcodeParams.append(obj['postalCode'])
 
-	output = NikeSportActivity.objects.filter(postal_code__in=zipcodeParms) 
+	print zipcodeParams
+	output = NikeSportActivity.objects.filter(postal_code__in=zipcodeParams) 
 
 	out_array = []
 	for activity in output:
