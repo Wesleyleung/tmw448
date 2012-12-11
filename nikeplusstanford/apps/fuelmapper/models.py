@@ -54,11 +54,18 @@ class NikeSportActivity(models.Model):
 	postal_code = models.CharField(max_length=200)
 	country = models.CharField(max_length=200)
 
+	def get_JSON(self):
+		output = {}
+		for field in NikeSportActivity._meta.fields:
+			output[field.name] = field.value_to_string(self)
+		return output
+
 	def get_fields(self):
 		return [(field.name, field.value_to_string(self)) for field in NikeSportActivity._meta.fields]
 
 	def __unicode__(self):
 		return str(self.sport_activity_id)
+
 
 class PostalCode(models.Model):
 	postalcode = models.CharField(max_length=24, unique=True)
