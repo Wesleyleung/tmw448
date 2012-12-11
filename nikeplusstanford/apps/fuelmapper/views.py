@@ -96,12 +96,41 @@ def responseGenerator(request):
 	# activities_found = sorted(activities_found, key=lambda activity: activity.start_time_local, reverse=True)
 	# yield ' '
 	# print 'ACTIVITIES SORTED'
-
+	aggregates = {'data' : []}
+	max_fuel_in_range = 0
+	aggregates_data = aggregates['data']
 	activities_array = []
+	days = []
 	for activity in activities_found:
+		max_fuel_in_range = max(max_fuel_in_range, activity.fuel_amt)
 		activity_JSON = activity.get_JSON()
 		activity_JSON['postal_code'] = zipcode_objects[activity.postal_code].get_JSON()
+		index = 0
+		try:
+			index = days.index(activity_JSON['start_time_standard'])
+		except ValueError:
+			aggregates_data.append({'date' : activity_JSON['start_time_standard'],
+								    'totalFuel' : 0,
+								    'zipcodes' : [],
+								    'zipkeys' : []})
+			days.append(activity_JSON['start_time_standard'])
+			index = days.index(activity_JSON['start_time_standard'])
+		day = aggregates_data[index]
+		day['totalFuel'] = day['totalFuel'] + activity.fuel_amt
+		zip_index = 0
+		try:
+			zip_index = day['zipkeys'].index(activity.postal_code)
+		except ValueError:
+			day['zipkeys'].append(activity.postal_code)
+			day['zipcodes'].append({activity.postal_code : 0})
+			zip_index = day['zipkeys'].index(activity.postal_code)
+		day['zipcodes'][zip_index][activity.postal_code] = day['zipcodes'][zip_index][activity.postal_code] + activity.fuel_amt
+
 		activities_array.append(activity_JSON)
+
+	aggregates['maxFuelInRange'] = max_fuel_in_range
+	aggregates['startDate'] = days[0]
+	aggregates['endDate'] = days.pop()
 	responseDict = {'success' : 'OK',
 						'parameters' : {'zipCodes' : zipcodes_found,
 										'limit' : limit,
@@ -109,7 +138,8 @@ def responseGenerator(request):
 										'total' : activities_found_count},
 						'data' : {'activities': activities_array,
 								  'count' : len(activities_array),
-								  'total' : activities_found_count}}	
+								  'total' : activities_found_count,
+								  'aggregates' : aggregates}}	
 	print 'CREATED RESPONSE DICT'
 	yield ' '
 	yield json.dumps(responseDict)
