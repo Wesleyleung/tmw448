@@ -15,8 +15,9 @@ var totalRuns = 0;
 var runVisualizationsEnded = 0;
 var numProgressIntervals = 0;
 var visFullyComplete = false;
-var global_heat_data = null;
+var global_heat_data = [];
 
+var heatmap;
 
 google.maps.event.addDomListener(window, 'load', function () {
 	initialize();
@@ -48,8 +49,19 @@ function initialize() {
 	// 	handleNoGeolocation(false);
 	// }
 
+	
+
 	google.maps.event.addListenerOnce(map, 'idle', function() {
-		//generateHeatMap();	
+		heatmap = new google.maps.visualization.HeatmapLayer({
+			data: []
+		});
+
+		heatmap.setOptions({
+			dissipating: true,
+			opacity:0.75,
+			radius:20
+		});
+		heatmap.setMap(map);
 	});
 	
 	//generateBoundaries();
@@ -413,46 +425,36 @@ function setMapZoom(zoom) {
 	map.setZoom(zoom);
 }
 
-function generateHeatMap(callback) {
-	var heatMapData = [];
-	for (var i = 0; i < global_heat_data.data.count; i++) {
-		fuel_amt = global_heat_data.data.activities[i].fuel_amt;
-		lat = global_heat_data.data.activities[i].postal_code.geometry.location.lat;
-		lng = global_heat_data.data.activities[i].postal_code.geometry.location.lng;
+function generateHeatMap() {
+	var heatMapData = heatmap.getData();
+	// for (var i = 0; i < global_heat_data.data.count; i++) {
+	// 	fuel_amt = global_heat_data.data.activities[i].fuel_amt;
+	// 	lat = global_heat_data.data.activities[i].postal_code.geometry.location.lat;
+	// 	lng = global_heat_data.data.activities[i].postal_code.geometry.location.lng;
 
-		nelat = global_heat_data.data.activities[i].postal_code.geometry.bounds.northeast.lat;
-		swlat = global_heat_data.data.activities[i].postal_code.geometry.bounds.southwest.lat;
+	// 	nelat = global_heat_data.data.activities[i].postal_code.geometry.bounds.northeast.lat;
+	// 	swlat = global_heat_data.data.activities[i].postal_code.geometry.bounds.southwest.lat;
 
-		nelng = global_heat_data.data.activities[i].postal_code.geometry.bounds.northeast.lng;
-		swlng = global_heat_data.data.activities[i].postal_code.geometry.bounds.southwest.lng;
+	// 	nelng = global_heat_data.data.activities[i].postal_code.geometry.bounds.northeast.lng;
+	// 	swlng = global_heat_data.data.activities[i].postal_code.geometry.bounds.southwest.lng;
 		
-		for(var i = 0; i < Math.floor((Math.random()*10)+1); i++) {
-			console.log(i);
-			var randomLat = nelat + (swlat-nelat)*Math.random();
-			var randomLng = nelng + (swlng-nelng)*Math.random();
-			var LatLng = new google.maps.LatLng(randomLat, randomLng);
-			var dict = {location: LatLng, weight: fuel_amt};
-			console.log(dict);
-			heatMapData.push(dict);
-		}
+	// 	for(var i = 0; i < Math.floor((Math.random()*10)+1); i++) {
+	// 		console.log(i);
+	// 		var randomLat = nelat + (swlat-nelat)*Math.random();
+	// 		var randomLng = nelng + (swlng-nelng)*Math.random();
+	// 		var LatLng = new google.maps.LatLng(randomLat, randomLng);
+	// 		var dict = {location: LatLng, weight: fuel_amt};
+	// 		console.log(dict);
+	// 		heatMapData.push(dict);
+	// 	}
 		
-		//var start_time = global_heat_data.data.activities[i].start_time_standard;
-		var LatLng = new google.maps.LatLng(lat, lng)
-		var dict = {location: LatLng, weight: fuel_amt};
-		
-		heatMapData.push(dict);
-	}
-
-	heatmap = new google.maps.visualization.HeatmapLayer({
-		data: heatMapData
-	});
-
-	heatmap.setOptions({
-		dissipating: true,
-		opacity:0.75,
-		radius:20
-	});
-	heatmap.setMap(map);
+	// 	//var start_time = global_heat_data.data.activities[i].start_time_standard;
+	// 	var LatLng = new google.maps.LatLng(lat, lng)
+	// 	var dict = {location: LatLng, weight: fuel_amt};
+	for (var i = 0; i < global_heat_data.length; i++) {
+		heatMapData.push(global_heat_data.shift());
+	};
+	heatmap.setData(heatMapData);
 }
 
 function getHeatMapModel(callback) {
@@ -463,44 +465,69 @@ function getHeatMapModel(callback) {
     var maxRows = 20;
     var bounds = map.getBounds();
     var radius = (bounds.getNorthEast().lat() - bounds.getSouthWest().lat()) * 55.6;
+
+	//loadHeatmapData(start_time, end_time, center, radius, maxRows, 0, callback);
     $.get( "loadSportFromZipcodeViewJSON",
     	{lat: center.lat(), lng: center.lng(), radius: radius, maxRows: maxRows, startTime: start_time, endTime: end_time, limit: 100},
     	function(data) {
     		if(data.success == "OK" && data.data.count > 0) {   	
-	    		global_heat_data = data;
+	    		var activities = data['data']['activities'];
+	    		for (var i = 0; i < activities.length; i++) {
+	    			console.log(i);
+	    			var curActivity = activities[i];
+    				var fuel_amt = curActivity.fuel_amt;
+    
+    				var lat = curActivity.postal_code.geometry.location.lat;
+    				var lng = curActivity.postal_code.geometry.location.lng;
+    			
+    				var dict = {location : new google.maps.LatLng(lat, lng),
+    							weight : fuel_amt};
+    				console.log(dict);
+	    			global_heat_data.push(dict);
+	    		};
 	    		callback(data);
     		}
     	}
     );
 }
 
-function loadHeatmapData(start_time, end_time, center, radius, skip, callback) {
-	    $.get( "loadSportFromZipcodeViewJSON",
-	    	{lat: center.lat(), lng: center.lng(), radius: radius, maxRows: maxRows, startTime: start_time, endTime: end_time, limit: 100},
-	    	function(data) {
-	    		if(data.success == "OK" && data.data.count > 0) {   	
-		    		global_heat_data = data;
-		    		var thisCount = data['data']['count']
-		    		var thisSkip = data['parameters']['skip']
-		    		var thisTotal = data['parameters']['total']
-		    		if (thisCount + thisSkip < thisTotal) {
-		    			loadHeatmapData(start_time, end_time, center, radius, (thisSkip + thisCount), callback);
-		    			var activities = data['data']['activities'];
-		    			for (var i = 0; i < activities.length; i++) {
-		    				var curActivity = activities[i];
-		    				var fuel_amt = curActivity.fuel_amt;
-		    				var lat = curActivity.postal_code.geometry.location.lat;
-		    				var lng = curActivity.postal_code.geometry.location.lat;
-		    				var dict = {location : new google.maps.LatLng(lat, lng),
-		    							weight : fuel_amt};
-		    				global_heat_data.push(dict);
-		    			};
-		    		}
-		    		callback(data);
-	    		}
-	    	}
-	    );
-}
+// function loadHeatmapData(start_time, end_time, center, radius, maxRows, skip, callback) {
+// 	this.start_time = start_time;
+// 	this.end_time = end_time;
+// 	this.center = center;
+// 	this.radius = radius;
+// 	this.maxRows = maxRows;
+// 	this.skip = skip;
+// 	this.callback = callback;
+//     $.get( "loadSportFromZipcodeViewJSON",
+//     	{lat: this.center.lat(), lng: this.center.lng(), radius: this.radius, maxRows: this.maxRows, startTime: this.start_time, endTime: this.end_time, limit: 100},
+//     	function(data) {
+//     		if(data.success == "OK" && data.data.count > 0) {   	
+// 	    		console.log(data);
+// 	    		var thisCount = data['data']['count']
+// 	    		var thisSkip = data['parameters']['skip']
+// 	    		var thisTotal = data['parameters']['total']
+// 	    		if (thisCount + thisSkip < thisTotal) {
+// 	    			var activities = data['data']['activities'];
+// 	    			for (var i = 0; i < activities.length; i++) {
+// 	    				var curActivity = activities[i];
+// 	    				var fuel_amt = curActivity.fuel_amt;
+	    
+// 	    				var lat = curActivity.postal_code.geometry.location.lat;
+// 	    				var lng = curActivity.postal_code.geometry.location.lat;
+	    			
+// 	    				var dict = {location : new google.maps.LatLng(lat, lng),
+// 	    							weight : fuel_amt};
+// 	    				global_heat_data.push(dict);
+// 	    			};
+// 	    			//loadHeatmapData(this.start_time, this.end_time, this.center, this.radius, this.maxRows, (thisSkip + thisCount), this.callback);
+
+// 	    		}
+// 	    		callback(data);
+//     		}
+//     	}.bind(this)
+//     );
+// }
 
 
 
