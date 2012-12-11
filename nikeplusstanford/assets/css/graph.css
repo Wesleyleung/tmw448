@@ -31,6 +31,11 @@ svg {
 	stroke-opacity: 1;
 }
 
+.infoBox {
+	font: 14px Helvetica Neue;
+	outline: 1px solid #fff;
+}
+
 .title {
 	font: 300 78px Helvetica Neue;
 	fill: #666;
@@ -43,6 +48,7 @@ svg {
 rect {
 	fill-opacity: .6;
 	fill: #e377c2;
+	cursor: pointer;
 }
 
 rect:first-child {
