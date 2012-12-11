@@ -163,8 +163,11 @@ class PostalCode(models.Model):
 				obj.southwest_lat = geometry['viewport']['southwest']['lat']
 				obj.southwest_lng = geometry['viewport']['southwest']['lng']
 				obj.save()
-			else:
+			elif jsonResponse['status'] == 'ZERO_RESULTS':
+				print 'ZERO_RESULTS'
+			elif jsonResponse['status'] == 'OVER_QUERY_LIMIT':
 				obj.delete()
+				print content
 				print 'Over Limit'
 				return None
 		return obj
