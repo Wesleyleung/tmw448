@@ -62,12 +62,15 @@ def responseGenerator(request):
 	print 'ZIP CODES FOUND'
 	
 	zipcodes_found = []
+	zipcode_objects = {}
 	for obj in zipCodeData['postalCodes']:
 		zipcodes_found.append(obj['postalCode'])
+		zipcode_objects[obj['postalCode']] = PostalCode.find_or_create_code(obj['postalCode'])
 
 	#LOCAL DEV ONLY
 	if environ.get('HEROKU') is not 'yes':
 		zipcodes_found.append('60448')
+		zipcode_objects['60448'] = PostalCode.find_or_create_code('60448')
 
 	nike_hour_offset = 7 * 3600
 	startTime_timedate = datetime.fromtimestamp(startTime, utc)
@@ -96,7 +99,9 @@ def responseGenerator(request):
 
 	activities_array = []
 	for activity in activities_found:
-		activities_array.append(activity.get_JSON())
+		activity_JSON = activity.get_JSON()
+		activity_JSON['postal_code'] = zipcode_objects[activity.postal_code].get_JSON()
+		activities_array.append(activity_JSON)
 	responseDict = {'success' : 'OK',
 						'parameters' : {'zipCodes' : zipcodes_found,
 										'limit' : limit,
