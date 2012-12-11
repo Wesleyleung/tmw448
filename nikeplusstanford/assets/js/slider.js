@@ -13,7 +13,7 @@ Slider.prototype =  {
 			range: "min",
             value: 0,
             min: 0,
-            max: this.animationTime,
+            max: 86400,
             //on user slide
             slide: function( event, ui ) {
             	// console.log("slide");
@@ -27,6 +27,7 @@ Slider.prototype =  {
             	/*console.log("change");
             	console.log(event);
                 console.log(ui);*/
+                //console.log(this.sliderValue());
             }.bind(this)
 		});
 		this.bar = this.slider.children("div");
@@ -51,16 +52,38 @@ Slider.prototype =  {
 	// 	this.readSliderWhileAnimating();
 	// },
 
+	setMinValue: function(value) {
+		this.slider.slider('min', value);
+	},
+
+	setMaxValue: function(value) {
+		this.slider.slider('max', value);
+	},
+
 	animateProgressBar: function() {
 		var interval = 15;
+		this.timeStartedAnimating = 0;
+		var numIterations = this.animationTime / interval;
+		this.timeDifference = this.sliderMax() - this.sliderMin();
+		var valueToIncrement = Math.round(this.timeDifference / numIterations);
+		console.log(valueToIncrement);
 		setInterval(function() {
-			if (this.sliderValue() >= this.animationTime) {
+			if (this.timeStartedAnimating >= this.animationTime) {
 				clearInterval();
 				tray.playAndPause(true);
 			}
+			this.timeStartedAnimating += interval;
 			//Fires the onchange event every interval
-			this.slider.slider('value', this.sliderValue() + interval);
+			this.slider.slider('value', this.sliderValue() + valueToIncrement);
 		}.bind(this), interval);
+	},
+
+	sliderMax: function() {
+		return this.slider.slider('option', 'max');
+	},
+
+	sliderMin: function() {
+		return this.slider.slider('option', 'min');
 	},
 
 	sliderValue: function() {

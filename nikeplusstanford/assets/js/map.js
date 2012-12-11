@@ -207,7 +207,7 @@ function drawPath(pathLocations, runNum, minFuel, maxFuel) {
 	var animationTimeout = 500;
 
 	var thisColor = rgbForGradientValue(minFuel, maxFuel, pathLocations[pathLocations.length - 1].fuel, {r: 255, g: 0, b: 0}, {r: 0, g: 0, b: 255});
-	console.log("this color: " + thisColor);
+	//console.log("this color: " + thisColor);
 
 	var pathPolyline = polyLineArray[runNum];
 	pathPolyline.setOptions({strokeColor: thisColor});
