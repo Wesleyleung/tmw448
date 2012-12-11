@@ -51,19 +51,19 @@ def responseGenerator(request):
 	endTime = float(request.GET['endTime'])
 	
 	yield ' '
-	# request_url = "http://ws.geonames.org/findNearbyPostalCodesJSON?"
-	# zip_request_data = {'lat': centerLat, 'lng': centerLng, 'radius': radius, 'maxRows' : 3}
-	# h = httplib2.Http()
-	# zipCodeData = None
-	# resp, content = h.request(request_url + urlencode(zip_request_data), method="GET")
-	# if resp.status == 200:
-	# 	zipCodeData = json.loads(content)
-	# else:
-	# 	responseDict = {'status' : 'ERROR',
-	# 					'description' : 'Could not find zip codes'}	
-	# 	yield json.dumps(responseDict)
+	request_url = "http://ws.geonames.org/findNearbyPostalCodesJSON?"
+	zip_request_data = {'lat': centerLat, 'lng': centerLng, 'radius': radius, 'maxRows' : 3}
+	h = httplib2.Http()
+	zipCodeData = None
+	resp, content = h.request(request_url + urlencode(zip_request_data), method="GET")
+	if resp.status == 200:
+		zipCodeData = json.loads(content)
+	else:
+		responseDict = {'status' : 'ERROR',
+						'description' : 'Could not find zip codes'}	
+		yield json.dumps(responseDict)
 
-	zipcodes_found = PostalCode.objects.filter(lat__gte=)
+	# zipcodes_found = PostalCode.objects.filter(lat__gte=)
 	
 	print 'ZIP CODES FOUND'
 	
