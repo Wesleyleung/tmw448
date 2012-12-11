@@ -32,10 +32,12 @@ def responseGenerator(request):
 	limit = 1000
 	if 'limit' in request.GET:
 		limit = request.GET['limit']
+		limit = int(limit)
 
 	skip = 0
 	if 'skip' in request.GET:
 		skip = request.GET['skip']
+		skip = int(skip)
 
 	print 'STARTING ZIP CODE REQUEST'
 	centerLat = request.GET['lat']
