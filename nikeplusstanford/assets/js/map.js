@@ -460,8 +460,10 @@ function getHeatMapModel() {
     	{lat: center.lat(), lng: center.lng(), radius: radius, maxRows: maxRows},
     	function(data) {
     		console.log(data);
+    	}
+    );
     		//figure out what to do with the data. DRAW
-    });
+
 }
 
 

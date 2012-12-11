@@ -8,7 +8,7 @@ import httplib2
 from urllib import urlencode
 from os import environ
 
-from apps.fuelmapper.models	import NikeSportActivity, NikeUser
+from apps.fuelmapper.models	import NikeSportActivity, NikeUser,PostalCode
 
 def index(request):
 	context = {}
@@ -43,14 +43,20 @@ def loadSportFromZipcodeViewJSON(request):
 
 	request_url = "http://ws.geonames.org/findNearbyPostalCodesJSON?"
 	data = {'formatted': True, 'lat': request.GET['lat'], 'lng': centerLng, 'radius': radius, 'maxRows': maxRows}
-
 	h = httplib2.Http()
 	resp, content = h.request(request_url + urlencode(data), method="GET")
+	if resp.status == 200:
+		data = json.loads(content)
+		zipcodeParams = []
+		for obj in data['postalCodes']:
+			zipcodeParams.append(obj['postalCode'])
 
-	data = json.loads(content)
-	zipcodeParams = []
-	for obj in data['postalCodes']:
-		zipcodeParams.append(obj['postalCode'])
+
+	#LOCAL DEV ONLY
+	# zipcodeParams.append(60448)
+	# PostalCode.find_or_create_code("60448")
+	# PostalCode.objects.get(postalcode='60448')
+	# output = NikeSportActivity.objects.filter(postal_code=60448) 
 
 	print zipcodeParams
 	activities_found = NikeSportActivity.objects.filter(postal_code__in=zipcodeParams) 
@@ -64,4 +70,3 @@ def loadSportFromZipcodeViewJSON(request):
 						'data' : {'activities': activities_array,
 								  'count' : len(activities_array)}}	
 	return HttpResponse(json.dumps(responseDict), mimetype='application/json')
-
