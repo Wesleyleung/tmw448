@@ -63,6 +63,8 @@ def responseGenerator(request):
 						'description' : 'Could not find zip codes'}	
 		yield json.dumps(responseDict)
 
+	# zipcodes_found = PostalCode.objects.filter(lat__gte=)
+	
 	print 'ZIP CODES FOUND'
 	
 	zipcodes_found = []
@@ -106,7 +108,6 @@ def responseGenerator(request):
 	activities_array = []
 	days = []
 	for activity in activities_found:
-		max_fuel_in_range = max(max_fuel_in_range, activity.fuel_amt)
 		activity_JSON = activity.get_JSON()
 		activity_JSON['postal_code'] = zipcode_objects[activity.postal_code].get_JSON()
 		index = 0
@@ -121,6 +122,7 @@ def responseGenerator(request):
 			index = days.index(activity_JSON['start_time_standard'])
 		day = aggregates_data[index]
 		day['totalFuel'] = day['totalFuel'] + activity.fuel_amt
+		max_fuel_in_range = max(max_fuel_in_range, day['totalFuel'])
 		zip_index = 0
 		try:
 			zip_index = day['zipkeys'].index(activity.postal_code)
