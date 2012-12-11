@@ -421,7 +421,7 @@ function setMapZoom(zoom) {
 	map.setZoom(zoom);
 }
 
-function generateHeatMap() {
+function generateHeatMap(data) {
 	var heatMapData = heatmap.getData();
 	var length = global_heat_data.length;
 
@@ -429,6 +429,8 @@ function generateHeatMap() {
 		heatMapData.push(global_heat_data.shift());
 	};	
 	heatmap.setData(heatMapData);
+	//console.log(data['data']['aggregates']);
+	graph.initGraphWithJsonObject(JSON.stringify(data['data']['aggregates']));
 }
 
 function getHeatMapModel(callback) {

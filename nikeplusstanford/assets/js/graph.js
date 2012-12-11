@@ -5,6 +5,8 @@ function Graph(params) {
 	this.barToShowIndex = 0;
 	this.barArray = [];
 
+	this.color = d3.scale.category20();
+	//console.log(this.month[0]);
 	//this.initGraph();
 	var testjson = 
 	'{\
@@ -54,7 +56,7 @@ function Graph(params) {
 			}\
 		]\
 	}';
-	this.initGraphWithJsonObject(testjson);
+	//this.initGraphWithJsonObject(testjson);
 	//this.initGraphWithJsonObject(testjson2);
 
 	// $('body').bind('keypress', function() {
@@ -107,7 +109,6 @@ Graph.prototype = {
 		//use this to parse a myjson object
 		//json = JSON.parse( myjson );
 
-
 		//this should be the json response and not test csv file
 		d3.csv(static_file_url + "js/export.csv", function(error, data) {
 			console.log(data);
@@ -115,6 +116,7 @@ Graph.prototype = {
 			// Update the scale domains.
 			this.x.domain([0, this.numDays]);
 			this.y.domain([0, d3.max(data, function(d) { return parseInt(d.FUEL_AMT); })]);
+			//this.color.domain([0, ])
 
 			// Add an axis to show the day values.
 			// this.svg.append("g")
@@ -138,6 +140,8 @@ Graph.prototype = {
 				.attr("x", -this.barWidth / 2)
 				.attr("width", this.barWidth)
 				.attr("y", this.height)
+				.on("mouseover", over)
+       			.on("mouseout", out)
 				.transition()
 				.duration(700)
 				.attr("y", function(d) { return this.height - this.y(parseInt(d.FUEL_AMT)); }.bind(this))
@@ -206,6 +210,8 @@ Graph.prototype = {
 		// Update the scale domains.
 		this.x.domain([0, this.numDays - 1]);
 		this.y.domain([0, data.maxFuelInRange]);
+		//this.color.domain([0, 20]);
+
 
 		// Add labeled rects for each postal code.
 		var singleDay = days.selectAll(".days")
@@ -220,20 +226,40 @@ Graph.prototype = {
 			.attr("x", -this.barWidth / 2)
 			.attr("width", this.barWidth)
 			.attr("y", this.height)
+			.on("mouseover", this.over)
+       		.on("mouseout", this.out)
 			.transition()
 			.duration(700)
 			.attr("y", function(d) { return this.height - this.y(parseInt(d.totalFuel)); }.bind(this))
 			.attr("height", function(d) { return this.y(parseInt(d.totalFuel)); }.bind(this));
 
 		// Add labels to show birthyear.
-		singleDay.append("text")
-			.attr("text-anchor", "middle")
-			.attr("y", this.height)
-			.transition()
-			.duration(700)
-			.attr("y", function(d) { return this.height - this.y(parseInt(d.totalFuel)) + 10; }.bind(this))
-			.text(function(d, i) { return d.totalFuel; });
+		// singleDay.append("text")
+		// 	.attr("text-anchor", "middle")
+		// 	.attr("y", this.height)
+		// 	.transition()
+		// 	.duration(700)
+		// 	.attr("y", function(d) { return this.height - this.y(parseInt(d.totalFuel)) + 10; }.bind(this))
+		// 	.text(function(d, i) { return d.totalFuel; });
 	//}.bind(this));
+	},
+	over: function(d) {
+		var month = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', "Jul", 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+		var coords = d3.mouse(this.parentNode.parentNode);
+		var date = new Date(d.date*1000);
+		var dateStr = month[date.getMonth()] + ", " + date.getDate() + " " + date.getFullYear();
+		console.log(dateStr);
+	    d3.select(this.parentNode.parentNode).append("text")
+	        .attr("width", 100)
+	        .attr("height", 100)
+	        .attr("class", "infoBox")
+	        .text(dateStr + ": " + d.totalFuel + " fuel points earned")
+	        .attr("x", coords[0] + 5)
+	        .attr("y", coords[1] + 5);
+	},
+
+	out: function(d) {
+		d3.select(this.parentNode.parentNode).select(".infoBox").remove();
 	},
 
 	animateNextBar: function() {

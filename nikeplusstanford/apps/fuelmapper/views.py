@@ -42,6 +42,10 @@ def responseGenerator(request):
 	print 'STARTING ZIP CODE REQUEST'
 	centerLat = request.GET['lat']
 	centerLng = request.GET['lng']
+	neLat = request.GET['neLat']
+	neLng = request.GET['neLng']
+	swLat = request.GET['swLat']
+	swLng = request.GET['swLng']
 	# radius = int(request.GET['radius'])
 	radius = 20
 	# we're limited to a radius of 30 by the service
@@ -51,46 +55,30 @@ def responseGenerator(request):
 	endTime = float(request.GET['endTime'])
 	
 	yield ' '
-	request_url = "http://ws.geonames.org/findNearbyPostalCodesJSON?"
-	zip_request_data = {'lat': centerLat, 'lng': centerLng, 'radius': radius, 'maxRows' : 3}
-	h = httplib2.Http()
-	zipCodeData = None
-	resp, content = h.request(request_url + urlencode(zip_request_data), method="GET")
-	if resp.status == 200:
-		zipCodeData = json.loads(content)
-	else:
-		responseDict = {'status' : 'ERROR',
-						'description' : 'Could not find zip codes'}	
-		yield json.dumps(responseDict)
 
-	print 'ZIP CODES FOUND'
-	
-	zipcodes_found = []
+	zipcodes_found = PostalCode.objects.filter(lat__gte=swLat).filter(lng__gte=swLng).filter(lat__lte=neLat).filter(lng__lte=neLng)
+	zipcode_strings = []
 	zipcode_objects = {}
-	for obj in zipCodeData['postalCodes']:
-		zipcodes_found.append(obj['postalCode'])
-		zipcode_objects[obj['postalCode']] = PostalCode.find_or_create_code(obj['postalCode'])
+	for zipcode in zipcodes_found:
+		zipcode_strings.append(zipcode.postalcode)
+		zipcode_objects[zipcode.postalcode] = zipcode
 
-	#LOCAL DEV ONLY
-	# if environ.get('HEROKU') is not 'yes':
-	# 	zipcodes_found.append('60448')
-	# 	zipcode_objects['60448'] = PostalCode.find_or_create_code('60448')
+	yield ' '
+	print 'ZIP CODES FOUND LOCALLY'
+	print zipcode_strings
 
-	nike_hour_offset = 7 * 3600
 	startTime_timedate = datetime.fromtimestamp(startTime, utc)
 	endTime_timedate = datetime.fromtimestamp(endTime, utc)
-	print startTime_timedate
-	print endTime_timedate
 
 	print 'STARTING ACTIVITY QUERY'
 	yield ' '
-	activities_found_count = NikeSportActivity.objects.filter(postal_code__in=zipcodes_found
+	activities_found_count = NikeSportActivity.objects.filter(postal_code__in=zipcode_strings
 													).filter(start_time_local__gte=startTime_timedate
 													).filter(start_time_local__lte=endTime_timedate
 													).count()
 	yield ' '
 	print 'STARTING DB REQUEST WITH SORT'
-	activities_found = NikeSportActivity.objects.filter(postal_code__in=zipcodes_found
+	activities_found = NikeSportActivity.objects.filter(postal_code__in=zipcode_strings
 													).filter(start_time_local__gte=startTime_timedate
 													).filter(start_time_local__lte=endTime_timedate
 													).order_by('start_time_local')[skip:skip+limit]
@@ -106,7 +94,6 @@ def responseGenerator(request):
 	activities_array = []
 	days = []
 	for activity in activities_found:
-		max_fuel_in_range = max(max_fuel_in_range, activity.fuel_amt)
 		activity_JSON = activity.get_JSON()
 		activity_JSON['postal_code'] = zipcode_objects[activity.postal_code].get_JSON()
 		index = 0
@@ -121,6 +108,7 @@ def responseGenerator(request):
 			index = days.index(activity_JSON['start_time_standard'])
 		day = aggregates_data[index]
 		day['totalFuel'] = day['totalFuel'] + activity.fuel_amt
+		max_fuel_in_range = max(max_fuel_in_range, day['totalFuel'])
 		zip_index = 0
 		try:
 			zip_index = day['zipkeys'].index(activity.postal_code)
@@ -136,18 +124,21 @@ def responseGenerator(request):
 		aggregates['startDate'] = days[0]
 		aggregates['endDate'] = days.pop()
 	else:
-		aggregates['maxFuelInRange'] = 0
-		aggregates['startDate'] = 0
-		aggregates['endDate'] = 0
-	responseDict = {'success' : 'OK',
-						'parameters' : {'zipCodes' : zipcodes_found,
-										'limit' : limit,
-										'skip' : skip,
-										'total' : activities_found_count},
-						'data' : {'activities': activities_array,
-								  'count' : len(activities_array),
-								  'total' : activities_found_count,
-								  'aggregates' : aggregates}}	
+		aggregates['data'] = None
+	if len(activities_array) > 0:
+		responseDict = {'success' : 'OK',
+							'parameters' : {'zipCodes' : zipcode_strings,
+											'limit' : limit,
+											'skip' : skip,
+											'total' : activities_found_count},
+							'data' : {'activities': activities_array,
+									  'count' : len(activities_array),
+									  'total' : activities_found_count,
+									  'aggregates' : aggregates}}
+	else:
+		responseDict = {'success' : 'OK',
+						'parameters' : None,
+						'data' : None}	
 	print 'CREATED RESPONSE DICT'
 	yield ' '
 	yield json.dumps(responseDict)
@@ -165,7 +156,11 @@ def loadSportFromZipcodeViewJSON(request):
 	try:
 		centerLat = request.GET['lat']
 		centerLng = request.GET['lng']
-		radius = request.GET['radius']
+		neLat = request.GET['neLat']
+		neLng = request.GET['neLng']
+		swLat = request.GET['swLat']
+		swLng = request.GET['swLng']
+		# radius = request.GET['radius']
 		startTime = float(request.GET['startTime'])
 		endTime = float(request.GET['endTime'])
 	except KeyError:
