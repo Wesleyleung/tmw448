@@ -85,13 +85,13 @@ def responseGenerator(request):
 	activities_found = NikeSportActivity.objects.filter(postal_code__in=zipcodes_found
 													).filter(start_time_local__gte=startTime_timedate
 													).filter(start_time_local__lte=endTime_timedate
-													)[skip:skip+limit]
+													).order_by('start_time_local')[skip:skip+limit]
 	yield ' '
-	print 'STARTING ACTIVITY SORT'
+	print 'ACTIVITIES SORTED IN DB'
 
-	activities_found = sorted(activities_found, key=lambda activity: activity.start_time_local, reverse=True)
-	yield ' '
-	print 'ACTIVITIES SORTED'
+	# activities_found = sorted(activities_found, key=lambda activity: activity.start_time_local, reverse=True)
+	# yield ' '
+	# print 'ACTIVITIES SORTED'
 
 	activities_array = []
 	for activity in activities_found:
