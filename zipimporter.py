@@ -40,6 +40,8 @@ def importFromCSV(url):
 	f.close()
 	f = open(file_name, 'rb')
 	csvDict = csv.DictReader(f)
+	total = 0
+	print 'Starting import of zip codes.'
 	for line in csvDict:
 		zipcode = line['Zipcode']
 		if len(zipcode) == 5:
@@ -47,8 +49,12 @@ def importFromCSV(url):
 			while postal_code == None:
 				time.sleep(1)
 				postal_code = PostalCode.find_or_create_code(zipcode)
-				print 'postal code from loop: %s' % postal_code
-			print postal_code
+				print 'Total created: %d. Postal code from wait loop: %s' % (total, postal_code)
+			total += 1
+			if total % 100 == 0:
+				print 'Postal codes created:%d    \r' % total,
+				print ''
+	print 'Completed with %d total codes imported.' % total
 			# time.sleep(1)
 
 
