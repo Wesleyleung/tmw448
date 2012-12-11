@@ -54,7 +54,10 @@ Slider.prototype =  {
 	animateProgressBarTest: function() {
 		var interval = 15;
 		setInterval(function() {
-			if (this.sliderValue() >= this.animationTime) clearInterval();
+			if (this.sliderValue() >= this.animationTime) {
+				clearInterval();
+				tray.playAndPause(true);
+			}
 			this.slider.slider('value', this.sliderValue() + interval);
 		}.bind(this), interval);
 	},
