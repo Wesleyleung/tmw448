@@ -445,7 +445,7 @@ function getHeatMapModel(callback) {
     var radius = 5;
    		
     $.get( "loadSportFromZipcodeViewJSON",
-    	{lat: center.lat(), lng: center.lng(), radius: radius, maxRows: maxRows, startTime: start_time, endTime: end_time},
+    	{lat: center.lat(), lng: center.lng(), radius: radius, maxRows: maxRows, startTime: start_time, endTime: end_time, limit: 100},
     	function(data) {
     		if(data.success == "OK" && data.data.count > 0) {   	
 	    		global_heat_data = data;
