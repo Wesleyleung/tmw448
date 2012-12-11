@@ -63,9 +63,6 @@ def loadSportFromZipcodeViewJSON(request):
 	for obj in zipCodeData['postalCodes']:
 		zipcodes_found.append(obj['postalCode'])
 
-	#LOCAL DEV ONLY
-	zipcodes_found.append('60448')
-
 	nike_hour_offset = 7 * 3600
 	startTime_timedate = datetime.fromtimestamp(startTime, utc)
 	endTime_timedate = datetime.fromtimestamp(endTime, utc)
