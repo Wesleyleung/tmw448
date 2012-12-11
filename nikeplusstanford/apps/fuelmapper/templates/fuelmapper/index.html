@@ -29,7 +29,7 @@
     <script type="text/javascript"src="{{ STATIC_URL }}js/slider.js"></script>
     <script type="text/javascript"src="{{ STATIC_URL }}js/graph.js"></script>
     <script type="text/javascript"src="{{ STATIC_URL }}js/modal.js"></script>
-    <script type="text/javascript"src="{{ STATIC_URL }}js/jquery.joyride-2.0.2.js"></script> 
+   <!-- <script type="text/javascript"src="{{ STATIC_URL }}js/jquery.joyride-2.0.2.js"></script> -->
 
     <script type="text/javascript">
 
@@ -124,10 +124,33 @@
     </div>
 
     <div id="map_canvas"></div>
-    <div class="alert">
-      <button type="button" class="close" data-dismiss="alert">&times;</button>
-      <strong>Warning!</strong> Test Alert.
-    </div>
+
+          <!-- Tip Content -->
+    <ol id="joyRideTipContent">
+      <li data-button="Next">
+        <h2>Stop #4</h2>
+        <p>Modal Test</p>
+      </li>
+
+      <li data-id="tray-handle" data-text="Next" class="custom">
+        <h2>Stop #1</h2>
+        <p>.dsfdsfsdfsdfsdfsdf</p>
+      </li>
+      <li data-id="tray-play" data-button="Next" data-options="tipLocation:top;tipAnimation:fade">
+        <h2>Stop #2</h2>
+        <p>sdfsdfsdf!</p>
+      </li>
+      <li data-id="numero3" data-button="Next" data-options="tipLocation:right">
+        <h2>Stop #3</h2>
+        <p>It works right aligned.</p>
+      </li>
+      <li data-id="numero4" data-button="Close">
+        <h2>Stop #5</h2>
+        <p>Now what are you waiting for? Add this to your projects and get the most out of your apps!</p>
+      </li>
+    </ol>
+
+
     <script type="text/javascript">
       var modal = new Modal ({
         modal: $('#myModal')
@@ -147,5 +170,11 @@
         $( "#end_date" ).datepicker().datepicker("setDate", new Date());
       });
     </script>
+    <script>
+      $(window).load(function() {
+        $('#joyRideTipContent').joyride();
+      });
+    </script>
+
   </body>
 </html>
