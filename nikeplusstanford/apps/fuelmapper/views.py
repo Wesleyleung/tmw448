@@ -7,6 +7,8 @@ import math
 import httplib2 
 from urllib import urlencode
 from os import environ
+from datetime import datetime, timedelta
+from pytz import timezone, utc
 
 from apps.fuelmapper.models	import NikeSportActivity, NikeUser,PostalCode
 
@@ -26,23 +28,27 @@ def loadStaticJSON(request):
 		return HttpResponse(content.read(), mimetype='application/json')
 
 # We expect this to be a POST with these parameters in the body
-# zipCodes = array of strings representing zip codes to search and return data for
+# lat, lng = coordinates of the center of the view
+# radius = zip code search radius
 # startTime & endTime = unix encoded time values
-@csrf_exempt
 def loadSportFromZipcodeViewJSON(request):
-# #loadSportFromZipcodeViewJSON?swLat=36.66560863153126&swLng=-125.43725519921873&neLat=38.174996763572814&neLng=-118.89489680078123
+	if not request.method == 'GET':
+		responseDict = {'status' : 'ERROR',
+						'description' : 'Must be a get request.'}	
+		return HttpResponse(json.dumps(responseDict), mimetype='application/json', status=400)
 	try:
 		centerLat = request.GET['lat']
 		centerLng = request.GET['lng']
 		radius = request.GET['radius']
-		maxRows = request.GET['maxRows']
+		startTime = float(request.GET['startTime'])
+		endTime = float(request.GET['endTime'])
 	except KeyError:
 		responseDict = {'status' : 'ERROR',
 						'description' : 'Insufficient parameters.'}	
 		return HttpResponse(json.dumps(responseDict), mimetype='application/json', status=400)
 
 	request_url = "http://ws.geonames.org/findNearbyPostalCodesJSON?"
-	zip_request_data = {'formatted': True, 'lat': centerLat, 'lng': centerLng, 'radius': radius, 'maxRows': maxRows}
+	zip_request_data = {'lat': centerLat, 'lng': centerLng, 'radius': radius, 'maxRows' : 100}
 	h = httplib2.Http()
 	zipCodeData = None
 	resp, content = h.request(request_url + urlencode(zip_request_data), method="GET")
@@ -60,7 +66,15 @@ def loadSportFromZipcodeViewJSON(request):
 	#LOCAL DEV ONLY
 	zipcodes_found.append('60448')
 
-	activities_found = NikeSportActivity.objects.filter(postal_code__in=zipcodes_found) 
+	nike_hour_offset = 7 * 3600
+	startTime_timedate = datetime.fromtimestamp(startTime, utc)
+	endTime_timedate = datetime.fromtimestamp(endTime, utc)
+	print startTime_timedate
+	print endTime_timedate
+
+	activities_found = NikeSportActivity.objects.filter(postal_code__in=zipcodes_found
+													).filter(start_time_local__gte=startTime_timedate
+													).filter(start_time_local__lte=endTime_timedate) 
 
 	activities_array = []
 	for activity in activities_found:
