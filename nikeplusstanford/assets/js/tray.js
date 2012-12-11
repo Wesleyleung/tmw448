@@ -115,9 +115,13 @@ Tray.prototype =  {
 		if (!isPaused) {
 			this.progressBarWrapper.addClass('progress-striped');
 			this.progressBarWrapper.addClass('active');
+			this.playButton.html('<img src="' + static_file_url + 'img/pausebutton.png" />');
+			this.playButton.css('cursor', 'progress');
 		} else {
 			this.progressBarWrapper.removeClass('progress-striped');
 			this.progressBarWrapper.removeClass('active');
+			this.playButton.html('<img src="' + static_file_url + 'img/playbutton.png" />');
+			this.playButton.css('cursor', 'pointer');
 		}
 	}
 };
