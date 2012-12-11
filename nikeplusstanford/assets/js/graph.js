@@ -5,6 +5,8 @@ function Graph(params) {
 	this.barToShowIndex = 0;
 	this.barArray = [];
 
+	this.color = d3.scale.category20();
+
 	//this.initGraph();
 	var testjson = 
 	'{\
@@ -115,6 +117,7 @@ Graph.prototype = {
 			// Update the scale domains.
 			this.x.domain([0, this.numDays]);
 			this.y.domain([0, d3.max(data, function(d) { return parseInt(d.FUEL_AMT); })]);
+			//this.color.domain([0, ])
 
 			// Add an axis to show the day values.
 			// this.svg.append("g")
@@ -206,6 +209,7 @@ Graph.prototype = {
 		// Update the scale domains.
 		this.x.domain([0, this.numDays - 1]);
 		this.y.domain([0, data.maxFuelInRange]);
+		//this.color.domain([0, 20]);
 
 		// Add labeled rects for each postal code.
 		var singleDay = days.selectAll(".days")
