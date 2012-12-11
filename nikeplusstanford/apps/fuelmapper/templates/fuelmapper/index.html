@@ -60,8 +60,13 @@
       </div>
     </div>
     <div id="tray">
-      <div id="d3-graph"></div>
       <div id="tray-handle">+</div>
+      <div id="d3-graph-wrapper" class="row-fluid">
+        <div id="graph-spacer" class="span1"></div>
+        <div class="span11">
+          <div id="d3-graph"></div>
+        </div>
+      </div>
       <div id="tray-full-wrapper">
         <div id="tray-play-wrapper" class="row-fluid">
           <div class="row-fluid">
@@ -117,12 +122,12 @@
         </div>
       </div>
     </div>
-    <div class="alert">
-  <button type="button" class="close" data-dismiss="alert">&times;</button>
-  <strong>Warning!</strong> Test Alert.
-  </div>
 
     <div id="map_canvas"></div>
+    <div class="alert">
+      <button type="button" class="close" data-dismiss="alert">&times;</button>
+      <strong>Warning!</strong> Test Alert.
+    </div>
     <script type="text/javascript">
       var tray = new Tray ({
         tray: $("#tray"),

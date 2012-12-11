@@ -1,5 +1,15 @@
-.temp {
+#d3-graph-wrapper {
+	position: relative;
+	top: -220px;
+}
 
+#d3-graph {
+	height: 200px;
+	z-index: 3;
+}
+
+#graph-spacer {
+	z-index: 0;
 }
 
 svg {

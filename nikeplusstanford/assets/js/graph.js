@@ -1,133 +1,118 @@
 function Graph(params) {
 	this.jqueryGraph = params.graph;
 	this.graphIDString = params.graphDivName;
+
+	this.barToShowIndex = 0;
+	this.barArray = [];
+
+	this.initGraph();
+
+	$('body').bind('keypress', function() {
+		this.animateNextBar();
+	}.bind(this));
 }
 
 Graph.prototype = {
 	initGraph: function() {
-		var margin = {top: 20, right: 40, bottom: 30, left: 20},
-			width = 960 - margin.left - margin.right,
-			height = 500 - margin.top - margin.bottom,
-			barWidth = Math.floor(width / 19) - 1;
+		var margin = {top: 5, right: 0, bottom: 0, left: 0},
+			numDays = 10;
+			this.width = this.jqueryGraph.parent().width() - margin.left - margin.right;
+			this.height = 200 - margin.top - margin.bottom;
+			 //this should come from the json response
+		
+		this.barWidth = Math.floor(this.width / (numDays + 1)) - 2;
 
-		var x = d3.scale.linear()
-			.range([barWidth / 2, width - barWidth / 2]);
+		this.x = d3.scale.linear()
+			.range([this.barWidth / 2, this.width - this.barWidth / 2 - 2]);
 
-		var y = d3.scale.linear()
-			.range([height, 0]);
+		this.y = d3.scale.linear()
+			.range([0, this.height]);
 
 		var yAxis = d3.svg.axis()
-			.scale(y)
+			.scale(this.y)
 			.orient("right")
-			.tickSize(-width)
-			.tickFormat(function(d) { return Math.round(d / 1e6) + "M"; });
+			.tickSize(-this.width)
+			.tickFormat(function(d) { return ""; });
 
 		// An SVG element with a bottom-right origin.
-		var svg = d3.select(this.graphIDString).append("svg")
-			.attr("width", width + margin.left + margin.right)
-			.attr("height", height + margin.top + margin.bottom)
-			.append("g")
+		this.svg = d3.select(this.graphIDString).append("svg")
+			.attr("width", this.width + margin.left + margin.right)
+			.attr("height", this.height + margin.top + margin.bottom)
+			.append("g") // do i need this?
 			.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+			//.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
 		// A sliding container to hold the bars by birthyear.
-		var birthyears = svg.append("g")
-			.attr("class", "birthyears");
+		var days = this.svg.append("g")
+			.attr("class", "days");
 
 		// A label for the current year.
-		var title = svg.append("text")
+		var title = this.svg.append("text")
 			.attr("class", "title")
 			.attr("dy", ".71em")
 			.text(2000);
 
-		d3.csv("population.csv", function(error, data) {
-			// Convert strings to numbers.
-			data.forEach(function(d) {
-				d.people = +d.people;
-				d.year = +d.year;
-				d.age = +d.age;
-			});
-
-			// Compute the extent of the data set in age and years.
-			var age1 = d3.max(data, function(d) { return d.age; }),
-				year0 = d3.min(data, function(d) { return d.year; }),
-				year1 = d3.max(data, function(d) { return d.year; }),
-				year = year1;
+		//this should be the json response and not test csv file
+		d3.csv(static_file_url + "js/export.csv", function(error, data) {
 
 			// Update the scale domains.
-			x.domain([year1 - age1, year1]);
-			y.domain([0, d3.max(data, function(d) { return d.people; })]);
+			this.x.domain([0, data.length]);
+			this.y.domain([0, d3.max(data, function(d) { return parseInt(d.FUEL_AMT); })]);
 
-			// Produce a map from year and birthyear to [male, female].
-			data = d3.nest()
-				.key(function(d) { return d.year; })
-				.key(function(d) { return d.year - d.age; })
-				.rollup(function(v) { return v.map(function(d) { return d.people; }); })
-				.map(data);
+			// Add an axis to show the day values.
+			// this.svg.append("g")
+			// 	.attr("class", "y axis")
+			// 	.attr("transform", "translate(" + (this.width - 95) + ",0)")
+			// 	.call(yAxis)
+			// 	.selectAll("g")
+			// 	.filter(function(value) { return !value; });
+				//.classed("major", true);
 
-			// Add an axis to show the population values.
-			svg.append("g")
-				.attr("class", "y axis")
-				.attr("transform", "translate(" + width + ",0)")
-				.call(yAxis)
-				.selectAll("g")
-				.filter(function(value) { return !value; })
-				.classed("major", true);
-
-			// Add labeled rects for each birthyear (so that no enter or exit is required).
-			var birthyear = birthyears.selectAll(".birthyear")
-				.data(d3.range(year0 - age1, year1 + 1, 5))
+			// Add labeled rects for each postal code.
+			var singleDay = days.selectAll(".days")
+				.data(data)
 				.enter().append("g")
-				.attr("class", "birthyear")
-				.attr("transform", function(birthyear) { return "translate(" + x(birthyear) + ",0)"; });
+				.attr("class", "day")
+				.attr("transform", function(d, i) { return "translate(" + this.x(i) + ",-5)"; }.bind(this));
 
-			birthyear.selectAll("rect")
-				.data(function(birthyear) { return data[year][birthyear] || [0, 0]; })
-				.enter().append("rect")
-				.attr("x", -barWidth / 2)
-				.attr("width", barWidth)
-				.attr("y", y)
-				.attr("height", function(value) { return height - y(value); });
+			singleDay.selectAll("rect")
+				.data(function(d, i) { return [d]; });
 
 			// Add labels to show birthyear.
-			birthyear.append("text")
-				.attr("y", height - 4)
-				.text(function(birthyear) { return birthyear; });
+			// singleDay.append("text")
+			// 	.attr("y", this.height - 5)
+			// 	.text(function(d, i) { return "Day " + (i + 1); });
 
-			// Add labels to show age (separate; not animated).
-			svg.selectAll(".age")
-				.data(d3.range(0, age1 + 1, 5))
-				.enter().append("text")
-				.attr("class", "age")
-				.attr("x", function(age) { return x(year - age); })
-				.attr("y", height + 4)
-				.attr("dy", ".71em")
-				.text(function(age) { return age; });
+			// singleDay.append("text")
+			// 	.attr("y", function(d) { return this.height - this.y(parseInt(d.FUEL_AMT)) + 10; }.bind(this))
+			// 	.text(function(d, i) { return d.FUEL_AMT; });
+		}.bind(this));
+	},
 
-			// Allow the arrow keys to change the displayed year.
-			window.focus();
-			d3.select(window).on("keydown", function() {
-				switch (d3.event.keyCode) {
-				case 37: year = Math.max(year0, year - 10); break;
-				case 39: year = Math.min(year1, year + 10); break;
-			}
-				update();
-			});
+	animateNextBar: function() {
+		var days = this.svg.selectAll(".day")[0];
+		this.animateBar(days[this.barToShowIndex]);
+		this.barToShowIndex ++;
+	},
 
-			function update() {
-				if (!(year in data)) return;
-				title.text(year);
+	animateBar: function(node) {
+		node = d3.select(node);
+		node
+			.append("rect")
+			.attr("x", -this.barWidth / 2)
+			.attr("width", this.barWidth)
+			.attr("y", this.height)
+			.transition()
+			.duration(700)
+			.attr("y", function(d) { return this.height - this.y(parseInt(d.FUEL_AMT)); }.bind(this))
+			.attr("height", function(d) { return this.y(parseInt(d.FUEL_AMT)); }.bind(this));
 
-				birthyears.transition()
-					.duration(750)
-					.attr("transform", "translate(" + (x(year1) - x(year)) + ",0)");
-
-				birthyear.selectAll("rect")
-					.data(function(birthyear) { return data[year][birthyear] || [0, 0]; })
-					.transition()
-					.duration(750)
-					.attr("y", y)
-					.attr("height", function(value) { return height - y(value); });
-			}
-		});
+		node.append("text")
+			.attr("text-anchor", "middle")
+			.attr("y", this.height + 10)
+			.transition()
+			.duration(700)
+			.attr("y", function(d) { return this.height - this.y(parseInt(d.FUEL_AMT)) + 10; }.bind(this))
+			.text(function(d, i) { return d.FUEL_AMT; });
 	}
 }
