@@ -46,13 +46,13 @@ def importFromCSV(url):
 		zipcode = line['Zipcode']
 		if len(zipcode) == 5:
 			postal_code = PostalCode.find_or_create_code(zipcode)
-			sleep_time = 1
+			sleep_time = 5
 			while postal_code == None:
 				sleep_time = min(sleep_time, 2048)
 				time.sleep(sleep_time)
 				postal_code = PostalCode.find_or_create_code(zipcode)
 				print 'Sleeping in loop sleep time: %d.' % sleep_time
-				sleep_time *= 2
+				sleep_time *= 1.2
 				if postal_code != None:
 					print 'Total created: %d. Postal code from wait loop: %s' % (total, postal_code)
 			total += 1
