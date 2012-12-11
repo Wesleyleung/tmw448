@@ -1,6 +1,6 @@
 #d3-graph-wrapper {
 	position: relative;
-	top: -220px;
+	top: -225px;
 }
 
 #d3-graph {
@@ -36,11 +36,7 @@ svg {
 	fill: #666;
 }
 
-.birthyear, .age {
-	text-anchor: middle;
-}
-
-.birthyear {
+.day {
 	fill: #fff;
 }
 
