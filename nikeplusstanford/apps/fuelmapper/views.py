@@ -1,11 +1,14 @@
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.conf import settings
+from django.views.decorators.csrf import csrf_exempt
 import json
 import math
 import httplib2 
 from urllib import urlencode
 from os import environ
+from datetime import datetime, timedelta
+from pytz import timezone, utc
 
 from apps.fuelmapper.models	import NikeSportActivity, NikeUser,PostalCode
 
@@ -24,34 +27,60 @@ def loadStaticJSON(request):
 		content = open(settings.STATIC_ROOT + '/js/%s' % json_file)
 		return HttpResponse(content.read(), mimetype='application/json')
 
+# We expect this to be a POST with these parameters in the body
+# lat, lng = coordinates of the center of the view
+# radius = zip code search radius
+# startTime & endTime = unix encoded time values
 def loadSportFromZipcodeViewJSON(request):
-	centerLat = request.GET['lat']
-	centerLng = request.GET['lng']
-	radius = request.GET['radius']
-	maxRows = request.GET['maxRows']
+	if not request.method == 'GET':
+		responseDict = {'status' : 'ERROR',
+						'description' : 'Must be a get request.'}	
+		return HttpResponse(json.dumps(responseDict), mimetype='application/json', status=400)
+	try:
+		centerLat = request.GET['lat']
+		centerLng = request.GET['lng']
+		radius = request.GET['radius']
+		startTime = float(request.GET['startTime'])
+		endTime = float(request.GET['endTime'])
+	except KeyError:
+		responseDict = {'status' : 'ERROR',
+						'description' : 'Insufficient parameters.'}	
+		return HttpResponse(json.dumps(responseDict), mimetype='application/json', status=400)
 
 	request_url = "http://ws.geonames.org/findNearbyPostalCodesJSON?"
-	data = {'formatted': True, 'lat': request.GET['lat'], 'lng': centerLng, 'radius': radius, 'maxRows': maxRows}
+	zip_request_data = {'lat': centerLat, 'lng': centerLng, 'radius': radius, 'maxRows' : 100}
 	h = httplib2.Http()
-	resp, content = h.request(request_url + urlencode(data), method="GET")
+	zipCodeData = None
+	resp, content = h.request(request_url + urlencode(zip_request_data), method="GET")
 	if resp.status == 200:
-		data = json.loads(content)
-		zipcodeParams = []
-		for obj in data['postalCodes']:
-			zipcodeParams.append(obj['postalCode'])
-
-		#LOCAL DEV ONLY
-		# zipcodeParams.append(60448)
-		# PostalCode.find_or_create_code("60448")
-		# PostalCode.objects.get(postalcode='60448')
-		# output = NikeSportActivity.objects.filter(postal_code=60448) 
-
-
-		output = NikeSportActivity.objects.filter(postal_code__in=zipcodeParams) 
-		out_array = []
-		for activity in output:
-			out_array.append(activity.get_JSON())	
-
-		return HttpResponse(json.dumps(out_array), mimetype='application/json')
+		zipCodeData = json.loads(content)
 	else:
-		return resp.status
+		responseDict = {'status' : 'ERROR',
+						'description' : 'Could not find zip codes'}	
+		return HttpResponse(json.dumps(responseDict), mimetype='application/json', status=400)
+
+	zipcodes_found = []
+	for obj in zipCodeData['postalCodes']:
+		zipcodes_found.append(obj['postalCode'])
+
+	#LOCAL DEV ONLY
+	zipcodes_found.append('60448')
+
+	nike_hour_offset = 7 * 3600
+	startTime_timedate = datetime.fromtimestamp(startTime, utc)
+	endTime_timedate = datetime.fromtimestamp(endTime, utc)
+	print startTime_timedate
+	print endTime_timedate
+
+	activities_found = NikeSportActivity.objects.filter(postal_code__in=zipcodes_found
+													).filter(start_time_local__gte=startTime_timedate
+													).filter(start_time_local__lte=endTime_timedate) 
+
+	activities_array = []
+	for activity in activities_found:
+		activities_array.append(activity.get_JSON())
+	responseDict = {'success' : 'OK',
+						'parameters' : {'zipCodes' : zipcodes_found},
+						'data' : {'activities': activities_array,
+								  'count' : len(activities_array)}}	
+	return HttpResponse(json.dumps(responseDict), mimetype='application/json')

@@ -1,6 +1,10 @@
 from django.db import models
 import httplib2
 import json
+import time
+from datetime import datetime, tzinfo, timedelta
+
+from pytz import timezone, utc
 
 class NikeUser(models.Model):
     upm_user_id = models.CharField(max_length=200, unique=True)
@@ -111,7 +115,17 @@ class NikeSportActivity(models.Model):
 	def get_JSON(self):
 		output = {}
 		for field in NikeSportActivity._meta.fields:
-			output[field.name] = field.value_to_string(self)
+			output[field.name] = getattr(self, field.name)
+		# Nike stores it's times as its server local times (Beaverton, OR)
+		nike_hour_offset = 8 * 3600
+		output['start_time_standard'] = time.mktime((self.start_time_local - timedelta(0, nike_hour_offset)).utctimetuple())
+		del output['start_time_local']
+		del output['dst_offset']
+		del output['nike_user']
+		del output['duration']
+		del output['id']
+		del output['timezone_name']
+		output['postal_code'] = PostalCode.find_or_create_code(self.postal_code).get_JSON()
 		return output
 
 	def get_fields(self):
@@ -152,6 +166,27 @@ class PostalCode(models.Model):
 			obj.southwest_lng = geometry['viewport']['southwest']['lng']
 			obj.save()
 		return obj
+
+	def get_JSON(self):
+		jsonDict = {'geometry' : {
+						'bounds' : {
+							'northeast' : {
+								'lat' : self.northeast_lat,
+								'lng' : self.northeast_lng
+							},
+							'southwest' : {
+								'lat' : self.southwest_lat,
+								'lng' : self.southwest_lat
+							}
+						},
+						'location' : {
+							'lat' : self.lat,
+							'lng' : self.lng
+						}
+					},
+					'postal_code' : self.postalcode
+					}
+		return jsonDict
 
 	def __unicode__(self):
 		return '%s: location %f %f' % (self.postalcode, self.lat, self.lng)
