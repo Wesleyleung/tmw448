@@ -121,6 +121,27 @@ body {
 	top: 16px;
 }
 
+#start_date_wrapper {
+	position: relative;
+	display: inline-block;
+	float: left;
+	width: 79%;
+}
+
+#end_date_wrapper {
+	position: relative;
+	display: inline-block;
+	margin-left: 3px;
+}
+
+#start_date {
+	width: 85px;
+}
+
+#end_date {
+	width:85px;
+}
+
 .centered {
   display: inline-block;
   vertical-align: middle;
