@@ -40,7 +40,7 @@ def importFromCSV(url):
 	f.close()
 	f = open(file_name, 'rb')
 	csvDict = csv.DictReader(f)
-	total = 0
+	total = PostalCode.objects.all().count()
 	print 'Starting import of zip codes.'
 	for line in csvDict:
 		zipcode = line['Zipcode']
