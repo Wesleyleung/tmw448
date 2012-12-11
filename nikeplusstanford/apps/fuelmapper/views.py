@@ -39,6 +39,11 @@ def responseGenerator(request):
 		skip = request.GET['skip']
 		skip = int(skip)
 
+	zip_limit = 1000
+	if 'zip_limit' in request.GET:
+		zip_limit = request.GET['zip_limit']
+		zip_limit = int(zip_limit)
+
 	print 'STARTING ZIP CODE REQUEST'
 	neLat = request.GET['neLat']
 	neLng = request.GET['neLng']
@@ -48,8 +53,7 @@ def responseGenerator(request):
 	endTime = float(request.GET['endTime'])
 	
 	yield ' '
-	zip_limit = 20
-	zipcodes_found = PostalCode.objects.filter(lat__gte=swLat).filter(lng__gte=swLng).filter(lat__lte=neLat).filter(lng__lte=neLng)[:20]
+	zipcodes_found = PostalCode.objects.filter(lat__gte=swLat).filter(lng__gte=swLng).filter(lat__lte=neLat).filter(lng__lte=neLng)[:zip_limit]
 	zipcode_strings = []
 	zipcode_objects = {}
 	for zipcode in zipcodes_found:
