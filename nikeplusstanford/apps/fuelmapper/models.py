@@ -29,6 +29,33 @@ class NikeUser(models.Model):
     def __unicode__(self):
     	return self.upm_user_id
 
+class NikeSportUser(models.Model):
+    upm_user_id = models.CharField(max_length=200, unique=True)
+    gender = models.IntegerField(default=None, null=True)
+    postal_code = models.CharField(max_length=24, default=None)
+    height = models.FloatField(default=None, null=True)
+    weight = models.FloatField(default=None, null=True)
+    country = models.CharField(max_length=40, default=None, null=True)
+    year_birthdate = models.IntegerField(default=0, null=True)
+
+    def calculate_age(born):
+	    today = date.today()
+	    try: # raised when birth date is February 29 and the current year is not a leap year
+	        birthday = born.replace(year=today.year)
+	    except ValueError:
+	        birthday = born.replace(year=today.year, day=born.day-1)
+	    if birthday > today:
+	        return today.year - born.year - 1
+	    else:
+	        return today.year - born.year
+
+
+    def get_fields(self):
+    	return [(field.name, field.value_to_string(self)) for field in NikeSportActivity._meta.fields]
+
+    def __unicode__(self):
+    	return self.upm_user_id
+
 class NikeRun(models.Model):
     nike_id = models.CharField(max_length=200)
 

@@ -1,5 +1,5 @@
 import csv
-from apps.fuelmapper.models import NikeUser, NikeSportActivity
+from apps.fuelmapper.models import NikeSportUser, NikeSportActivity
 from datetime import datetime
 from django.db import IntegrityError
 from django.db.utils import DatabaseError
@@ -122,6 +122,8 @@ def importUsersFromCSV(url):
 	    print status,
 
 	f.close()
+	from django.db import connection
+	connection._rollback()
 	f = open(file_name, 'rb')
 	csvDict = csv.DictReader(f)
 	print csvDict
@@ -141,18 +143,22 @@ def importUsersFromCSV(url):
 		line['year_birthdate'] = new_year
 		if line['height'] == '':
 			line['height'] = 0
+		line['height'] = float(line['height'])
 		if line['weight'] == '':
 			line['weight'] = 0
-		if line['height'] == '':
-			line['height'] = 0
-		print line
-		newUser = NikeUser(**line)
+		line['weight'] = float(line['weight'])
+		if line['gender'] == '':
+			line['gender'] = 0
+		elif line['gender'] == '1' or line['gender'] == '2':
+			line['gender'] = int(line['gender'])
+		newUser = NikeSportUser(**line)
 		try:
 			newUser.save()
 			count += 1
 		except IntegrityError:
 			existingCount += 1
-		except DatabaseError:
+		except DatabaseError, e:
+			print e
 			errorCount += 1
 		print '%d rows completed. %d existing rows skipped. Error count: %d                      \r' % (count, existingCount, errorCount),
 	print ''
