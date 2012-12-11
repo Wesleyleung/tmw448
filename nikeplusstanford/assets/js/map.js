@@ -455,6 +455,34 @@ function getHeatMapModel(callback) {
     );
 }
 
+function loadHeatmapData(start_time, end_time, center, radius, skip, callback) {
+	    $.get( "loadSportFromZipcodeViewJSON",
+	    	{lat: center.lat(), lng: center.lng(), radius: radius, maxRows: maxRows, startTime: start_time, endTime: end_time, limit: 100},
+	    	function(data) {
+	    		if(data.success == "OK" && data.data.count > 0) {   	
+		    		global_heat_data = data;
+		    		var thisCount = data['data']['count']
+		    		var thisSkip = data['parameters']['skip']
+		    		var thisTotal = data['parameters']['total']
+		    		if (thisCount + thisSkip < thisTotal) {
+		    			loadHeatmapData(start_time, end_time, center, radius, (thisSkip + thisCount), callback);
+		    			var activities = data['data']['activities'];
+		    			for (var i = 0; i < activities.length; i++) {
+		    				var curActivity = activities[i];
+		    				var fuel_amt = curActivity.fuel_amt;
+		    				var lat = curActivity.postal_code.geometry.location.lat;
+		    				var lng = curActivity.postal_code.geometry.location.lat;
+		    				var dict = {location : new google.maps.LatLng(lat, lng),
+		    							weight : fuel_amt};
+		    				global_heat_data.push(dict);
+		    			};
+		    		}
+		    		callback(data);
+	    		}
+	    	}
+	    );
+}
+
 
 
 
