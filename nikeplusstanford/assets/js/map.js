@@ -156,6 +156,10 @@ function loadPathsFromJSON(path, minFuel, maxFuel) {
 }
 
 function graphPaths() {
+	//Gets unix time from tray selector
+	console.log(start_date.getTime()/1000);
+	console.log(end_date.getTime()/1000);
+
 	var minFuel = 0;
 	var maxFuel = 600;
 	if (pathLocationsLoaded) {
@@ -307,9 +311,7 @@ function polyClick (event, path) {
 // }
 function toggleHeatmap() {
  		console.log("heat map toggled");
-
-        heatmap.setMap(heatmap.getMap() ? null : map);
-      
+        heatmap.setMap(heatmap.getMap() ? null : map);    
 }
 
 function setMarkerAtLatLng(ll) {
