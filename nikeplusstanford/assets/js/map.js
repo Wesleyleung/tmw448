@@ -419,9 +419,27 @@ function generateHeatMap(callback) {
 		fuel_amt = global_heat_data.data.activities[i].fuel_amt;
 		lat = global_heat_data.data.activities[i].postal_code.geometry.location.lat;
 		lng = global_heat_data.data.activities[i].postal_code.geometry.location.lng;
-		start_time = global_heat_data.data.activities[i].start_time_standard;
+
+		nelat = global_heat_data.data.activities[i].postal_code.geometry.bounds.northeast.lat;
+		swlat = global_heat_data.data.activities[i].postal_code.geometry.bounds.southwest.lat;
+
+		nelng = global_heat_data.data.activities[i].postal_code.geometry.bounds.northeast.lng;
+		swlng = global_heat_data.data.activities[i].postal_code.geometry.bounds.southwest.lng;
+		
+		for(var i = 0; i < Math.floor((Math.random()*10)+1); i++) {
+			console.log(i);
+			var randomLat = nelat + (swlat-nelat)*Math.random();
+			var randomLng = nelng + (swlng-nelng)*Math.random();
+			var LatLng = new google.maps.LatLng(randomLat, randomLng);
+			var dict = {location: LatLng, weight: fuel_amt};
+			console.log(dict);
+			heatMapData.push(dict);
+		}
+		
+		//var start_time = global_heat_data.data.activities[i].start_time_standard;
 		var LatLng = new google.maps.LatLng(lat, lng)
 		var dict = {location: LatLng, weight: fuel_amt};
+		
 		heatMapData.push(dict);
 	}
 
@@ -432,7 +450,7 @@ function generateHeatMap(callback) {
 	heatmap.setOptions({
 		dissipating: true,
 		opacity:0.75,
-		radius:15
+		radius:20
 	});
 	heatmap.setMap(map);
 }
@@ -441,9 +459,10 @@ function getHeatMapModel(callback) {
 	var start_time = new Date($("#start_date").val()).getTime()/1000;
 	var end_time = new Date($("#end_date").val()).getTime()/1000;
 	var center = map.getCenter();
-    var maxRows = 10;
-    var radius = 5;
-    
+
+    var maxRows = 20;
+    var bounds = map.getBounds();
+    var radius = (bounds.getNorthEast().lat() - bounds.getSouthWest().lat()) * 55.6;
     $.get( "loadSportFromZipcodeViewJSON",
     	{lat: center.lat(), lng: center.lng(), radius: radius, maxRows: maxRows, startTime: start_time, endTime: end_time, limit: 100},
     	function(data) {
@@ -453,6 +472,34 @@ function getHeatMapModel(callback) {
     		}
     	}
     );
+}
+
+function loadHeatmapData(start_time, end_time, center, radius, skip, callback) {
+	    $.get( "loadSportFromZipcodeViewJSON",
+	    	{lat: center.lat(), lng: center.lng(), radius: radius, maxRows: maxRows, startTime: start_time, endTime: end_time, limit: 100},
+	    	function(data) {
+	    		if(data.success == "OK" && data.data.count > 0) {   	
+		    		global_heat_data = data;
+		    		var thisCount = data['data']['count']
+		    		var thisSkip = data['parameters']['skip']
+		    		var thisTotal = data['parameters']['total']
+		    		if (thisCount + thisSkip < thisTotal) {
+		    			loadHeatmapData(start_time, end_time, center, radius, (thisSkip + thisCount), callback);
+		    			var activities = data['data']['activities'];
+		    			for (var i = 0; i < activities.length; i++) {
+		    				var curActivity = activities[i];
+		    				var fuel_amt = curActivity.fuel_amt;
+		    				var lat = curActivity.postal_code.geometry.location.lat;
+		    				var lng = curActivity.postal_code.geometry.location.lat;
+		    				var dict = {location : new google.maps.LatLng(lat, lng),
+		    							weight : fuel_amt};
+		    				global_heat_data.push(dict);
+		    			};
+		    		}
+		    		callback(data);
+	    		}
+	    	}
+	    );
 }
 
 
