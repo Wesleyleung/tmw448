@@ -108,7 +108,8 @@ def loadSportFromZipcodeViewJSON(request):
 	responseDict = {'success' : 'OK',
 						'parameters' : {'zipCodes' : zipcodes_found,
 										'limit' : limit,
-										'skip' : skip},
+										'skip' : skip,
+										'total' : total},
 						'data' : {'activities': activities_array,
 								  'count' : len(activities_array),
 								  'total' : activities_found_count}}	
