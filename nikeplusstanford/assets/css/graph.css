@@ -32,8 +32,9 @@ svg {
 }
 
 .infoBox {
-	font: 14px Helvetica Neue;
+	font: 16px Helvetica Neue;
 	outline: 1px solid #fff;
+	background-color: gray;
 }
 
 .title {

@@ -246,6 +246,12 @@ Graph.prototype = {
 	over: function(d) {
 		var month = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', "Jul", 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 		var coords = d3.mouse(this.parentNode.parentNode);
+		var xcoord = coords[0] + 5;
+		var ycoord = coords[1] + 10;
+		var maxWidth = $('#d3-graph').width();
+		var maxHeight = $('#d3-graph').height();
+		if (xcoord + 300 > maxWidth) xcoord = coords[0] - 305;
+		console.log($('#d3-graph').width());
 		var date = new Date(d.date*1000);
 		var dateStr = month[date.getMonth()] + ", " + date.getDate() + " " + date.getFullYear();
 		console.log(dateStr);
@@ -254,8 +260,8 @@ Graph.prototype = {
 	        .attr("height", 100)
 	        .attr("class", "infoBox")
 	        .text(dateStr + ": " + d.totalFuel + " fuel points earned")
-	        .attr("x", coords[0] + 5)
-	        .attr("y", coords[1] + 5);
+	        .attr("x", xcoord)
+	        .attr("y", ycoord);
 	},
 
 	out: function(d) {

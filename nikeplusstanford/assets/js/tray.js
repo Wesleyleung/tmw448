@@ -52,7 +52,7 @@ Tray.prototype =  {
 
 	//Takes an optional argument true or false to set isPaused to
 	playAndPause: function() {
-		if (arguments.length != 0 && !isPaused) return false;
+		if (!isPaused) return false;
 		var start_input = $("#start_date").val()
 		var end_input = $("#end_date").val()
 
