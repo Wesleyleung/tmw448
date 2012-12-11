@@ -47,6 +47,8 @@ def loadSportFromZipcodeViewJSON(request):
 						'description' : 'Insufficient parameters.'}	
 		return HttpResponse(json.dumps(responseDict), mimetype='application/json', status=400)
 
+	print 'STARTING ZIP CODE REQUEST'
+
 	request_url = "http://ws.geonames.org/findNearbyPostalCodesJSON?"
 	zip_request_data = {'lat': centerLat, 'lng': centerLng, 'radius': radius, 'maxRows' : 100}
 	h = httplib2.Http()
@@ -59,6 +61,8 @@ def loadSportFromZipcodeViewJSON(request):
 						'description' : 'Could not find zip codes'}	
 		return HttpResponse(json.dumps(responseDict), mimetype='application/json', status=400)
 
+	print 'ZIP CODES FOUND'
+	
 	zipcodes_found = []
 	for obj in zipCodeData['postalCodes']:
 		zipcodes_found.append(obj['postalCode'])
@@ -73,11 +77,17 @@ def loadSportFromZipcodeViewJSON(request):
 	print startTime_timedate
 	print endTime_timedate
 
+	print 'STARTING ACTIVITY QUERY'
+
 	activities_found = NikeSportActivity.objects.filter(postal_code__in=zipcodes_found
 													).filter(start_time_local__gte=startTime_timedate
 													).filter(start_time_local__lte=endTime_timedate) 
 
+	print 'STARTING ACTIVITY SORT'
+
 	activities_found = sorted(activities_found, key=lambda activity: activity.start_time_local, reverse=True)
+
+	print 'ACTIVITIES SORTED'
 
 	activities_array = []
 	for activity in activities_found:
@@ -86,4 +96,5 @@ def loadSportFromZipcodeViewJSON(request):
 						'parameters' : {'zipCodes' : zipcodes_found},
 						'data' : {'activities': activities_array,
 								  'count' : len(activities_array)}}	
+	print 'CREATED RESPONSE DICT'
 	return HttpResponse(json.dumps(responseDict), mimetype='application/json')
