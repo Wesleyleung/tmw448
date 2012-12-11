@@ -15,6 +15,8 @@ var totalRuns = 0;
 var runVisualizationsEnded = 0;
 var numProgressIntervals = 0;
 var visFullyComplete = false;
+var global_heat_data = null;
+
 
 google.maps.event.addDomListener(window, 'load', function () {
 	initialize();
@@ -27,7 +29,6 @@ function initialize() {
 		mapTypeId: google.maps.MapTypeId.ROADMAP
 	};
 	map = new google.maps.Map(document.getElementById('map_canvas'), mapOptions);
-
 	//Try HTML5 geolocation
 	// if(navigator.geolocation) {
 	// 	navigator.geolocation.getCurrentPosition(function(position) {
@@ -48,7 +49,7 @@ function initialize() {
 	// }
 
 	google.maps.event.addListenerOnce(map, 'idle', function() {
-		generateHeatMap();	
+		//generateHeatMap();	
 	});
 	
 	//generateBoundaries();
@@ -314,8 +315,8 @@ function toggleHeatmap() {
         heatmap.setMap(heatmap.getMap() ? null : map);    
 }
 
+//Set a marker on the location searched
 function setMarkerAtLatLng(ll) {
-	//Set a marker on the location searched
 	//clear old marker
 	if (marker) marker.setMap(null);
 	//set marker to location
@@ -338,8 +339,13 @@ function searchLocation() {
 			var resType = results[0].geometry.location_type;
 			var res = results[0].geometry.location;
 			var LatLng = new google.maps.LatLng(res.lat(), res.lng());
+			var geocoder2 = new google.maps.Geocoder();
+			geocoder2.geocode({ 'latLng': LatLng, 'region': 'US' }, function (results, status) {
+				console.log(results[0]);
+			});
 			console.log(results[0]);
 			//If it's a rooftop location, set zoom to fairly high
+			//If there are no bounds, we can't use the function setLocationOnMapByBounds
 			if (resType == 'ROOFTOP' || !results[0].geometry.bounds) {
 				setLocationOnMapByLatLng(LatLng);
 				var maxZoomService = new google.maps.MaxZoomService();
@@ -360,7 +366,7 @@ function searchLocation() {
 			
 		} else {
 			if (!results.length) {
-				showModal("Location Not Found", '<p>Your search for "' + this.searchInput.val() + '" did not return any results.  Please search for another location.</p>');
+				modal.showModal("Location Not Found", '<p>Your search for "' + this.searchInput.val() + '" did not return any results.  Please search for another location.</p>');
 			}
 		}
 	});
@@ -391,7 +397,6 @@ function showModal(headerText, bodyText, includeFooter) {
 		this.modalFooter.remove();
 	}
 
-	//show modal
 	this.modal.modal();
 }
 
@@ -408,69 +413,48 @@ function setMapZoom(zoom) {
 	map.setZoom(zoom);
 }
 
+function generateHeatMap(callback) {
+	var heatMapData = [];
+	for (var i = 0; i < global_heat_data.data.count; i++) {
+		fuel_amt = global_heat_data.data.activities[i].fuel_amt;
+		lat = global_heat_data.data.activities[i].postal_code.geometry.location.lat;
+		lng = global_heat_data.data.activities[i].postal_code.geometry.location.lng;
+		start_time = global_heat_data.data.activities[i].start_time_standard;
+		var LatLng = new google.maps.LatLng(lat, lng)
+		var dict = {location: LatLng, weight: fuel_amt};
+		heatMapData.push(dict);
+	}
 
-function generateHeatMap() {
-	getHeatMapModel();
-	
+	heatmap = new google.maps.visualization.HeatmapLayer({
+		data: heatMapData
+	});
 
-	$.getJSON("loadStaticJSON?json_file=locations.json", function(json) {
-		//console.log(json);
-		var heatMapData = [];
-		var added = {}
-		for (var i = 0; i < json.locations.length; i++) {
-			var location = json.locations[i];
-			var LatLng = new google.maps.LatLng(location.coords.lat, location.coords.lng)
-			if (!added[LatLng]) {
-				//added additional points for testing purposes
-				// var delta = 0.0025;
-				// var dictne = {location: new google.maps.LatLng(location.coords.lat+delta, location.coords.lng+delta), weight: location.weight};
-				// var dictse = {location: new google.maps.LatLng(location.coords.lat+delta, location.coords.lng-delta), weight: location.weight};
-				// var dictnw = {location: new google.maps.LatLng(location.coords.lat-delta, location.coords.lng+delta), weight: location.weight};
-				// var dictsw = {location: new google.maps.LatLng(location.coords.lat-delta, location.coords.lng-delta), weight: location.weight};
-				// heatMapData.push(dictne);
-				// heatMapData.push(dictse);
-				// heatMapData.push(dictnw);
-				// heatMapData.push(dictsw);
-
-				var dict = {location: LatLng , weight: location.weight};
-				heatMapData.push(dict);
-				added[LatLng] = true;
-			}
-		};
-		heatmap = new google.maps.visualization.HeatmapLayer({
-			data: heatMapData
-		});
-		heatmap.setOptions({
-			dissipating: true,
-			opacity:0.75,
-			radius:20
-		});
-		heatmap.setMap(map);
-	 });
+	heatmap.setOptions({
+		dissipating: true,
+		opacity:0.75,
+		radius:15
+	});
+	heatmap.setMap(map);
 }
 
-function getHeatMapModel() {
+function getHeatMapModel(callback) {
 	var start_time = new Date($("#start_date").val()).getTime()/1000;
 	var end_time = new Date($("#end_date").val()).getTime()/1000;
-
-
-	var geocoder = new google.maps.Geocoder();
-	var bounds = map.getBounds();
 	var center = map.getCenter();
     var maxRows = 10;
     var radius = 5;
-    		
-
-    $.get(
-    	"loadSportFromZipcodeViewJSON",
+   		
+    $.get( "loadSportFromZipcodeViewJSON",
     	{lat: center.lat(), lng: center.lng(), radius: radius, maxRows: maxRows, startTime: start_time, endTime: end_time},
     	function(data) {
-    		console.log(data);
+    		if(data.success == "OK" && data.data.count > 0) {   	
+	    		global_heat_data = data;
+	    		callback(data);
+    		}
     	}
     );
-    		//figure out what to do with the data. DRAW
-
 }
+
 
 
 

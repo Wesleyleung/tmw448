@@ -1,6 +1,6 @@
 function Slider (params) {
 	this.slider = params.slider;
-	this.animationTime = 30000;
+	this.animationTime = 10000;
 	this.timeStartedAnimating = 0;
 	this.initSlider();
 	//this.animateSliderOverTime();
@@ -33,6 +33,9 @@ Slider.prototype =  {
 		this.slideElement = this.slider.children("a");
 		//set slider color
 		this.bar.css("background","#0D90D1");
+
+		//disable slide drag
+		this.slideElement.mousedown(function() { return false; });
 	},
 	/*
 	on start button click, store current system time.
@@ -48,10 +51,13 @@ Slider.prototype =  {
 		this.readSliderWhileAnimating();
 	},
 
-	animateProgressBarTest: function() {
+	animateProgressBar: function() {
 		var interval = 15;
 		setInterval(function() {
-			if (this.sliderValue() >= this.animationTime) clearInterval();
+			if (this.sliderValue() >= this.animationTime) {
+				clearInterval();
+				tray.playAndPause(true);
+			}
 			this.slider.slider('value', this.sliderValue() + interval);
 		}.bind(this), interval);
 	},

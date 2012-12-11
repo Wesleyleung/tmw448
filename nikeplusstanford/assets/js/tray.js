@@ -20,6 +20,7 @@ function Tray (params) {
 
 Tray.prototype =  {
 	//Define functions here
+
 	initTray: function() {
 		this.tray.css('bottom', this.tray.height() * -1 + this.trayPlayControlsWrapper.height());
 		this.numProgressIntervals = 0;
@@ -27,7 +28,6 @@ Tray.prototype =  {
 	},
 
 	setNumProgressIntervals: function(num) {
-		console.log(num);
 		this.numProgressIntervals = num;
 	},
 
@@ -62,7 +62,7 @@ Tray.prototype =  {
 		start_date = new Date(start_input)
 		end_date = new Date(end_input)	
 		if(start_date >= end_date) {
-			alert("Please enter a valid date range.");
+			modal.showModal("Not a Valid Date", '<p>Please select a start date after the end date.</p>');
 			return false;
 		}
 		//If an argument is passed in, use it to set isPaused
@@ -71,7 +71,10 @@ Tray.prototype =  {
 		this.setProgressBarActiveState(isPaused);
 		if (!isPaused) {
 			this.playButton.html('<img src="' + static_file_url + 'img/pausebutton.png" />');
+			slider.animateProgressBar();
 			//graphPaths from map.js
+			getHeatMapModel(generateHeatMap);
+			
 			graphPaths();
 		} else {
 			this.playButton.html('<img src="' + static_file_url + 'img/playbutton.png" />');
@@ -91,7 +94,6 @@ Tray.prototype =  {
 		/*this.progressBar.animate({
 			width: percentage + "%"
 		}, 10);*/
-		console.log(percentage);
 		this.progressBar.width(percentage + "%");
 	},
 
