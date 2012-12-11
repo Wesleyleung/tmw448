@@ -55,17 +55,6 @@ def responseGenerator(request):
 	endTime = float(request.GET['endTime'])
 	
 	yield ' '
-	# request_url = "http://ws.geonames.org/findNearbyPostalCodesJSON?"
-	# zip_request_data = {'lat': centerLat, 'lng': centerLng, 'radius': radius, 'maxRows' : 3}
-	# h = httplib2.Http()
-	# zipCodeData = None
-	# resp, content = h.request(request_url + urlencode(zip_request_data), method="GET")
-	# if resp.status == 200:
-	# 	zipCodeData = json.loads(content)
-	# else:
-	# 	responseDict = {'status' : 'ERROR',
-	# 					'description' : 'Could not find zip codes'}	
-	# 	yield json.dumps(responseDict)
 
 	zipcodes_found = PostalCode.objects.filter(lat__gte=swLat).filter(lng__gte=swLng).filter(lat__lte=neLat).filter(lng__lte=neLng)
 	zipcode_strings = []
@@ -74,24 +63,12 @@ def responseGenerator(request):
 		zipcode_strings.append(zipcode.postalcode)
 		zipcode_objects[zipcode.postalcode] = zipcode
 
+	yield ' '
+	print 'ZIP CODES FOUND LOCALLY'
 	print zipcode_strings
-	print 'ZIP CODES FOUND'
-	
-	# zipcodes_found = []
-	# zipcode_objects = {}
-	# for obj in zipCodeData['postalCodes']:
-	# 	zipcodes_found.append(obj['postalCode'])
-	# 	zipcode_objects[obj['postalCode']] = PostalCode.find_or_create_code(obj['postalCode'])
-
-	#LOCAL DEV ONLY
-	# if environ.get('HEROKU') is not 'yes':
-	# 	zipcodes_found.append('60448')
-	# 	zipcode_objects['60448'] = PostalCode.find_or_create_code('60448')
 
 	startTime_timedate = datetime.fromtimestamp(startTime, utc)
 	endTime_timedate = datetime.fromtimestamp(endTime, utc)
-	print startTime_timedate
-	print endTime_timedate
 
 	print 'STARTING ACTIVITY QUERY'
 	yield ' '
