@@ -34,7 +34,7 @@ svg {
 .infoBox {
 	font: 16px Helvetica Neue;
 	outline: 1px solid #fff;
-	background-color: gray;
+	z-index: 5;
 }
 
 .title {
@@ -44,6 +44,7 @@ svg {
 
 .day {
 	fill: #fff;
+	z-index: 4;
 }
 
 rect {
