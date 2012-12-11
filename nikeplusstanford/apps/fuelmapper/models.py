@@ -1,6 +1,10 @@
 from django.db import models
 import httplib2
 import json
+import time
+from datetime import datetime, tzinfo, timedelta
+
+from pytz import timezone, utc
 
 class NikeUser(models.Model):
     upm_user_id = models.CharField(max_length=200, unique=True)
@@ -111,7 +115,11 @@ class NikeSportActivity(models.Model):
 	def get_JSON(self):
 		output = {}
 		for field in NikeSportActivity._meta.fields:
-			output[field.name] = field.value_to_string(self)
+			output[field.name] = getattr(self, field.name)
+		# Nike stores it's times as its server local times (Beaverton, OR)
+		nike_hour_offset = 8 * 3600
+		output['start_time_standard'] = time.mktime((self.start_time_local - timedelta(0, nike_hour_offset)).utctimetuple())
+		del output['start_time_local']
 		return output
 
 	def get_fields(self):

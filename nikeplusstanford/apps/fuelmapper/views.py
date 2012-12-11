@@ -1,6 +1,7 @@
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.conf import settings
+from django.views.decorators.csrf import csrf_exempt
 import json
 import math
 import httplib2
@@ -23,31 +24,35 @@ def loadStaticJSON(request):
 		content = open(settings.STATIC_ROOT + '/js/%s' % json_file)
 		return HttpResponse(content.read(), mimetype='application/json')
 
+# We expect this to be a POST with these parameters in the body
+# zipCodes = array of strings representing zip codes to search and return data for
+# startTime & endTime = unix encoded time values
+@csrf_exempt
 def loadSportFromZipcodeViewJSON(request):
-	print request
+	try:
+		zipCodes = request.POST['zipCodes']
+		startTime = request.POST['startTime']
+		endTime = request.POST['endTime']
+	except KeyError:
+		responseDict = {'status' : 'ERROR',
+						'description' : 'Insufficient parameters.'}	
+		return HttpResponse(json.dumps(responseDict), mimetype='application/json', status=400)
 
-	swLat = request.GET['swLat']
-	swLng = request.GET['swLng']
-	neLat = request.GET['neLat']
-	neLng = request.GET['neLng']
-
-
-	test = int(math.floor(swLat))
-	print test
-
-	print swLat, swLng, neLat, neLng
-	
-	for i in range(int(math.floor(swLat)), int(math.ceil(neLat))):
-		for j in range(int(math.floor(swLng)), int(math.ceil(neLng))):
-			print i, j
 
 
 	output = NikeSportActivity.objects.all()[:5]
 
-	out_array = []
+	activities_array = []
 	for activity in output:
-		out_array.append(activity.get_JSON())	
-	return HttpResponse(json.dumps(out_array), mimetype='application/json')
+		activities_array.append(activity.get_JSON())
+	print activities_array
+	responseDict = {'success' : 'OK',
+					'parameters' : {'zipCodes' : zipCodes,
+									'startTime' : startTime,
+									'endTime' : endTime},
+					'data' : {'activities': activities_array,
+							  'count' : len(activities_array)}}	
+	return HttpResponse(json.dumps(responseDict), mimetype='application/json')
 
 
 
