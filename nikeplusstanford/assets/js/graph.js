@@ -7,20 +7,21 @@ function Graph(params) {
 
 	this.initGraph();
 
-	$('body').bind('keypress', function() {
-		this.animateNextBar();
-	}.bind(this));
+	// $('body').bind('keypress', function() {
+	// 	this.animateNextBar();
+	// }.bind(this));
 }
 
 Graph.prototype = {
 	initGraph: function() {
-		var margin = {top: 5, right: 0, bottom: 0, left: 0},
-			numDays = 10;
+		var margin = {top: 5, right: 0, bottom: 0, left: 0};
+			//this.numDays needs to be set beforehand
+			this.numDays = 10;
 			this.width = this.jqueryGraph.parent().width() - margin.left - margin.right;
 			this.height = 200 - margin.top - margin.bottom;
 			 //this should come from the json response
 		
-		this.barWidth = Math.floor(this.width / (numDays + 1)) - 2;
+		this.barWidth = Math.floor(this.width / (this.numDays + 1)) - 2;
 
 		this.x = d3.scale.linear()
 			.range([this.barWidth / 2, this.width - this.barWidth / 2 - 2]);
@@ -47,16 +48,16 @@ Graph.prototype = {
 			.attr("class", "days");
 
 		// A label for the current year.
-		var title = this.svg.append("text")
-			.attr("class", "title")
-			.attr("dy", ".71em")
-			.text(2000);
+		// var title = this.svg.append("text")
+		// 	.attr("class", "title")
+		// 	.attr("dy", ".71em")
+		// 	.text(2000);
 
 		//this should be the json response and not test csv file
 		d3.csv(static_file_url + "js/export.csv", function(error, data) {
 
 			// Update the scale domains.
-			this.x.domain([0, data.length]);
+			this.x.domain([0, this.numDays]);
 			this.y.domain([0, d3.max(data, function(d) { return parseInt(d.FUEL_AMT); })]);
 
 			// Add an axis to show the day values.
@@ -81,12 +82,17 @@ Graph.prototype = {
 				.attr("x", -this.barWidth / 2)
 				.attr("width", this.barWidth)
 				.attr("y", this.height)
+				.transition()
+				.duration(700)
 				.attr("y", function(d) { return this.height - this.y(parseInt(d.FUEL_AMT)); }.bind(this))
 				.attr("height", function(d) { return this.y(parseInt(d.FUEL_AMT)); }.bind(this));
 
 			// Add labels to show birthyear.
 			singleDay.append("text")
 				.attr("text-anchor", "middle")
+				.attr("y", this.height)
+				.transition()
+				.duration(700)
 				.attr("y", function(d) { return this.height - this.y(parseInt(d.FUEL_AMT)) + 10; }.bind(this))
 				.text(function(d, i) { return d.FUEL_AMT; });
 			// singleDay.append("text")
