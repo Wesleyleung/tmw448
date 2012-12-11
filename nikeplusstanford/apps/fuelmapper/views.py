@@ -1,4 +1,4 @@
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, StreamingHttpResponse
 from django.shortcuts import render
 from django.conf import settings
 from django.views.decorators.csrf import csrf_exempt
@@ -44,7 +44,7 @@ def responseGenerator(request):
 	startTime = float(request.GET['startTime'])
 	endTime = float(request.GET['endTime'])
 
-	yield 'hi '
+	yield ' '
 	request_url = "http://ws.geonames.org/findNearbyPostalCodesJSON?"
 	zip_request_data = {'lat': centerLat, 'lng': centerLng, 'radius': radius, 'maxRows' : 100}
 	h = httplib2.Http()
@@ -74,7 +74,7 @@ def responseGenerator(request):
 	print endTime_timedate
 
 	print 'STARTING ACTIVITY QUERY'
-	yield 'hello '
+	yield ' '
 	activities_found_count = NikeSportActivity.objects.filter(postal_code__in=zipcodes_found
 													).filter(start_time_local__gte=startTime_timedate
 													).filter(start_time_local__lte=endTime_timedate
@@ -129,6 +129,6 @@ def loadSportFromZipcodeViewJSON(request):
 
 	
 
-	response = HttpResponse(content=responseGenerator(request), content_type='application/json', status=200)
+	response = HttpResponse(responseGenerator(request), content_type='application/json')
 
 	return response
