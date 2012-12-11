@@ -82,6 +82,7 @@ def responseGenerator(request):
 													).filter(start_time_local__lte=endTime_timedate
 													).count()
 	yield ' '
+	print 'STARTING DB REQUEST WITH SORT'
 	activities_found = NikeSportActivity.objects.filter(postal_code__in=zipcodes_found
 													).filter(start_time_local__gte=startTime_timedate
 													).filter(start_time_local__lte=endTime_timedate
