@@ -452,107 +452,16 @@ function getHeatMapModel() {
 	var geocoder = new google.maps.Geocoder();
 	var bounds = map.getBounds();
 	var center = map.getCenter();
-    var zipcodes = [];
-
-
-    // $.get(
-    // 	"http://ws.geonames.org/findNearbyPostalCodesJSON?formatted=true",
-    // 	{lat: center.lat(), lng: center.lng(), radius: 5, maxRows: 10},
-    // 	function(data) {
-    // 		console.log(data['postalCodes']);
-
-    // 		// for (object in data['postalCodes']){
-    // 		// 	console.log(object);
-    // 		// 
-
-    // 		for (var i = 0; i < data['postalCodes'].length; i++) {
-    // 			console.log(data['postalCodes'][i]['postalCode']);
-    // 			zipcodes.push(data['postalCodes'][i]['postalCode']);
-    // 		}
-    // 		console.log(zipcodes);
-
-    // 	}
-    // );
-
+    var maxRows = 10;
+    var radius = 5;
 
     $.get(
     	"loadSportFromZipcodeViewJSON",
-    	{lat: center.lat(), lng: center.lng(), radius: 5, maxRows: 10},
+    	{lat: center.lat(), lng: center.lng(), radius: radius, maxRows: maxRows},
     	function(data) {
-    		alert('page content:' + data);
-    	}
-    );
-
-
-	
-
-   // for (var i = Math.floor(swLat); i < Math.ceil(neLat); i++) {
-    //	for (var j = Math.floor(swLng); j < Math.ceil(neLng); j++) {
-    			
-    			//var Latlng = new google.maps.LatLng(i,j);
-   				// var LatLng = new google.maps.LatLng(i, j);
-    			
-    			// console.log(i,j);
-    // 			geocoder.geocode({'latLng': center, 'region': 'US'}, function (results, status) {
-		
-					
-				// 	console.log(status);
-				// 	if (status == google.maps.GeocoderStatus.OK) {
-				// 		console.log(results);
-				// 		var address = results[0].address_components;
-				// 		console.log("address" + address);
-				// 		var zipcode = address[address.length - 1].long_name;
-				// 		console.log("zipcode" + zipcode);
-	   //  				zipcodes.push(zipcode)
-	   //  			} else {
-	   //  				console.log("dfsdfdsf");
-	   //  			}
-	    		
-    // 			});
-    // 	//}
-    // //}
-    // console.log(zipcodes);
-
-    $.get(
-    	"loadSportFromZipcodeViewJSON",
-    	{swLat: swLat, swLng: swLng, neLat: neLat, neLng: neLng},
-    	function(data) {
-    		alert('page content:' + data);
-    	}
-    );
-
-//     "loadStaticJSON?json_file=randomRuns.json"
-
-// function loadPathsFromJSON(path, minFuel, maxFuel) {
-// 	$.getJSON(path, function(json) {
-
-	//get request using lat, lng bounds
-	//send start time, end time
-
-	//response json
-
-
-
-	//is puased false
-	//pass in data from view 
-	//GET VIEWPORT
-
-	//HTTP CALL TO SERVER
-	//GET JSON BACK
-	//DRAW
-
-
-
-// 	function (request, response) {
-//   geocoder.geocode({ 'address': request.term, 'latLng': centLatLng, 'region': 'US' }, function (results, status) {
-//     response($.map(results, function (item) {
-//       return {
-
-//       	var address = results[0].address_components;
-// var zipcode = address[address.length - 1].long_name;
-//        item.address_components.postal_code;//This is what you want to look at
-//       }
-
+    		console.log(data);
+    		//figure out what to do with the data. DRAW
+    });
 }
 
 

@@ -4,7 +4,8 @@ from django.conf import settings
 from django.views.decorators.csrf import csrf_exempt
 import json
 import math
-import httplib2
+import httplib2 
+from urllib import urlencode
 from os import environ
 
 from apps.fuelmapper.models	import NikeSportActivity, NikeUser
@@ -29,6 +30,7 @@ def loadStaticJSON(request):
 # startTime & endTime = unix encoded time values
 @csrf_exempt
 def loadSportFromZipcodeViewJSON(request):
+<<<<<<< HEAD
 	jsonPOST = json.loads(request.body)
 	try:
 		zipCodes = jsonPOST['zipCodes']
@@ -58,16 +60,30 @@ def loadSportFromZipcodeViewJSON(request):
 
 
 # #loadSportFromZipcodeViewJSON?swLat=36.66560863153126&swLng=-125.43725519921873&neLat=38.174996763572814&neLng=-118.89489680078123
+=======
+	centerLat = request.GET['lat']
+	centerLng = request.GET['lng']
+	radius = request.GET['radius']
+	maxRows = request.GET['maxRows']
 
+	request_url = "http://ws.geonames.org/findNearbyPostalCodesJSON?"
+	data = {'formatted': True, 'lat': request.GET['lat'], 'lng': centerLng, 'radius': radius, 'maxRows': maxRows}
 
+	h = httplib2.Http()
+	resp, content = h.request(request_url + urlencode(data), method="GET")
 
-# 	sport_activty_data = NikeSportActivity.objects.all()[:1]
-# 	return 0
+	data = json.loads(content)
+	zipcodeParams = []
+	for obj in data['postalCodes']:
+		zipcodeParams.append(obj['postalCode'])
 
-# def NikeModelToJSON
+	print zipcodeParams
+	output = NikeSportActivity.objects.filter(postal_code__in=zipcodeParams) 
 
-# [<NikeSportActivity: e55fbb86-73ae-4467-9eaa-f97137be82cc>, 
-# 	#params start time, end time, 
-# 	#params 4 lat, lng pairs
-# 	#geocoding. 
+	out_array = []
+	for activity in output:
+		out_array.append(activity.get_JSON())	
+>>>>>>> 7636d60718c6a6a007087afd2b16b7ad10c60520
+
+	return HttpResponse(json.dumps(out_array), mimetype='application/json')
 
