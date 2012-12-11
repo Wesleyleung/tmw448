@@ -75,12 +75,12 @@
                 <a id="tray-play" href="#"><img src="{{ STATIC_URL }}img/playbutton.png" /></a>
               </div>
               <div class="span10">
-                <div id="tray-progress-wrapper" class="progress">
+                <!--<div id="tray-progress-wrapper" class="progress">
                   <div id="tray-progress-bar" class="bar"></div>
-                </div>
-                <!--<div id="slider-wrapper">
-                  <div id="slider"></div>
                 </div>-->
+                <div id="slider-wrapper">
+                  <div id="slider"></div>
+                </div>
               </div>
             </div>
           </div>
@@ -129,6 +129,9 @@
       <strong>Warning!</strong> Test Alert.
     </div>
     <script type="text/javascript">
+      var slider = new Slider ({
+        slider: $("#slider")
+      });
       var tray = new Tray ({
         tray: $("#tray"),
       });
@@ -140,9 +143,6 @@
         $( "#start_date" ).datepicker().datepicker("setDate", new Date("2/1/2012"));
         $( "#end_date" ).datepicker().datepicker("setDate", new Date());
       });
-      // var slider = new Slider ({
-      //   slider: $("slider")
-      // });
     </script>
   </body>
 </html>

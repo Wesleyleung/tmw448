@@ -13,6 +13,7 @@ function Tray (params) {
 
 	this.playButton.bind('click', function() {
 		this.playAndPause();
+		slider.animateProgressBarTest();
 	}.bind(this));
 
 	this.initTray();
@@ -27,7 +28,6 @@ Tray.prototype =  {
 	},
 
 	setNumProgressIntervals: function(num) {
-		console.log(num);
 		this.numProgressIntervals = num;
 	},
 
@@ -91,7 +91,6 @@ Tray.prototype =  {
 		/*this.progressBar.animate({
 			width: percentage + "%"
 		}, 10);*/
-		console.log(percentage);
 		this.progressBar.width(percentage + "%");
 	},
 
