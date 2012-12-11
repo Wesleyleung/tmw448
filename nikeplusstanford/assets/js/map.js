@@ -484,7 +484,6 @@ function getHeatMapModel() {
     );
 
 
-	
 
    // for (var i = Math.floor(swLat); i < Math.ceil(neLat); i++) {
     //	for (var j = Math.floor(swLng); j < Math.ceil(neLng); j++) {
