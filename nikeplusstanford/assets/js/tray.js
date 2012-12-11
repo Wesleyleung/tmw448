@@ -52,6 +52,7 @@ Tray.prototype =  {
 
 	//Takes an optional argument true or false to set isPaused to
 	playAndPause: function() {
+		if (arguments.length != 0 && !isPaused) return false;
 		var start_input = $("#start_date").val()
 		var end_input = $("#end_date").val()
 
@@ -71,13 +72,15 @@ Tray.prototype =  {
 		this.setProgressBarActiveState(isPaused);
 		if (!isPaused) {
 			this.playButton.html('<img src="' + static_file_url + 'img/pausebutton.png" />');
-			slider.animateProgressBar();
+			this.playButton.css('cursor', 'progress');
+			//slider.animateProgressBar();
 			//graphPaths from map.js
 			getHeatMapModel(generateHeatMap);
 			
 			graphPaths();
 		} else {
 			this.playButton.html('<img src="' + static_file_url + 'img/playbutton.png" />');
+			this.playButton.css('cursor', 'pointer');
 		}
 	},
 
