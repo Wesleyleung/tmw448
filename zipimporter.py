@@ -47,9 +47,11 @@ def importFromCSV(url):
 		if len(zipcode) == 5:
 			postal_code = PostalCode.find_or_create_code(zipcode)
 			while postal_code == None:
-				time.sleep(1)
+				time.sleep(5)
 				postal_code = PostalCode.find_or_create_code(zipcode)
-				print 'Total created: %d. Postal code from wait loop: %s' % (total, postal_code)
+				print 'Sleeping in loop.'
+				if postal_code != None:
+					print 'Total created: %d. Postal code from wait loop: %s' % (total, postal_code)
 			total += 1
 			if total % 100 == 0:
 				print 'Postal codes created:%d    \r' % total,
