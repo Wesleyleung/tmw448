@@ -29,21 +29,22 @@ def loadStaticJSON(request):
 # startTime & endTime = unix encoded time values
 @csrf_exempt
 def loadSportFromZipcodeViewJSON(request):
+	jsonPOST = json.loads(request.body)
 	try:
-		zipCodes = request.POST['zipCodes']
-		startTime = request.POST['startTime']
-		endTime = request.POST['endTime']
+		zipCodes = jsonPOST['zipCodes']
+		startTime = jsonPOST['startTime']
+		endTime = jsonPOST['endTime']
+		# startTime = 0
+		# endTime = 1
 	except KeyError:
 		responseDict = {'status' : 'ERROR',
 						'description' : 'Insufficient parameters.'}	
 		return HttpResponse(json.dumps(responseDict), mimetype='application/json', status=400)
 
-
-
-	output = NikeSportActivity.objects.all()[:5]
+	activities_found = NikeSportActivity.objects.filter(postal_code__in=zipCodes)[:5]
 
 	activities_array = []
-	for activity in output:
+	for activity in activities_found:
 		activities_array.append(activity.get_JSON())
 	print activities_array
 	responseDict = {'success' : 'OK',
