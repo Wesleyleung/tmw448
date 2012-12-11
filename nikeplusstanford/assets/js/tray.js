@@ -13,7 +13,6 @@ function Tray (params) {
 
 	this.playButton.bind('click', function() {
 		this.playAndPause();
-		slider.animateProgressBarTest();
 	}.bind(this));
 
 	this.initTray();
@@ -62,7 +61,7 @@ Tray.prototype =  {
 		start_date = new Date(start_input)
 		end_date = new Date(end_input)	
 		if(start_date >= end_date) {
-			alert("Please enter a valid date range.");
+			modal.showModal("Not a Valid Date", '<p>Please select a start date after the end date.</p>');
 			return false;
 		}
 		//If an argument is passed in, use it to set isPaused
@@ -71,6 +70,7 @@ Tray.prototype =  {
 		this.setProgressBarActiveState(isPaused);
 		if (!isPaused) {
 			this.playButton.html('<img src="' + static_file_url + 'img/pausebutton.png" />');
+			slider.animateProgressBar();
 			//graphPaths from map.js
 			graphPaths();
 		} else {

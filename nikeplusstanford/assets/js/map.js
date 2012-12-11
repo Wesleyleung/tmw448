@@ -365,39 +365,11 @@ function searchLocation() {
 			
 		} else {
 			if (!results.length) {
-				showModal("Location Not Found", '<p>Your search for "' + this.searchInput.val() + '" did not return any results.  Please search for another location.</p>');
+				modal.showModal("Location Not Found", '<p>Your search for "' + this.searchInput.val() + '" did not return any results.  Please search for another location.</p>');
 			}
 		}
 	});
 	geocoder = null;
-}
-
-/*
-headerText is only text and bodyText can include html
-*/
-function showModal(headerText, bodyText, includeFooter) {
-	this.modal = $('#myModal');
-	this.modalHeader = this.modal.find('.modal-header h3');
-	this.modalBody = this.modal.find('.modal-body');
-	this.modalFooter = this.modal.find('.modal-footer');
-	this.modalHeader.html(headerText);
-	this.modalBody.html(bodyText);
-
-	//defaults to true
-	if (typeof(includeFooter) === 'undefined' || includeFooter) {
-		if (!this.modalFooter.length) {
-			this.modalBody.after(
-				'<div class="modal-footer">\
-        			<button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>\
-     			 </div>'
-			)
-		}
-	} else if (!includeFooter) {
-		this.modalFooter.remove();
-	}
-
-	//show modal
-	this.modal.modal();
 }
 
 function setLocationOnMapByBounds(bounds) {
@@ -416,7 +388,6 @@ function setMapZoom(zoom) {
 
 function generateHeatMap() {
 	getHeatMapModel();
-	
 
 	$.getJSON("loadStaticJSON?json_file=locations.json", function(json) {
 		//console.log(json);

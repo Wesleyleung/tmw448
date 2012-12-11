@@ -51,7 +51,7 @@ Slider.prototype =  {
 		this.readSliderWhileAnimating();
 	},
 
-	animateProgressBarTest: function() {
+	animateProgressBar: function() {
 		var interval = 15;
 		setInterval(function() {
 			if (this.sliderValue() >= this.animationTime) {

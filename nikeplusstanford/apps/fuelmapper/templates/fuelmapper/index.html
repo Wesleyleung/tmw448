@@ -27,6 +27,7 @@
     <script type="text/javascript"src="{{ STATIC_URL }}js/rgb.js"></script>
     <script type="text/javascript"src="{{ STATIC_URL }}js/slider.js"></script>
     <script type="text/javascript"src="{{ STATIC_URL }}js/graph.js"></script>
+    <script type="text/javascript"src="{{ STATIC_URL }}js/modal.js"></script>
     <script type="text/javascript">
 
       var _gaq = _gaq || [];
@@ -48,9 +49,7 @@
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
         <h3 id="myModalLabel"></h3>
       </div>
-      <div class="modal-body">
-      </div>
-      
+      <div class="modal-body"></div>
     </div>
     <div id="top-nav">
       <div id="search_wrapper">
@@ -129,6 +128,9 @@
       <strong>Warning!</strong> Test Alert.
     </div>
     <script type="text/javascript">
+      var modal = new Modal ({
+        modal: $('#myModal')
+      });
       var slider = new Slider ({
         slider: $("#slider")
       });
