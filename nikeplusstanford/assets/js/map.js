@@ -431,6 +431,7 @@ function generateHeatMap(data) {
 	heatmap.setData(heatMapData);
 	//console.log(data['data']['aggregates']);
 	graph.initGraphWithJsonObject(JSON.stringify(data['data']['aggregates']));
+	tray.playAndPause(true);
 }
 
 function getHeatMapModel(callback) {
