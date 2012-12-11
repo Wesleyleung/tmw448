@@ -180,19 +180,17 @@ Graph.prototype = {
 
 		console.log(this.width, this.numDays);
 		
-		this.barWidth = Math.floor(this.width / this.numDays) - 2;
+		this.barWidth = Math.floor(this.width / this.numDays);
 
 		this.x = d3.scale.linear()
 			.range([this.barWidth / 2, this.width - this.barWidth / 2]);
 
 		this.y = d3.scale.linear()
-			.range([0, this.height]);
+			.range([this.height, 0]);
 
 		var yAxis = d3.svg.axis()
-			.scale(this.y)
-			.orient("right")
-			.tickSize(-this.width)
-			.tickFormat(function(d) { return ""; });
+    		.scale(this.y)
+    		.orient("left");
 
 		// An SVG element with a bottom-right origin.
 		this.svg = d3.select(this.graphIDString).append("svg")
@@ -212,6 +210,14 @@ Graph.prototype = {
 		this.y.domain([0, data.maxFuelInRange]);
 		//this.color.domain([0, 20]);
 
+		//Add an axis to show the day values.
+		this.svg.append("g")
+			.attr("class", "y axis")
+			.attr("transform", "translate(" + (this.width) + ",0)")
+			.call(yAxis)
+			.selectAll("g");
+			//.filter(function(value) { return value; });
+
 
 		// Add labeled rects for each postal code.
 		var singleDay = days.selectAll(".days")
@@ -230,8 +236,8 @@ Graph.prototype = {
        		.on("mouseout", this.out)
 			.transition()
 			.duration(700)
-			.attr("y", function(d) { return this.height - this.y(parseInt(d.totalFuel)); }.bind(this))
-			.attr("height", function(d) { return this.y(parseInt(d.totalFuel)); }.bind(this));
+			.attr("y", function(d) { return this.y(parseInt(d.totalFuel)); }.bind(this))
+			.attr("height", function(d) { return this.height - this.y(parseInt(d.totalFuel)); }.bind(this));
 
 		// Add labels to show birthyear.
 		// singleDay.append("text")
@@ -246,16 +252,22 @@ Graph.prototype = {
 	over: function(d) {
 		var month = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', "Jul", 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 		var coords = d3.mouse(this.parentNode.parentNode);
+		var xcoord = coords[0] + 5;
+		var ycoord = coords[1] + 10;
+		var maxWidth = $('#d3-graph').width();
+		var maxHeight = $('#d3-graph').height();
+		if (xcoord + 300 > maxWidth) xcoord = coords[0] - 305;
+		console.log($('#d3-graph').width());
 		var date = new Date(d.date*1000);
 		var dateStr = month[date.getMonth()] + ", " + date.getDate() + " " + date.getFullYear();
 		console.log(dateStr);
-	    d3.select(this.parentNode.parentNode).append("text")
+	    d3.select(this.parentNode.parentNode).insert("text", ":first-child")
 	        .attr("width", 100)
 	        .attr("height", 100)
 	        .attr("class", "infoBox")
 	        .text(dateStr + ": " + d.totalFuel + " fuel points earned")
-	        .attr("x", coords[0] + 5)
-	        .attr("y", coords[1] + 5);
+	        .attr("x", xcoord)
+	        .attr("y", ycoord);
 	},
 
 	out: function(d) {
