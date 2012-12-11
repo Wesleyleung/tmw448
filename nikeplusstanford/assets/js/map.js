@@ -513,13 +513,7 @@ function getHeatMapModel() {
     // //}
     // console.log(zipcodes);
 
-    $.get(
-    	"loadSportFromZipcodeViewJSON",
-    	{swLat: swLat, swLng: swLng, neLat: neLat, neLng: neLng},
-    	function(data) {
-    		alert('page content:' + data);
-    	}
-    );
+
 
 //     "loadStaticJSON?json_file=randomRuns.json"
 
