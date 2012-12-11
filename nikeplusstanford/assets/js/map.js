@@ -451,7 +451,7 @@ function getHeatMapModel(callback) {
    
 	//loadHeatmapData(start_time, end_time, center, radius, maxRows, 0, callback);
     $.get( "loadSportFromZipcodeViewJSON",
-    	{neLat: neLat, neLng: neLng, swLat: swLat, swLng: swLng, startTime: start_time, endTime: end_time, limit: 1000},
+    	{neLat: neLat, neLng: neLng, swLat: swLat, swLng: swLng, startTime: start_time, endTime: end_time, limit: 10000},
     	function(data) {
     		if(data.success == "OK" && data.data.count > 0) {  
     			console.log(data['data']['activities']); 	
