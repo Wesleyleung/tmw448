@@ -153,11 +153,8 @@ class PostalCode(models.Model):
 			request_url = 'http://maps.googleapis.com/maps/api/geocode/json?address=%s&sensor=false' % postalcode
 			response, content = h.request(request_url)
 			jsonResponse = json.loads(content)
-			print content
-			print jsonResponse
 			geometry = jsonResponse['results'][0]['geometry']
 			obj.postalcode = postalcode
-			print geometry
 			obj.lat = geometry['location']['lat']
 			obj.lng = geometry['location']['lng']
 			obj.northeast_lat = geometry['viewport']['northeast']['lat']
