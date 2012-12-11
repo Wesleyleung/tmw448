@@ -81,13 +81,14 @@ def loadSportFromZipcodeViewJSON(request):
 
 	activities_found = NikeSportActivity.objects.filter(postal_code__in=zipcodes_found
 													).filter(start_time_local__gte=startTime_timedate
-													).filter(start_time_local__lte=endTime_timedate) 
+													).filter(start_time_local__lte=endTime_timedate
+													).order_by('start_time_local').reverse() 
 
-	print 'STARTING ACTIVITY SORT'
+	# print 'STARTING ACTIVITY SORT'
 
-	activities_found = sorted(activities_found, key=lambda activity: activity.start_time_local, reverse=True)
+	# activities_found = sorted(activities_found, key=lambda activity: activity.start_time_local, reverse=True)
 
-	print 'ACTIVITIES SORTED'
+	# print 'ACTIVITIES SORTED'
 
 	activities_array = []
 	for activity in activities_found:
