@@ -176,7 +176,7 @@ class PostalCode(models.Model):
 							},
 							'southwest' : {
 								'lat' : self.southwest_lat,
-								'lng' : self.southwest_lat
+								'lng' : self.southwest_lng
 							}
 						},
 						'location' : {
