@@ -16,14 +16,14 @@ Graph.prototype = {
 	initGraph: function() {
 		var margin = {top: 5, right: 0, bottom: 0, left: 0},
 			numDays = 10;
-			this.width = this.jqueryGraph.parent().width() - margin.left - margin.right;
+			this.width = this.jqueryGraph.parent().width() - margin.left - margin.right + 2;
 			this.height = 200 - margin.top - margin.bottom;
 			 //this should come from the json response
 		
-		this.barWidth = Math.floor(this.width / (numDays + 1)) - 2;
+		this.barWidth = Math.floor(this.width / (numDays + 1)) + 7;
 
 		this.x = d3.scale.linear()
-			.range([this.barWidth / 2, this.width - this.barWidth / 2 - 2]);
+			.range([this.barWidth / 2, this.width + this.barWidth / 2]);
 
 		this.y = d3.scale.linear()
 			.range([0, this.height]);
