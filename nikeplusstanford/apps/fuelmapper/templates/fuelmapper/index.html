@@ -10,10 +10,10 @@
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
     <link href="https://netdna.bootstrapcdn.com/twitter-bootstrap/2.2.1/css/bootstrap-combined.min.css" rel="stylesheet">
     <script src="https://netdna.bootstrapcdn.com/twitter-bootstrap/2.2.1/js/bootstrap.min.js"></script>
-
     <script type="text/javascript"
       src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA0fbVwcr2LQZho14TG7BgNq3x5Cx53kw0&sensor=true&libraries=visualization">
     </script>
+    <script src="http://d3js.org/d3.v3.min.js"></script>
       <script type="text/javascript">
         var static_file_url = "{{ STATIC_URL }}";
       </script>
@@ -56,6 +56,7 @@
       </div>
     </div>
     <div id="tray">
+      <div id="d3-graph"></div>
       <div id="tray-handle">+</div>
       <div id="tray-full-wrapper">
         <div id="tray-play-wrapper" class="row-fluid">
@@ -110,6 +111,10 @@
     <script type="text/javascript">
       var tray = new Tray ({
         tray: $("#tray"),
+      });
+      var graph = new Graph ({
+        graph: $("#d3-graph"),
+        graphDivName: "#d3-graph"
       });
       // var slider = new Slider ({
       //   slider: $("slider")
