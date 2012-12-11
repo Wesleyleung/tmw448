@@ -63,6 +63,10 @@ def loadSportFromZipcodeViewJSON(request):
 	for obj in zipCodeData['postalCodes']:
 		zipcodes_found.append(obj['postalCode'])
 
+	#LOCAL DEV ONLY
+	if environ.get('HEROKU') is not 'yes':
+		zipcodes_found.append('60448')
+
 	nike_hour_offset = 7 * 3600
 	startTime_timedate = datetime.fromtimestamp(startTime, utc)
 	endTime_timedate = datetime.fromtimestamp(endTime, utc)
@@ -72,6 +76,8 @@ def loadSportFromZipcodeViewJSON(request):
 	activities_found = NikeSportActivity.objects.filter(postal_code__in=zipcodes_found
 													).filter(start_time_local__gte=startTime_timedate
 													).filter(start_time_local__lte=endTime_timedate) 
+
+	activities_found = sorted(activities_found, key=lambda activity: activity.start_time_local, reverse=True)
 
 	activities_array = []
 	for activity in activities_found:
