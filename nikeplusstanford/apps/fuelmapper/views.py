@@ -43,6 +43,9 @@ def responseGenerator(request):
 	centerLat = request.GET['lat']
 	centerLng = request.GET['lng']
 	radius = request.GET['radius']
+	# we're limited to a radius of 30 by the service
+	if radius > 30:
+		radius = 30
 	startTime = float(request.GET['startTime'])
 	endTime = float(request.GET['endTime'])
 
