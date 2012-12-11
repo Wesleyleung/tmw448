@@ -52,7 +52,7 @@ Tray.prototype =  {
 
 	//Takes an optional argument true or false to set isPaused to
 	playAndPause: function() {
-		if (arguments.length != 0 && !isPaused) return false;
+		if (!isPaused) return false;
 		var start_input = $("#start_date").val()
 		var end_input = $("#end_date").val()
 
@@ -115,9 +115,13 @@ Tray.prototype =  {
 		if (!isPaused) {
 			this.progressBarWrapper.addClass('progress-striped');
 			this.progressBarWrapper.addClass('active');
+			this.playButton.html('<img src="' + static_file_url + 'img/pausebutton.png" />');
+			this.playButton.css('cursor', 'progress');
 		} else {
 			this.progressBarWrapper.removeClass('progress-striped');
 			this.progressBarWrapper.removeClass('active');
+			this.playButton.html('<img src="' + static_file_url + 'img/playbutton.png" />');
+			this.playButton.css('cursor', 'pointer');
 		}
 	}
 };

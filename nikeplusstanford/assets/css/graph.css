@@ -21,8 +21,8 @@ svg {
 }
 
 .y.axis line {
-	stroke: #fff;
-	stroke-opacity: .2;
+	stroke: #000;
+	stroke-opacity: .3;
 	shape-rendering: crispEdges;
 }
 
@@ -32,8 +32,8 @@ svg {
 }
 
 .infoBox {
-	font: 14px Helvetica Neue;
-	outline: 1px solid #fff;
+	font: 16px Helvetica Neue;
+	z-index: 5;
 }
 
 .title {
@@ -43,11 +43,12 @@ svg {
 
 .day {
 	fill: #fff;
+	z-index: 4;
 }
 
 rect {
 	fill-opacity: .6;
-	fill: #e377c2;
+	fill: #0D8ECF;
 	cursor: pointer;
 }
 

@@ -431,7 +431,8 @@ function generateHeatMap(data) {
 	heatmap.setData(heatMapData);
 	//console.log(data['data']['aggregates']);
 	graph.initGraphWithJsonObject(JSON.stringify(data['data']['aggregates']));
-	tray.playAndPause(true);
+	console.log("done");
+	tray.setProgressBarActiveState(true);
 }
 
 function getHeatMapModel(callback) {
@@ -446,13 +447,12 @@ function getHeatMapModel(callback) {
     //check if heatmap is present. delete and redraw
     console.log(heatmap.getData().length);
     if(heatmap.getData().length > 0) {
-    	global_heat_data = [];
-    	heatmap.setData(global_heat_data);  
+    	heatmap.setData([]);  
     }
    
 	//loadHeatmapData(start_time, end_time, center, radius, maxRows, 0, callback);
     $.get( "loadSportFromZipcodeViewJSON",
-    	{neLat: neLat, neLng: neLng, swLat: swLat, swLng: swLng, startTime: start_time, endTime: end_time, limit: 1000},
+    	{neLat: neLat, neLng: neLng, swLat: swLat, swLng: swLng, startTime: start_time, endTime: end_time, limit: 10000},
     	function(data) {
     		if(data.success == "OK" && data.data.count > 0) {  
     			console.log(data['data']['activities']); 	
