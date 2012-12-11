@@ -42,7 +42,8 @@ def responseGenerator(request):
 	print 'STARTING ZIP CODE REQUEST'
 	centerLat = request.GET['lat']
 	centerLng = request.GET['lng']
-	radius = int(request.GET['radius'])
+	# radius = int(request.GET['radius'])
+	radius = 20
 	# we're limited to a radius of 30 by the service
 	if radius > 30:
 		radius = 30
