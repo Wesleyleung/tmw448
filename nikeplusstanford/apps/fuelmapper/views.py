@@ -51,18 +51,20 @@ def responseGenerator(request):
 	endTime = float(request.GET['endTime'])
 	
 	yield ' '
-	request_url = "http://ws.geonames.org/findNearbyPostalCodesJSON?"
-	zip_request_data = {'lat': centerLat, 'lng': centerLng, 'radius': radius, 'maxRows' : 3}
-	h = httplib2.Http()
-	zipCodeData = None
-	resp, content = h.request(request_url + urlencode(zip_request_data), method="GET")
-	if resp.status == 200:
-		zipCodeData = json.loads(content)
-	else:
-		responseDict = {'status' : 'ERROR',
-						'description' : 'Could not find zip codes'}	
-		yield json.dumps(responseDict)
+	# request_url = "http://ws.geonames.org/findNearbyPostalCodesJSON?"
+	# zip_request_data = {'lat': centerLat, 'lng': centerLng, 'radius': radius, 'maxRows' : 3}
+	# h = httplib2.Http()
+	# zipCodeData = None
+	# resp, content = h.request(request_url + urlencode(zip_request_data), method="GET")
+	# if resp.status == 200:
+	# 	zipCodeData = json.loads(content)
+	# else:
+	# 	responseDict = {'status' : 'ERROR',
+	# 					'description' : 'Could not find zip codes'}	
+	# 	yield json.dumps(responseDict)
 
+	zipcodes_found = PostalCode.objects.filter(lat__gte=)
+	
 	print 'ZIP CODES FOUND'
 	
 	zipcodes_found = []
@@ -106,7 +108,6 @@ def responseGenerator(request):
 	activities_array = []
 	days = []
 	for activity in activities_found:
-		max_fuel_in_range = max(max_fuel_in_range, activity.fuel_amt)
 		activity_JSON = activity.get_JSON()
 		activity_JSON['postal_code'] = zipcode_objects[activity.postal_code].get_JSON()
 		index = 0
@@ -121,6 +122,7 @@ def responseGenerator(request):
 			index = days.index(activity_JSON['start_time_standard'])
 		day = aggregates_data[index]
 		day['totalFuel'] = day['totalFuel'] + activity.fuel_amt
+		max_fuel_in_range = max(max_fuel_in_range, day['totalFuel'])
 		zip_index = 0
 		try:
 			zip_index = day['zipkeys'].index(activity.postal_code)
