@@ -76,9 +76,19 @@ Graph.prototype = {
 				.attr("transform", function(d, i) { return "translate(" + this.x(i) + ",-5)"; }.bind(this));
 
 			singleDay.selectAll("rect")
-				.data(function(d, i) { return [d]; });
+				.data(function(d, i) { return [d]; })
+				.enter().append("rect")
+				.attr("x", -this.barWidth / 2)
+				.attr("width", this.barWidth)
+				.attr("y", this.height)
+				.attr("y", function(d) { return this.height - this.y(parseInt(d.FUEL_AMT)); }.bind(this))
+				.attr("height", function(d) { return this.y(parseInt(d.FUEL_AMT)); }.bind(this));
 
 			// Add labels to show birthyear.
+			singleDay.append("text")
+				.attr("text-anchor", "middle")
+				.attr("y", function(d) { return this.height - this.y(parseInt(d.FUEL_AMT)) + 10; }.bind(this))
+				.text(function(d, i) { return d.FUEL_AMT; });
 			// singleDay.append("text")
 			// 	.attr("y", this.height - 5)
 			// 	.text(function(d, i) { return "Day " + (i + 1); });
@@ -97,7 +107,7 @@ Graph.prototype = {
 
 	animateBar: function(node) {
 		node = d3.select(node);
-		node
+		/*node
 			.append("rect")
 			.attr("x", -this.barWidth / 2)
 			.attr("width", this.barWidth)
@@ -113,6 +123,6 @@ Graph.prototype = {
 			.transition()
 			.duration(700)
 			.attr("y", function(d) { return this.height - this.y(parseInt(d.FUEL_AMT)) + 10; }.bind(this))
-			.text(function(d, i) { return d.FUEL_AMT; });
+			.text(function(d, i) { return d.FUEL_AMT; });*/
 	}
 }
