@@ -47,6 +47,10 @@ def loadSportFromZipcodeViewJSON(request):
 						'description' : 'Insufficient parameters.'}	
 		return HttpResponse(json.dumps(responseDict), mimetype='application/json', status=400)
 
+	limit = 1000
+	if 'limit' in request.GET:
+		limit = request.GET['limit']
+
 	print 'STARTING ZIP CODE REQUEST'
 
 	request_url = "http://ws.geonames.org/findNearbyPostalCodesJSON?"
@@ -82,19 +86,20 @@ def loadSportFromZipcodeViewJSON(request):
 	activities_found = NikeSportActivity.objects.filter(postal_code__in=zipcodes_found
 													).filter(start_time_local__gte=startTime_timedate
 													).filter(start_time_local__lte=endTime_timedate
-													).order_by('start_time_local').reverse() 
+													)[:limit]
 
-	# print 'STARTING ACTIVITY SORT'
+	print 'STARTING ACTIVITY SORT'
 
-	# activities_found = sorted(activities_found, key=lambda activity: activity.start_time_local, reverse=True)
+	activities_found = sorted(activities_found, key=lambda activity: activity.start_time_local, reverse=True)
 
-	# print 'ACTIVITIES SORTED'
+	print 'ACTIVITIES SORTED'
 
 	activities_array = []
 	for activity in activities_found:
 		activities_array.append(activity.get_JSON())
 	responseDict = {'success' : 'OK',
-						'parameters' : {'zipCodes' : zipcodes_found},
+						'parameters' : {'zipCodes' : zipcodes_found,
+										'limit' : limit},
 						'data' : {'activities': activities_array,
 								  'count' : len(activities_array)}}	
 	print 'CREATED RESPONSE DICT'
