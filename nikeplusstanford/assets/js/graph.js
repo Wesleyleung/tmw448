@@ -90,6 +90,9 @@ Graph.prototype = {
 			// Add labels to show birthyear.
 			singleDay.append("text")
 				.attr("text-anchor", "middle")
+				.attr("y", this.height)
+				.transition()
+				.duration(700)
 				.attr("y", function(d) { return this.height - this.y(parseInt(d.FUEL_AMT)) + 10; }.bind(this))
 				.text(function(d, i) { return d.FUEL_AMT; });
 			// singleDay.append("text")
