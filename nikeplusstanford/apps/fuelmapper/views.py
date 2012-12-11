@@ -42,10 +42,13 @@ def responseGenerator(request):
 	print 'STARTING ZIP CODE REQUEST'
 	centerLat = request.GET['lat']
 	centerLng = request.GET['lng']
-	radius = request.GET['radius']
+	radius = int(request.GET['radius'])
+	# we're limited to a radius of 30 by the service
+	if radius > 30:
+		radius = 30
 	startTime = float(request.GET['startTime'])
 	endTime = float(request.GET['endTime'])
-
+	
 	yield ' '
 	request_url = "http://ws.geonames.org/findNearbyPostalCodesJSON?"
 	zip_request_data = {'lat': centerLat, 'lng': centerLng, 'radius': radius, 'maxRows' : 3}
