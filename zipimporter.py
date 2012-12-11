@@ -59,7 +59,7 @@ def importFromCSV(url):
 			if total % 100 == 0:
 				print 'Postal codes created:%d    \r' % total,
 				print ''
-			sleep(1)
+			time.sleep(1)
 	print 'Completed with %d total codes imported.' % total
 			# time.sleep(1)
 
