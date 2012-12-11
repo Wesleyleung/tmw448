@@ -125,6 +125,7 @@ class NikeSportActivity(models.Model):
 		del output['duration']
 		del output['id']
 		del output['timezone_name']
+		output['postal_code'] = PostalCode.find_or_create_code(self.postal_code).get_JSON()
 		return output
 
 	def get_fields(self):
@@ -165,6 +166,27 @@ class PostalCode(models.Model):
 			obj.southwest_lng = geometry['viewport']['southwest']['lng']
 			obj.save()
 		return obj
+
+	def get_JSON(self):
+		jsonDict = {'geometry' : {
+						'bounds' : {
+							'northeast' : {
+								'lat' : self.northeast_lat,
+								'lng' : self.northeast_lng
+							},
+							'southwest' : {
+								'lat' : self.southwest_lat,
+								'lng' : self.southwest_lat
+							}
+						},
+						'location' : {
+							'lat' : self.lat,
+							'lng' : self.lng
+						}
+					},
+					'postal_code' : self.postalcode
+					}
+		return jsonDict
 
 	def __unicode__(self):
 		return '%s: location %f %f' % (self.postalcode, self.lat, self.lng)
