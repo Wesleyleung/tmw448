@@ -458,20 +458,24 @@ function getHeatMapModel(callback) {
 					var nelng = curActivity.postal_code.geometry.bounds.northeast.lng;
 					var swlng = curActivity.postal_code.geometry.bounds.southwest.lng;
 
-					var dict = {location : new google.maps.LatLng(lat, lng),
-    							weight : fuel_amt};
+
+					var randomLat = nelat + (swlat-nelat)*Math.random();
+					var randomLng = nelng + (swlng-nelng)*Math.random();
+					var LatLng = new google.maps.LatLng(randomLat, randomLng);
+					var dict = {location: LatLng, weight: fuel_amt};
+
     				console.log(dict);
 	    			global_heat_data.push(dict);
 
-					for(var i = 0; i < Math.floor((Math.random()*10)+1); i++) {
-						console.log(i);
-						var randomLat = nelat + (swlat-nelat)*Math.random();
-						var randomLng = nelng + (swlng-nelng)*Math.random();
-						var LatLng = new google.maps.LatLng(randomLat, randomLng);
-						var dict = {location: LatLng, weight: fuel_amt};
-						console.log(dict);
-						global_heat_data.push(dict);
-					}
+					// for(var i = 0; i < Math.floor((Math.random()*10)+1); i++) {
+					// 	console.log(i);
+					// 	var randomLat = nelat + (swlat-nelat)*Math.random();
+					// 	var randomLng = nelng + (swlng-nelng)*Math.random();
+					// 	var LatLng = new google.maps.LatLng(randomLat, randomLng);
+					// 	var dict = {location: LatLng, weight: fuel_amt};
+					// 	console.log(dict);
+					// 	global_heat_data.push(dict);
+					// }
 	    		};
 	    		callback(data);
     		}
