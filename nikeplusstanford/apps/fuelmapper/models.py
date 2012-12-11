@@ -125,7 +125,7 @@ class NikeSportActivity(models.Model):
 		del output['duration']
 		del output['id']
 		del output['timezone_name']
-		output['postal_code'] = PostalCode.find_or_create_code(self.postal_code).get_JSON()
+		# output['postal_code'] = PostalCode.find_or_create_code(self.postal_code).get_JSON()
 		return output
 
 	def get_fields(self):

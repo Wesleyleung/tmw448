@@ -461,9 +461,11 @@ function getHeatMapModel(callback) {
 	var start_time = new Date($("#start_date").val()).getTime()/1000;
 	var end_time = new Date($("#end_date").val()).getTime()/1000;
 	var center = map.getCenter();
+
     var maxRows = 20;
     var bounds = map.getBounds();
     var radius = (bounds.getNorthEast().lat() - bounds.getSouthWest().lat()) * 55.6;
+
 	//loadHeatmapData(start_time, end_time, center, radius, maxRows, 0, callback);
     $.get( "loadSportFromZipcodeViewJSON",
     	{lat: center.lat(), lng: center.lng(), radius: radius, maxRows: maxRows, startTime: start_time, endTime: end_time, limit: 100},
