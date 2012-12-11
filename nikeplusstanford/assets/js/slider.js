@@ -16,10 +16,10 @@ Slider.prototype =  {
             max: this.animationTime,
             //on user slide
             slide: function( event, ui ) {
-            	console.log("slide");
-                console.log(event);
-                console.log(ui);
-                			console.log(this.slider.slider("widget"));
+            	// console.log("slide");
+             //    console.log(event);
+             //    console.log(ui);
+             //    console.log(this.slider.slider("widget"));
 
             }.bind(this),
             //on change of value programatically
@@ -43,13 +43,13 @@ Slider.prototype =  {
 	*/
 
 	//If millis is specified, uses that.  else it uses 10 seconds
-	animateSliderOverTime: function() {
-		console.log("ere");
-		this.slider.slider('option', 'animate', this.animationTime);
-		this.slider.slider('value', this.slider.slider('option', 'max'));
-		this.timeStartedAnimating = new Date().getTime();
-		this.readSliderWhileAnimating();
-	},
+	// animateSliderOverTime: function() {
+	// 	console.log("ere");
+	// 	this.slider.slider('option', 'animate', this.animationTime);
+	// 	this.slider.slider('value', this.slider.slider('option', 'max'));
+	// 	this.timeStartedAnimating = new Date().getTime();
+	// 	this.readSliderWhileAnimating();
+	// },
 
 	animateProgressBar: function() {
 		var interval = 15;
@@ -58,12 +58,9 @@ Slider.prototype =  {
 				clearInterval();
 				tray.playAndPause(true);
 			}
+			//Fires the onchange event every interval
 			this.slider.slider('value', this.sliderValue() + interval);
 		}.bind(this), interval);
-	},
-
-	sliderValueWhileAnimating: function() {
-
 	},
 
 	sliderValue: function() {
@@ -71,16 +68,16 @@ Slider.prototype =  {
 	},
 
 	//Fires every 5 ms while the slider is moving and returns the value of the slider
-	readSliderWhileAnimating: function() {
-		if (!this.slideElement.is(':animated')) {
-			return;
-		}
-		setInterval(function() {
-			var now = new Date().getTime();
-			if (!this.slideElement.is(':animated')) {
-				clearInterval();
-				console.log(now - this.timeStartedAnimating);
-			}
-		}.bind(this), 10);
-	}
+	// readSliderWhileAnimating: function() {
+	// 	if (!this.slideElement.is(':animated')) {
+	// 		return;
+	// 	}
+	// 	setInterval(function() {
+	// 		var now = new Date().getTime();
+	// 		if (!this.slideElement.is(':animated')) {
+	// 			clearInterval();
+	// 			console.log(now - this.timeStartedAnimating);
+	// 		}
+	// 	}.bind(this), 10);
+	// }
 }
