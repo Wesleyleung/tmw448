@@ -446,8 +446,7 @@ function getHeatMapModel(callback) {
     //check if heatmap is present. delete and redraw
     console.log(heatmap.getData().length);
     if(heatmap.getData().length > 0) {
-    	global_heat_data = [];
-    	heatmap.setData(global_heat_data);  
+    	heatmap.setData([]);  
     }
    
 	//loadHeatmapData(start_time, end_time, center, radius, maxRows, 0, callback);
