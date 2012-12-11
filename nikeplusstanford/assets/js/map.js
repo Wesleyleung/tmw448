@@ -443,7 +443,7 @@ function getHeatMapModel(callback) {
 	var center = map.getCenter();
     var maxRows = 10;
     var radius = 5;
-   		
+    
     $.get( "loadSportFromZipcodeViewJSON",
     	{lat: center.lat(), lng: center.lng(), radius: radius, maxRows: maxRows, startTime: start_time, endTime: end_time, limit: 100},
     	function(data) {
