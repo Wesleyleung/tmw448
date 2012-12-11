@@ -153,15 +153,20 @@ class PostalCode(models.Model):
 			request_url = 'http://maps.googleapis.com/maps/api/geocode/json?address=%s&sensor=false' % postalcode
 			response, content = h.request(request_url)
 			jsonResponse = json.loads(content)
-			geometry = jsonResponse['results'][0]['geometry']
-			obj.postalcode = postalcode
-			obj.lat = geometry['location']['lat']
-			obj.lng = geometry['location']['lng']
-			obj.northeast_lat = geometry['viewport']['northeast']['lat']
-			obj.northeast_lng = geometry['viewport']['northeast']['lng']
-			obj.southwest_lat = geometry['viewport']['southwest']['lat']
-			obj.southwest_lng = geometry['viewport']['southwest']['lng']
-			obj.save()
+			if jsonResponse['status'] == 'OK':
+				geometry = jsonResponse['results'][0]['geometry']
+				obj.postalcode = postalcode
+				obj.lat = geometry['location']['lat']
+				obj.lng = geometry['location']['lng']
+				obj.northeast_lat = geometry['viewport']['northeast']['lat']
+				obj.northeast_lng = geometry['viewport']['northeast']['lng']
+				obj.southwest_lat = geometry['viewport']['southwest']['lat']
+				obj.southwest_lng = geometry['viewport']['southwest']['lng']
+				obj.save()
+			else:
+				obj.delete()
+				print 'Over Limit'
+				return None
 		return obj
 
 	def get_JSON(self):
