@@ -79,10 +79,10 @@
         <div id="tray-content-wrapper" class="row-fluid">
           <div class="row-fluid">
             <div id="start_date_wrapper">
-              <input type="text" placeholder = "Start Date" name="start_date" id="start_date" />
+              <input type="text" name="start_date" id="start_date" />
             </div>
             <div id="end_date_wrapper">
-              <input type="text" placeholder="End Date" name="end_date" id="end_date" />
+              <input type="text" name="end_date" id="end_date" />
             </div>        
             <div id="heatmaptoggle_wrapper">
               <button class="btn btn-primary" type="button" onclick="toggleHeatmap()">Toggle Heatmap</button>
@@ -113,6 +113,11 @@
         </div>
       </div>
     </div>
+    <div class="alert">
+  <button type="button" class="close" data-dismiss="alert">&times;</button>
+  <strong>Warning!</strong> Test Alert.
+  </div>
+
     <div id="map_canvas"></div>
     <script type="text/javascript">
       var tray = new Tray ({
@@ -120,8 +125,12 @@
       });
 
       $(function() {
-        $("#start_date, #end_date").datepicker();
+        $( "#start_date" ).datepicker().datepicker("setDate", new Date("2/1/2012"));
+        $( "#end_date" ).datepicker().datepicker("setDate", new Date());
       });
+
+
+
       // var slider = new Slider ({
       //   slider: $("slider")
       // });
