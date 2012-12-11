@@ -3,7 +3,8 @@ from django.shortcuts import render
 from django.conf import settings
 import json
 import math
-import httplib2
+import httplib2 
+from urllib import urlencode
 from os import environ
 
 from apps.fuelmapper.models	import NikeSportActivity, NikeUser
@@ -24,44 +25,28 @@ def loadStaticJSON(request):
 		return HttpResponse(content.read(), mimetype='application/json')
 
 def loadSportFromZipcodeViewJSON(request):
-	print request
+	centerLat = request.GET['lat']
+	centerLng = request.GET['lng']
+	radius = request.GET['radius']
+	maxRows = request.GET['maxRows']
 
-	swLat = request.GET['swLat']
-	swLng = request.GET['swLng']
-	neLat = request.GET['neLat']
-	neLng = request.GET['neLng']
+	request_url = "http://ws.geonames.org/findNearbyPostalCodesJSON?"
+	data = {'formatted': True, 'lat': request.GET['lat'], 'lng': centerLng, 'radius': radius, 'maxRows': maxRows}
 
+	h = httplib2.Http()
+	resp, content = h.request(request_url + urlencode(data), method="GET")
 
-	test = int(math.floor(swLat))
-	print test
+	data = json.loads(content)
+	zipcodeParams = []
+	for obj in data['postalCodes']:
 
-	print swLat, swLng, neLat, neLng
-	
-	for i in range(int(math.floor(swLat)), int(math.ceil(neLat))):
-		for j in range(int(math.floor(swLng)), int(math.ceil(neLng))):
-			print i, j
+		zipcodeParams.append(obj['postalCode'])
 
-
-	output = NikeSportActivity.objects.all()[:5]
+	output = NikeSportActivity.objects.filter(postal_code__in=zipcodeParms) 
 
 	out_array = []
 	for activity in output:
 		out_array.append(activity.get_JSON())	
+
 	return HttpResponse(json.dumps(out_array), mimetype='application/json')
-
-
-
-# #loadSportFromZipcodeViewJSON?swLat=36.66560863153126&swLng=-125.43725519921873&neLat=38.174996763572814&neLng=-118.89489680078123
-
-
-
-# 	sport_activty_data = NikeSportActivity.objects.all()[:1]
-# 	return 0
-
-# def NikeModelToJSON
-
-# [<NikeSportActivity: e55fbb86-73ae-4467-9eaa-f97137be82cc>, 
-# 	#params start time, end time, 
-# 	#params 4 lat, lng pairs
-# 	#geocoding. 
 
