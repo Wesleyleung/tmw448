@@ -2,6 +2,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.conf import settings
 from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import condition
 import json
 import math
 import httplib2 
@@ -27,26 +28,7 @@ def loadStaticJSON(request):
 		content = open(settings.STATIC_ROOT + '/js/%s' % json_file)
 		return HttpResponse(content.read(), mimetype='application/json')
 
-# We expect this to be a POST with these parameters in the body
-# lat, lng = coordinates of the center of the view
-# radius = zip code search radius
-# startTime & endTime = unix encoded time values
-def loadSportFromZipcodeViewJSON(request):
-	if not request.method == 'GET':
-		responseDict = {'status' : 'ERROR',
-						'description' : 'Must be a get request.'}	
-		return HttpResponse(json.dumps(responseDict), mimetype='application/json', status=400)
-	try:
-		centerLat = request.GET['lat']
-		centerLng = request.GET['lng']
-		radius = request.GET['radius']
-		startTime = float(request.GET['startTime'])
-		endTime = float(request.GET['endTime'])
-	except KeyError:
-		responseDict = {'status' : 'ERROR',
-						'description' : 'Insufficient parameters.'}	
-		return HttpResponse(json.dumps(responseDict), mimetype='application/json', status=400)
-
+def responseGenerator(request):
 	limit = 1000
 	if 'limit' in request.GET:
 		limit = request.GET['limit']
@@ -56,7 +38,13 @@ def loadSportFromZipcodeViewJSON(request):
 		skip = request.GET['skip']
 
 	print 'STARTING ZIP CODE REQUEST'
+	centerLat = request.GET['lat']
+	centerLng = request.GET['lng']
+	radius = request.GET['radius']
+	startTime = float(request.GET['startTime'])
+	endTime = float(request.GET['endTime'])
 
+	yield 'hi '
 	request_url = "http://ws.geonames.org/findNearbyPostalCodesJSON?"
 	zip_request_data = {'lat': centerLat, 'lng': centerLng, 'radius': radius, 'maxRows' : 100}
 	h = httplib2.Http()
@@ -67,10 +55,8 @@ def loadSportFromZipcodeViewJSON(request):
 	else:
 		responseDict = {'status' : 'ERROR',
 						'description' : 'Could not find zip codes'}	
-		return HttpResponse(json.dumps(responseDict), mimetype='application/json', status=400)
+		yield json.dumps(responseDict)
 
-	response = HttpResponse(content_type='application/json', status=200)
-	response.write(' ')
 	print 'ZIP CODES FOUND'
 	
 	zipcodes_found = []
@@ -88,21 +74,21 @@ def loadSportFromZipcodeViewJSON(request):
 	print endTime_timedate
 
 	print 'STARTING ACTIVITY QUERY'
-
+	yield 'hello '
 	activities_found_count = NikeSportActivity.objects.filter(postal_code__in=zipcodes_found
 													).filter(start_time_local__gte=startTime_timedate
 													).filter(start_time_local__lte=endTime_timedate
 													).count()
-	response.write(' ')
+	yield ' '
 	activities_found = NikeSportActivity.objects.filter(postal_code__in=zipcodes_found
 													).filter(start_time_local__gte=startTime_timedate
 													).filter(start_time_local__lte=endTime_timedate
 													)[skip:skip+limit]
-
+	yield ' '
 	print 'STARTING ACTIVITY SORT'
 
 	activities_found = sorted(activities_found, key=lambda activity: activity.start_time_local, reverse=True)
-
+	yield ' '
 	print 'ACTIVITIES SORTED'
 
 	activities_array = []
@@ -117,5 +103,32 @@ def loadSportFromZipcodeViewJSON(request):
 								  'count' : len(activities_array),
 								  'total' : activities_found_count}}	
 	print 'CREATED RESPONSE DICT'
-	response.write(json.dumps(responseDict))
+	yield ' '
+	yield json.dumps(responseDict)
+
+# We expect this to be a POST with these parameters in the body
+# lat, lng = coordinates of the center of the view
+# radius = zip code search radius
+# startTime & endTime = unix encoded time values
+@condition(etag_func=None)
+def loadSportFromZipcodeViewJSON(request):
+	if not request.method == 'GET':
+		responseDict = {'status' : 'ERROR',
+						'description' : 'Must be a get request.'}	
+		return HttpResponse(json.dumps(responseDict), mimetype='application/json', status=400)
+	try:
+		centerLat = request.GET['lat']
+		centerLng = request.GET['lng']
+		radius = request.GET['radius']
+		startTime = float(request.GET['startTime'])
+		endTime = float(request.GET['endTime'])
+	except KeyError:
+		responseDict = {'status' : 'ERROR',
+						'description' : 'Insufficient parameters.'}	
+		return HttpResponse(json.dumps(responseDict), mimetype='application/json', status=400)
+
+	
+
+	response = HttpResponse(content=responseGenerator(request), content_type='application/json', status=200)
+
 	return response
