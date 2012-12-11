@@ -23,27 +23,27 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 ######### DATABASE CONFIGURATION
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#databases
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': normpath(join(DJANGO_ROOT, 'default.db')),
-        'USER': '',
-        'PASSWORD': '',
-        'HOST': '',
-        'PORT': '',
-    }
-}
-
 # DATABASES = {
 #     'default': {
-#       'ENGINE': 'django.db.backends.postgresql_psycopg2',
-#       'NAME': 'dkcra5hs4op5v',
-#       'HOST': 'ec2-54-243-249-191.compute-1.amazonaws.com',
-#       'PORT': 5432,
-#       'USER': 'kbbluqtknnsasm',
-#       'PASSWORD': 'ottrWusWDWcUN9GT2_YetToVlL'
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': normpath(join(DJANGO_ROOT, 'default.db')),
+#         'USER': '',
+#         'PASSWORD': '',
+#         'HOST': '',
+#         'PORT': '',
 #     }
 # }
+
+DATABASES = {
+    'default': {
+      'ENGINE': 'django.db.backends.postgresql_psycopg2',
+      'NAME': 'dkcra5hs4op5v',
+      'HOST': 'ec2-54-243-249-191.compute-1.amazonaws.com',
+      'PORT': 5432,
+      'USER': 'kbbluqtknnsasm',
+      'PASSWORD': 'ottrWusWDWcUN9GT2_YetToVlL'
+    }
+}
 # DATABASES = {
 #    'default' : {
 #       'ENGINE' : 'django_mongodb_engine',
