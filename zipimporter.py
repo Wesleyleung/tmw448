@@ -38,7 +38,7 @@ def importFromCSV(url):
 	    print status,
 
 	f.close()
-	f = open(file_name, 'rb')
+	f = open(file_name, 'rU')
 	csvDict = csv.DictReader(f)
 	total = 0
 	print 'Starting import of zip codes.'
