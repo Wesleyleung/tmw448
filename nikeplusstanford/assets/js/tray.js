@@ -20,6 +20,7 @@ function Tray (params) {
 
 Tray.prototype =  {
 	//Define functions here
+
 	initTray: function() {
 		this.tray.css('bottom', this.tray.height() * -1 + this.trayPlayControlsWrapper.height());
 		this.numProgressIntervals = 0;
@@ -72,6 +73,8 @@ Tray.prototype =  {
 			this.playButton.html('<img src="' + static_file_url + 'img/pausebutton.png" />');
 			slider.animateProgressBar();
 			//graphPaths from map.js
+			getHeatMapModel(generateHeatMap);
+			
 			graphPaths();
 		} else {
 			this.playButton.html('<img src="' + static_file_url + 'img/playbutton.png" />');
