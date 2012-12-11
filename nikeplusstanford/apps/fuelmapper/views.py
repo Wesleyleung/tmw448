@@ -69,6 +69,8 @@ def loadSportFromZipcodeViewJSON(request):
 						'description' : 'Could not find zip codes'}	
 		return HttpResponse(json.dumps(responseDict), mimetype='application/json', status=400)
 
+	response = HttpResponse(content_type='application/json', status=200)
+	response.write(' ')
 	print 'ZIP CODES FOUND'
 	
 	zipcodes_found = []
@@ -91,6 +93,7 @@ def loadSportFromZipcodeViewJSON(request):
 													).filter(start_time_local__gte=startTime_timedate
 													).filter(start_time_local__lte=endTime_timedate
 													).count()
+	response.write(' ')
 	activities_found = NikeSportActivity.objects.filter(postal_code__in=zipcodes_found
 													).filter(start_time_local__gte=startTime_timedate
 													).filter(start_time_local__lte=endTime_timedate
@@ -109,9 +112,10 @@ def loadSportFromZipcodeViewJSON(request):
 						'parameters' : {'zipCodes' : zipcodes_found,
 										'limit' : limit,
 										'skip' : skip,
-										'total' : total},
+										'total' : activities_found_count},
 						'data' : {'activities': activities_array,
 								  'count' : len(activities_array),
 								  'total' : activities_found_count}}	
 	print 'CREATED RESPONSE DICT'
-	return HttpResponse(json.dumps(responseDict), mimetype='application/json')
+	response.write(json.dumps(responseDict))
+	return response
