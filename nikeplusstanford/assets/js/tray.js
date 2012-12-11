@@ -52,6 +52,19 @@ Tray.prototype =  {
 
 	//Takes an optional argument true or false to set isPaused to
 	playAndPause: function() {
+		var start_input = $("#start_date").val()
+		var end_input = $("#end_date").val()
+
+		if(!start_input|| !end_input) {
+				alert("Please enter a date range");
+				return false;
+		}
+		start_date = new Date(start_input)
+		end_date = new Date(end_input)	
+		if(start_date >= end_date) {
+			alert("Please enter a valid date range.");
+			return false;
+		}
 		//If an argument is passed in, use it to set isPaused
 		if (arguments.length == 0) isPaused = !isPaused;
 		else isPaused = arguments[0];

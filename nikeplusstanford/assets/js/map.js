@@ -156,6 +156,10 @@ function loadPathsFromJSON(path, minFuel, maxFuel) {
 }
 
 function graphPaths() {
+	//Gets unix time from tray selector
+	console.log(start_date.getTime()/1000);
+	console.log(end_date.getTime()/1000);
+
 	var minFuel = 0;
 	var maxFuel = 600;
 	if (pathLocationsLoaded) {
@@ -307,9 +311,7 @@ function polyClick (event, path) {
 // }
 function toggleHeatmap() {
  		console.log("heat map toggled");
-
-        heatmap.setMap(heatmap.getMap() ? null : map);
-      
+        heatmap.setMap(heatmap.getMap() ? null : map);    
 }
 
 //Set a marker on the location searched
@@ -453,20 +455,26 @@ function generateHeatMap() {
 }
 
 function getHeatMapModel() {
-	
+	var start_time = new Date($("#start_date").val()).getTime()/1000;
+	var end_time = new Date($("#end_date").val()).getTime()/1000;
+
+
 	var geocoder = new google.maps.Geocoder();
 	var bounds = map.getBounds();
 	var center = map.getCenter();
     var maxRows = 10;
     var radius = 5;
+    		
 
     $.get(
     	"loadSportFromZipcodeViewJSON",
-    	{lat: center.lat(), lng: center.lng(), radius: radius, maxRows: maxRows},
+    	{lat: center.lat(), lng: center.lng(), radius: radius, maxRows: maxRows, startTime: start_time, endTime: end_time},
     	function(data) {
     		console.log(data);
+    	}
+    );
     		//figure out what to do with the data. DRAW
-    });
+
 }
 
 

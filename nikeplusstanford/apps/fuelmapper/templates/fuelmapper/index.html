@@ -10,32 +10,36 @@
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
     <link href="https://netdna.bootstrapcdn.com/twitter-bootstrap/2.2.1/css/bootstrap-combined.min.css" rel="stylesheet">
     <script src="https://netdna.bootstrapcdn.com/twitter-bootstrap/2.2.1/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.9.1/themes/base/jquery-ui.css"/>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.9.1/jquery-ui.min.js"></script>
+
     <script type="text/javascript"
       src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA0fbVwcr2LQZho14TG7BgNq3x5Cx53kw0&sensor=true&libraries=visualization">
     </script>
     <script src="http://d3js.org/d3.v3.min.js"></script>
-      <script type="text/javascript">
-        var static_file_url = "{{ STATIC_URL }}";
-      </script>
 
-	    <script type="text/javascript"src="{{ STATIC_URL }}js/map.js"></script>
-	    <script type="text/javascript"src="{{ STATIC_URL }}js/tray.js"></script>
-	    <script type="text/javascript"src="{{ STATIC_URL }}js/rgb.js"></script>
-      <script type="text/javascript"src="{{ STATIC_URL }}js/slider.js"></script>
-      <script type="text/javascript"src="{{ STATIC_URL }}js/graph.js"></script>
-      <script type="text/javascript">
+    <script type="text/javascript">
+      var static_file_url = "{{ STATIC_URL }}";
+    </script>
 
-        var _gaq = _gaq || [];
-        _gaq.push(['_setAccount', 'UA-36887057-1']);
-        _gaq.push(['_trackPageview']);
+    <script type="text/javascript"src="{{ STATIC_URL }}js/map.js"></script>
+    <script type="text/javascript"src="{{ STATIC_URL }}js/tray.js"></script>
+    <script type="text/javascript"src="{{ STATIC_URL }}js/rgb.js"></script>
+    <script type="text/javascript"src="{{ STATIC_URL }}js/slider.js"></script>
+    <script type="text/javascript"src="{{ STATIC_URL }}js/graph.js"></script>
+    <script type="text/javascript">
 
-        (function() {
-          var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-          ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-          var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-        })();
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-36887057-1']);
+      _gaq.push(['_trackPageview']);
 
-      </script>
+      (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();
+
+    </script>
   </head>
   <body>
     <!-- Modal -->
@@ -78,6 +82,12 @@
         </div>
         <div id="tray-content-wrapper" class="row-fluid">
           <div class="row-fluid">
+            <div id="start_date_wrapper">
+              <input type="text" name="start_date" id="start_date" />
+            </div>
+            <div id="end_date_wrapper">
+              <input type="text" name="end_date" id="end_date" />
+            </div>        
             <div id="heatmaptoggle_wrapper">
               <button class="btn btn-primary" type="button" onclick="toggleHeatmap()">Toggle Heatmap</button>
             </div>
@@ -107,6 +117,11 @@
         </div>
       </div>
     </div>
+    <div class="alert">
+  <button type="button" class="close" data-dismiss="alert">&times;</button>
+  <strong>Warning!</strong> Test Alert.
+  </div>
+
     <div id="map_canvas"></div>
     <script type="text/javascript">
       var tray = new Tray ({
@@ -115,6 +130,10 @@
       var graph = new Graph ({
         graph: $("#d3-graph"),
         graphDivName: "#d3-graph"
+      });
+      $(function() {
+        $( "#start_date" ).datepicker().datepicker("setDate", new Date("2/1/2012"));
+        $( "#end_date" ).datepicker().datepicker("setDate", new Date());
       });
       // var slider = new Slider ({
       //   slider: $("slider")
