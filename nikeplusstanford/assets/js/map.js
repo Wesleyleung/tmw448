@@ -423,9 +423,11 @@ function setMapZoom(zoom) {
 
 function generateHeatMap() {
 	var heatMapData = heatmap.getData();
-	for (var i = 0; i < global_heat_data.length; i++) {
+	var length = global_heat_data.length;
+
+	for (var i = 0; i < length; i++) {
 		heatMapData.push(global_heat_data.shift());
-	};
+	};	
 	heatmap.setData(heatMapData);
 }
 
@@ -448,9 +450,6 @@ function getHeatMapModel(callback) {
 	    			console.log(i);
 	    			var curActivity = activities[i];
     				var fuel_amt = curActivity.fuel_amt;
-    
-    				var lat = curActivity.postal_code.geometry.location.lat;
-    				var lng = curActivity.postal_code.geometry.location.lng;
     				
     				var nelat = curActivity.postal_code.geometry.bounds.northeast.lat;
 					var swlat = curActivity.postal_code.geometry.bounds.southwest.lat;
@@ -458,20 +457,14 @@ function getHeatMapModel(callback) {
 					var nelng = curActivity.postal_code.geometry.bounds.northeast.lng;
 					var swlng = curActivity.postal_code.geometry.bounds.southwest.lng;
 
-					var dict = {location : new google.maps.LatLng(lat, lng),
-    							weight : fuel_amt};
-    				console.log(dict);
-	    			global_heat_data.push(dict);
 
-					for(var i = 0; i < Math.floor((Math.random()*10)+1); i++) {
-						console.log(i);
-						var randomLat = nelat + (swlat-nelat)*Math.random();
-						var randomLng = nelng + (swlng-nelng)*Math.random();
-						var LatLng = new google.maps.LatLng(randomLat, randomLng);
-						var dict = {location: LatLng, weight: fuel_amt};
-						console.log(dict);
-						global_heat_data.push(dict);
-					}
+					var randomLat = nelat + (swlat-nelat)*Math.random();
+					var randomLng = nelng + (swlng-nelng)*Math.random();
+
+					var LatLng = new google.maps.LatLng(randomLat, randomLng);
+					var dict = {location: LatLng, weight: fuel_amt};
+
+	    			global_heat_data.push(dict);
 	    		};
 	    		callback(data);
     		}
