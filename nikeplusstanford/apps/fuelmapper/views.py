@@ -30,41 +30,16 @@ def loadStaticJSON(request):
 # startTime & endTime = unix encoded time values
 @csrf_exempt
 def loadSportFromZipcodeViewJSON(request):
-<<<<<<< HEAD
-	jsonPOST = json.loads(request.body)
+# #loadSportFromZipcodeViewJSON?swLat=36.66560863153126&swLng=-125.43725519921873&neLat=38.174996763572814&neLng=-118.89489680078123
 	try:
-		zipCodes = jsonPOST['zipCodes']
-		startTime = jsonPOST['startTime']
-		endTime = jsonPOST['endTime']
-		# startTime = 0
-		# endTime = 1
+		centerLat = request.GET['lat']
+		centerLng = request.GET['lng']
+		radius = request.GET['radius']
+		maxRows = request.GET['maxRows']
 	except KeyError:
 		responseDict = {'status' : 'ERROR',
 						'description' : 'Insufficient parameters.'}	
 		return HttpResponse(json.dumps(responseDict), mimetype='application/json', status=400)
-
-	activities_found = NikeSportActivity.objects.filter(postal_code__in=zipCodes)[:5]
-
-	activities_array = []
-	for activity in activities_found:
-		activities_array.append(activity.get_JSON())
-	print activities_array
-	responseDict = {'success' : 'OK',
-					'parameters' : {'zipCodes' : zipCodes,
-									'startTime' : startTime,
-									'endTime' : endTime},
-					'data' : {'activities': activities_array,
-							  'count' : len(activities_array)}}	
-	return HttpResponse(json.dumps(responseDict), mimetype='application/json')
-
-
-
-# #loadSportFromZipcodeViewJSON?swLat=36.66560863153126&swLng=-125.43725519921873&neLat=38.174996763572814&neLng=-118.89489680078123
-=======
-	centerLat = request.GET['lat']
-	centerLng = request.GET['lng']
-	radius = request.GET['radius']
-	maxRows = request.GET['maxRows']
 
 	request_url = "http://ws.geonames.org/findNearbyPostalCodesJSON?"
 	data = {'formatted': True, 'lat': request.GET['lat'], 'lng': centerLng, 'radius': radius, 'maxRows': maxRows}
@@ -78,12 +53,15 @@ def loadSportFromZipcodeViewJSON(request):
 		zipcodeParams.append(obj['postalCode'])
 
 	print zipcodeParams
-	output = NikeSportActivity.objects.filter(postal_code__in=zipcodeParams) 
+	activities_found = NikeSportActivity.objects.filter(postal_code__in=zipcodeParams) 
 
-	out_array = []
-	for activity in output:
-		out_array.append(activity.get_JSON())	
->>>>>>> 7636d60718c6a6a007087afd2b16b7ad10c60520
-
-	return HttpResponse(json.dumps(out_array), mimetype='application/json')
+	for activity in activities_found:
+		activities_array.append(activity.get_JSON())
+	responseDict = {'success' : 'OK',
+						'parameters' : {'zipCodes' : zipCodes,
+										'startTime' : startTime,
+										'endTime' : endTime},
+						'data' : {'activities': activities_array,
+								  'count' : len(activities_array)}}	
+	return HttpResponse(json.dumps(responseDict), mimetype='application/json')
 
