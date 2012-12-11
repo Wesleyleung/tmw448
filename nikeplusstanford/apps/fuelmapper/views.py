@@ -40,23 +40,16 @@ def responseGenerator(request):
 		skip = int(skip)
 
 	print 'STARTING ZIP CODE REQUEST'
-	centerLat = request.GET['lat']
-	centerLng = request.GET['lng']
 	neLat = request.GET['neLat']
 	neLng = request.GET['neLng']
 	swLat = request.GET['swLat']
 	swLng = request.GET['swLng']
-	# radius = int(request.GET['radius'])
-	radius = 20
-	# we're limited to a radius of 30 by the service
-	if radius > 30:
-		radius = 30
 	startTime = float(request.GET['startTime'])
 	endTime = float(request.GET['endTime'])
 	
 	yield ' '
-
-	zipcodes_found = PostalCode.objects.filter(lat__gte=swLat).filter(lng__gte=swLng).filter(lat__lte=neLat).filter(lng__lte=neLng)
+	zip_limit = 20
+	zipcodes_found = PostalCode.objects.filter(lat__gte=swLat).filter(lng__gte=swLng).filter(lat__lte=neLat).filter(lng__lte=neLng)[:20]
 	zipcode_strings = []
 	zipcode_objects = {}
 	for zipcode in zipcodes_found:
@@ -85,6 +78,7 @@ def responseGenerator(request):
 	yield ' '
 	print 'ACTIVITIES SORTED IN DB'
 
+	print 'STARTING TO CALCULATE AGGREGATES'
 	aggregates = {'data' : []}
 	max_fuel_in_range = 0
 	aggregates_data = aggregates['data']
@@ -114,14 +108,13 @@ def responseGenerator(request):
 			day['zipcodes'].append({activity.postal_code : 0})
 			zip_index = day['zipkeys'].index(activity.postal_code)
 		day['zipcodes'][zip_index][activity.postal_code] = day['zipcodes'][zip_index][activity.postal_code] + activity.fuel_amt
-
 		activities_array.append(activity_JSON)
+
+	print 'FINISHED CALCULATING AGGREGATES'
 	if len(days) > 0:
 		aggregates['maxFuelInRange'] = max_fuel_in_range
 		aggregates['startDate'] = days[0]
 		aggregates['endDate'] = days.pop()
-	else:
-		aggregates['data'] = None
 
 	if len(activities_array) > 0:
 		responseDict = {'success' : 'OK',
@@ -134,7 +127,7 @@ def responseGenerator(request):
 									  'total' : activities_found_count,
 									  'aggregates' : aggregates}}
 	else:
-		responseDict = {'success' : 'OK',
+		responseDict = {'success' : 'NO DATA',
 						'parameters' : None,
 						'data' : None}	
 	print 'CREATED RESPONSE DICT'
@@ -162,8 +155,6 @@ def loadSportFromZipcodeViewJSON(request):
 		responseDict = {'status' : 'ERROR',
 						'description' : 'Insufficient parameters.'}	
 		return HttpResponse(json.dumps(responseDict), mimetype='application/json', status=400)
-
-	
 
 	response = HttpResponse(responseGenerator(request), content_type='application/json')
 
