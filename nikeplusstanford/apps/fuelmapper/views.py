@@ -85,9 +85,6 @@ def responseGenerator(request):
 	yield ' '
 	print 'ACTIVITIES SORTED IN DB'
 
-	# activities_found = sorted(activities_found, key=lambda activity: activity.start_time_local, reverse=True)
-	# yield ' '
-	# print 'ACTIVITIES SORTED'
 	aggregates = {'data' : []}
 	max_fuel_in_range = 0
 	aggregates_data = aggregates['data']
@@ -125,6 +122,7 @@ def responseGenerator(request):
 		aggregates['endDate'] = days.pop()
 	else:
 		aggregates['data'] = None
+
 	if len(activities_array) > 0:
 		responseDict = {'success' : 'OK',
 							'parameters' : {'zipCodes' : zipcode_strings,
@@ -154,13 +152,10 @@ def loadSportFromZipcodeViewJSON(request):
 						'description' : 'Must be a get request.'}	
 		return HttpResponse(json.dumps(responseDict), mimetype='application/json', status=400)
 	try:
-		centerLat = request.GET['lat']
-		centerLng = request.GET['lng']
 		neLat = request.GET['neLat']
 		neLng = request.GET['neLng']
 		swLat = request.GET['swLat']
 		swLng = request.GET['swLng']
-		# radius = request.GET['radius']
 		startTime = float(request.GET['startTime'])
 		endTime = float(request.GET['endTime'])
 	except KeyError:
