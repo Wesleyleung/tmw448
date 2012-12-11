@@ -42,31 +42,35 @@ def loadSportFromZipcodeViewJSON(request):
 		return HttpResponse(json.dumps(responseDict), mimetype='application/json', status=400)
 
 	request_url = "http://ws.geonames.org/findNearbyPostalCodesJSON?"
-	data = {'formatted': True, 'lat': request.GET['lat'], 'lng': centerLng, 'radius': radius, 'maxRows': maxRows}
+	zip_request_data = {'formatted': True, 'lat': centerLat, 'lng': centerLng, 'radius': radius, 'maxRows': maxRows}
+	print request_url + urlencode(zip_request_data)
 	h = httplib2.Http()
-	resp, content = h.request(request_url + urlencode(data), method="GET")
+	zipCodeData = None
+	resp, content = h.request(request_url + urlencode(zip_request_data), method="GET")
 	if resp.status == 200:
-		data = json.loads(content)
-		zipcodeParams = []
-		for obj in data['postalCodes']:
-			zipcodeParams.append(obj['postalCode'])
+		zipCodeData = json.loads(content)
+	else:
+		responseDict = {'status' : 'ERROR',
+						'description' : 'Could not find zip codes'}	
+		return HttpResponse(json.dumps(responseDict), mimetype='application/json', status=400)
 
+	zipcodeParams = []
+	for obj in zipCodeData['postalCodes']:
+		zipcodeParams.append(obj['postalCode'])
 
 	#LOCAL DEV ONLY
-	# zipcodeParams.append(60448)
+	zipcodeParams.append('60448')
 	# PostalCode.find_or_create_code("60448")
 	# PostalCode.objects.get(postalcode='60448')
 	# output = NikeSportActivity.objects.filter(postal_code=60448) 
 
-	print zipcodeParams
 	activities_found = NikeSportActivity.objects.filter(postal_code__in=zipcodeParams) 
 
+	activities_array = []
 	for activity in activities_found:
 		activities_array.append(activity.get_JSON())
 	responseDict = {'success' : 'OK',
-						'parameters' : {'zipCodes' : zipCodes,
-										'startTime' : startTime,
-										'endTime' : endTime},
+						'parameters' : {'zipCodes' : zipcodeParams},
 						'data' : {'activities': activities_array,
 								  'count' : len(activities_array)}}	
 	return HttpResponse(json.dumps(responseDict), mimetype='application/json')
