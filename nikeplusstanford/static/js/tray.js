@@ -20,6 +20,7 @@ function Tray (params) {
 
 Tray.prototype =  {
 	//Define functions here
+
 	initTray: function() {
 		this.tray.css('bottom', this.tray.height() * -1 + this.trayPlayControlsWrapper.height());
 		this.numProgressIntervals = 0;
@@ -27,10 +28,8 @@ Tray.prototype =  {
 	},
 
 	setNumProgressIntervals: function(num) {
-		console.log(num);
 		this.numProgressIntervals = num;
 	},
-
 
 	setCurrentProgressInterval: function(num) {
 		this.currentProgressInterval = num;
@@ -53,13 +52,29 @@ Tray.prototype =  {
 
 	//Takes an optional argument true or false to set isPaused to
 	playAndPause: function() {
+		var start_input = $("#start_date").val()
+		var end_input = $("#end_date").val()
+
+		if(!start_input|| !end_input) {
+				alert("Please enter a date range");
+				return false;
+		}
+		start_date = new Date(start_input)
+		end_date = new Date(end_input)	
+		if(start_date >= end_date) {
+			modal.showModal("Not a Valid Date", '<p>Please select a start date after the end date.</p>');
+			return false;
+		}
 		//If an argument is passed in, use it to set isPaused
 		if (arguments.length == 0) isPaused = !isPaused;
 		else isPaused = arguments[0];
 		this.setProgressBarActiveState(isPaused);
 		if (!isPaused) {
 			this.playButton.html('<img src="' + static_file_url + 'img/pausebutton.png" />');
+			slider.animateProgressBar();
 			//graphPaths from map.js
+			getHeatMapModel(generateHeatMap);
+			
 			graphPaths();
 		} else {
 			this.playButton.html('<img src="' + static_file_url + 'img/playbutton.png" />');
@@ -79,7 +94,6 @@ Tray.prototype =  {
 		/*this.progressBar.animate({
 			width: percentage + "%"
 		}, 10);*/
-		console.log(percentage);
 		this.progressBar.width(percentage + "%");
 	},
 

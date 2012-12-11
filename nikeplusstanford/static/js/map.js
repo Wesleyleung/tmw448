@@ -5,6 +5,7 @@ var pathStrokeColor = "#FF0000";
 var hoverStrokeColor = "#7EE569";
 var infowindow;
 var isPaused = true;
+var marker = null;
 //These eight need to be reset whenever we get new data
 var pathLocationsLoaded = false;
 var coordsToBeGraphed = [];
@@ -14,6 +15,8 @@ var totalRuns = 0;
 var runVisualizationsEnded = 0;
 var numProgressIntervals = 0;
 var visFullyComplete = false;
+var global_heat_data = null;
+
 
 google.maps.event.addDomListener(window, 'load', function () {
 	initialize();
@@ -26,7 +29,6 @@ function initialize() {
 		mapTypeId: google.maps.MapTypeId.ROADMAP
 	};
 	map = new google.maps.Map(document.getElementById('map_canvas'), mapOptions);
-
 	//Try HTML5 geolocation
 	// if(navigator.geolocation) {
 	// 	navigator.geolocation.getCurrentPosition(function(position) {
@@ -45,7 +47,11 @@ function initialize() {
 	// // Browser doesn't support Geolocation
 	// 	handleNoGeolocation(false);
 	// }
-	generateHeatMap();
+
+	google.maps.event.addListenerOnce(map, 'idle', function() {
+		//generateHeatMap();	
+	});
+	
 	//generateBoundaries();
 }
 
@@ -151,6 +157,10 @@ function loadPathsFromJSON(path, minFuel, maxFuel) {
 }
 
 function graphPaths() {
+	//Gets unix time from tray selector
+	console.log(start_date.getTime()/1000);
+	console.log(end_date.getTime()/1000);
+
 	var minFuel = 0;
 	var maxFuel = 600;
 	if (pathLocationsLoaded) {
@@ -160,7 +170,7 @@ function graphPaths() {
 			drawPath(pathLocations, i, minFuel, maxFuel);	
 		}
 	} else {
-		loadPathsFromJSON(static_file_url + "js/randomRuns.json", minFuel, maxFuel);
+		loadPathsFromJSON("loadStaticJSON?json_file=randomRuns.json", minFuel, maxFuel);
 	}
 }
 
@@ -300,47 +310,151 @@ function polyClick (event, path) {
 // 		}
 // 	});
 // }
- function toggleHeatmap() {
+function toggleHeatmap() {
  		console.log("heat map toggled");
-
-        heatmap.setMap(heatmap.getMap() ? null : map);
-      
- }
-
-
-function generateHeatMap() {
-	$.getJSON(static_file_url + "js/locations.json", function(json) {
-		//console.log(json);
-		var heatMapData = [];
-		var added = {}
-		for (var i = 0; i < json.locations.length; i++) {
-			var location = json.locations[i];
-			var LatLng = new google.maps.LatLng(location.coords.lat, location.coords.lng)
-			if (!added[LatLng]) {
-				//added additional points for testing purposes
-				// var delta = 0.0025;
-				// var dictne = {location: new google.maps.LatLng(location.coords.lat+delta, location.coords.lng+delta), weight: location.weight};
-				// var dictse = {location: new google.maps.LatLng(location.coords.lat+delta, location.coords.lng-delta), weight: location.weight};
-				// var dictnw = {location: new google.maps.LatLng(location.coords.lat-delta, location.coords.lng+delta), weight: location.weight};
-				// var dictsw = {location: new google.maps.LatLng(location.coords.lat-delta, location.coords.lng-delta), weight: location.weight};
-				// heatMapData.push(dictne);
-				// heatMapData.push(dictse);
-				// heatMapData.push(dictnw);
-				// heatMapData.push(dictsw);
-
-				var dict = {location: LatLng , weight: location.weight};
-				heatMapData.push(dict);
-				added[LatLng] = true;
-			}
-		};
-		heatmap = new google.maps.visualization.HeatmapLayer({
-			data: heatMapData
-		});
-		 heatmap.setOptions({
-			dissipating: true,
-			opacity:0.75,
-			radius:20
-		 });
-		heatmap.setMap(map);
-	 });
+        heatmap.setMap(heatmap.getMap() ? null : map);    
 }
+
+//Set a marker on the location searched
+function setMarkerAtLatLng(ll) {
+	//clear old marker
+	if (marker) marker.setMap(null);
+	//set marker to location
+	marker = new google.maps.Marker({
+		map:map,
+		draggable:false,
+		clickable:false,
+		animation: google.maps.Animation.DROP,
+		position: ll
+	});
+}
+
+
+function searchLocation() {
+	if (!this.searchInput) this.searchInput = $('#search-input');
+	console.log(this.searchInput.val());
+	var geocoder = new google.maps.Geocoder();
+	geocoder.geocode({'address':this.searchInput.val()}, function (results, status) {
+		if (status == google.maps.GeocoderStatus.OK) {
+			var resType = results[0].geometry.location_type;
+			var res = results[0].geometry.location;
+			var LatLng = new google.maps.LatLng(res.lat(), res.lng());
+			var geocoder2 = new google.maps.Geocoder();
+			geocoder2.geocode({ 'latLng': LatLng, 'region': 'US' }, function (results, status) {
+				console.log(results[0]);
+			});
+			console.log(results[0]);
+			//If it's a rooftop location, set zoom to fairly high
+			//If there are no bounds, we can't use the function setLocationOnMapByBounds
+			if (resType == 'ROOFTOP' || !results[0].geometry.bounds) {
+				setLocationOnMapByLatLng(LatLng);
+				var maxZoomService = new google.maps.MaxZoomService();
+				maxZoomService.getMaxZoomAtLatLng(LatLng, function(response) {
+				    if (response.status != google.maps.MaxZoomStatus.OK) {
+						return;
+					} else {
+						if (results[0].geometry.bounds) setMapZoom(response.zoom - 2);
+						else setMapZoom(response.zoom - 5);
+					}
+					setMarkerAtLatLng(LatLng);
+				});
+			//if not, just set by the boundaries
+			} else {
+				setLocationOnMapByBounds(results[0].geometry.bounds);
+				setMarkerAtLatLng(LatLng);
+			}
+			
+		} else {
+			if (!results.length) {
+				modal.showModal("Location Not Found", '<p>Your search for "' + this.searchInput.val() + '" did not return any results.  Please search for another location.</p>');
+			}
+		}
+	});
+	geocoder = null;
+}
+
+/*
+headerText is only text and bodyText can include html
+*/
+function showModal(headerText, bodyText, includeFooter) {
+	this.modal = $('#myModal');
+	this.modalHeader = this.modal.find('.modal-header h3');
+	this.modalBody = this.modal.find('.modal-body');
+	this.modalFooter = this.modal.find('.modal-footer');
+	this.modalHeader.html(headerText);
+	this.modalBody.html(bodyText);
+
+	//defaults to true
+	if (typeof(includeFooter) === 'undefined' || includeFooter) {
+		if (!this.modalFooter.length) {
+			this.modalBody.after(
+				'<div class="modal-footer">\
+        			<button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>\
+     			 </div>'
+			)
+		}
+	} else if (!includeFooter) {
+		this.modalFooter.remove();
+	}
+
+	this.modal.modal();
+}
+
+function setLocationOnMapByBounds(bounds) {
+	map.setCenter(bounds.getCenter());
+	map.fitBounds(bounds);
+}
+
+function setLocationOnMapByLatLng(latLng) {
+	map.setCenter(latLng);
+}
+
+function setMapZoom(zoom) {
+	map.setZoom(zoom);
+}
+
+function generateHeatMap(callback) {
+	var heatMapData = [];
+	for (var i = 0; i < global_heat_data.data.count; i++) {
+		fuel_amt = global_heat_data.data.activities[i].fuel_amt;
+		lat = global_heat_data.data.activities[i].postal_code.geometry.location.lat;
+		lng = global_heat_data.data.activities[i].postal_code.geometry.location.lng;
+		start_time = global_heat_data.data.activities[i].start_time_standard;
+		var LatLng = new google.maps.LatLng(lat, lng)
+		var dict = {location: LatLng, weight: fuel_amt};
+		heatMapData.push(dict);
+	}
+
+	heatmap = new google.maps.visualization.HeatmapLayer({
+		data: heatMapData
+	});
+
+	heatmap.setOptions({
+		dissipating: true,
+		opacity:0.75,
+		radius:15
+	});
+	heatmap.setMap(map);
+}
+
+function getHeatMapModel(callback) {
+	var start_time = new Date($("#start_date").val()).getTime()/1000;
+	var end_time = new Date($("#end_date").val()).getTime()/1000;
+	var center = map.getCenter();
+    var maxRows = 10;
+    var radius = 5;
+   		
+    $.get( "loadSportFromZipcodeViewJSON",
+    	{lat: center.lat(), lng: center.lng(), radius: radius, maxRows: maxRows, startTime: start_time, endTime: end_time},
+    	function(data) {
+    		if(data.success == "OK" && data.data.count > 0) {   	
+	    		global_heat_data = data;
+	    		callback(data);
+    		}
+    	}
+    );
+}
+
+
+
+
