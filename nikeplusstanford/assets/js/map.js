@@ -308,8 +308,8 @@ function toggleHeatmap() {
       
 }
 
+//Set a marker on the location searched
 function setMarkerAtLatLng(ll) {
-	//Set a marker on the location searched
 	//clear old marker
 	if (marker) marker.setMap(null);
 	//set marker to location
@@ -332,8 +332,13 @@ function searchLocation() {
 			var resType = results[0].geometry.location_type;
 			var res = results[0].geometry.location;
 			var LatLng = new google.maps.LatLng(res.lat(), res.lng());
+			var geocoder2 = new google.maps.Geocoder();
+			geocoder2.geocode({ 'latLng': LatLng, 'region': 'US' }, function (results, status) {
+				console.log(results[0]);
+			});
 			console.log(results[0]);
 			//If it's a rooftop location, set zoom to fairly high
+			//If there are no bounds, we can't use the function setLocationOnMapByBounds
 			if (resType == 'ROOFTOP' || !results[0].geometry.bounds) {
 				setLocationOnMapByLatLng(LatLng);
 				var maxZoomService = new google.maps.MaxZoomService();
