@@ -48,7 +48,7 @@ def responseGenerator(request):
 
 	yield ' '
 	request_url = "http://ws.geonames.org/findNearbyPostalCodesJSON?"
-	zip_request_data = {'lat': centerLat, 'lng': centerLng, 'radius': radius, 'maxRows' : 100}
+	zip_request_data = {'lat': centerLat, 'lng': centerLng, 'radius': radius, 'maxRows' : 3}
 	h = httplib2.Http()
 	zipCodeData = None
 	resp, content = h.request(request_url + urlencode(zip_request_data), method="GET")
