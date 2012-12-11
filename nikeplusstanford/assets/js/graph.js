@@ -48,10 +48,10 @@ Graph.prototype = {
 			.attr("class", "days");
 
 		// A label for the current year.
-		var title = this.svg.append("text")
-			.attr("class", "title")
-			.attr("dy", ".71em")
-			.text(2000);
+		// var title = this.svg.append("text")
+		// 	.attr("class", "title")
+		// 	.attr("dy", ".71em")
+		// 	.text(2000);
 
 		//this should be the json response and not test csv file
 		d3.csv(static_file_url + "js/export.csv", function(error, data) {
