@@ -40,7 +40,7 @@ def responseGenerator(request):
 		skip = request.GET['skip']
 		skip = int(skip)
 
-	zip_limit = 8000
+	zip_limit = 5000
 	if 'zip_limit' in request.GET:
 		zip_limit = request.GET['zip_limit']
 		zip_limit = int(zip_limit)
@@ -89,34 +89,34 @@ def responseGenerator(request):
 	aggregates_data = aggregates['data']
 	activities_array = []
 	days = []
-	timedelta = endTime_timedate - startTime_timedate
+	# timedelta = endTime_timedate - startTime_timedate
 	for activity in activities_found:
 		yield ' '
 		activity_JSON = activity.get_JSON()
 		activity_JSON['postal_code'] = zipcode_objects[activity.postal_code].get_JSON()
-		if timedelta.days > 2:
-			index = 0
-			try:
-				index = days.index(activity_JSON['start_time_standard'])
-			except ValueError:
-				aggregates_data.append({'date' : activity_JSON['start_time_standard'],
-									    'totalFuel' : 0,
-									    'zipcodes' : [],
-									    'zipkeys' : []})
-				days.append(activity_JSON['start_time_standard'])
-				index = days.index(activity_JSON['start_time_standard'])
-			day = aggregates_data[index]
-			day['totalFuel'] = day['totalFuel'] + activity.fuel_amt
-			max_fuel_in_range = max(max_fuel_in_range, day['totalFuel'])
-			zip_index = 0
-			try:
-				zip_index = day['zipkeys'].index(activity.postal_code)
-			except ValueError:
-				day['zipkeys'].append(activity.postal_code)
-				day['zipcodes'].append({activity.postal_code : 0})
-				zip_index = day['zipkeys'].index(activity.postal_code)
-			day['zipcodes'][zip_index][activity.postal_code] = day['zipcodes'][zip_index][activity.postal_code] + activity.fuel_amt
-			activities_array.append(activity_JSON)
+		# if timedelta.days > 2:
+		index = 0
+		try:
+			index = days.index(activity_JSON['start_time_standard'])
+		except ValueError:
+			aggregates_data.append({'date' : activity_JSON['start_time_standard'],
+								    'totalFuel' : 0,
+								    'zipcodes' : [],
+								    'zipkeys' : []})
+			days.append(activity_JSON['start_time_standard'])
+			index = days.index(activity_JSON['start_time_standard'])
+		day = aggregates_data[index]
+		day['totalFuel'] = day['totalFuel'] + activity.fuel_amt
+		max_fuel_in_range = max(max_fuel_in_range, day['totalFuel'])
+		zip_index = 0
+		try:
+			zip_index = day['zipkeys'].index(activity.postal_code)
+		except ValueError:
+			day['zipkeys'].append(activity.postal_code)
+			day['zipcodes'].append({activity.postal_code : 0})
+			zip_index = day['zipkeys'].index(activity.postal_code)
+		day['zipcodes'][zip_index][activity.postal_code] = day['zipcodes'][zip_index][activity.postal_code] + activity.fuel_amt
+		activities_array.append(activity_JSON)
 		yield ' '
 	if len(days) > 0:
 		aggregates['maxFuelInRange'] = max_fuel_in_range
