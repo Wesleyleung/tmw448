@@ -91,6 +91,7 @@ def responseGenerator(request):
 	days = []
 	timedelta = endTime_timedate - startTime_timedate
 	for activity in activities_found:
+		yield ' '
 		activity_JSON = activity.get_JSON()
 		activity_JSON['postal_code'] = zipcode_objects[activity.postal_code].get_JSON()
 		if timedelta.days > 2:
