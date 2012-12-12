@@ -40,7 +40,7 @@ def responseGenerator(request):
 		skip = request.GET['skip']
 		skip = int(skip)
 
-	zip_limit = 10000
+	zip_limit = 5000
 	if 'zip_limit' in request.GET:
 		zip_limit = request.GET['zip_limit']
 		zip_limit = int(zip_limit)
