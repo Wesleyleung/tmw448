@@ -3,6 +3,7 @@ from django.shortcuts import render
 from django.conf import settings
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import condition
+from django.db.models import Count
 import json
 import math
 import httplib2 
