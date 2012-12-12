@@ -90,10 +90,10 @@ def responseGenerator(request):
 	activities_array = []
 	days = []
 	timedelta = endTime_timedate - startTime_timedate
-	if timedelta.days > 2:
-		for activity in activities_found:
-			activity_JSON = activity.get_JSON()
-			activity_JSON['postal_code'] = zipcode_objects[activity.postal_code].get_JSON()
+	for activity in activities_found:
+		activity_JSON = activity.get_JSON()
+		activity_JSON['postal_code'] = zipcode_objects[activity.postal_code].get_JSON()
+		if timedelta.days > 2:
 			index = 0
 			try:
 				index = days.index(activity_JSON['start_time_standard'])
@@ -116,16 +116,15 @@ def responseGenerator(request):
 				zip_index = day['zipkeys'].index(activity.postal_code)
 			day['zipcodes'][zip_index][activity.postal_code] = day['zipcodes'][zip_index][activity.postal_code] + activity.fuel_amt
 			activities_array.append(activity_JSON)
-			yield ' '
-	else:
-		aggregates = ['NO AGGREGATE DATA']
-
-	print 'FINISHED CALCULATING AGGREGATES'
-	yield ' '
+		yield ' '
 	if len(days) > 0:
 		aggregates['maxFuelInRange'] = max_fuel_in_range
 		aggregates['startDate'] = days[0]
 		aggregates['endDate'] = days.pop()
+
+	print 'FINISHED CALCULATING AGGREGATES'
+	yield ' '
+	
 
 	if len(activities_array) > 0:
 		responseDict = {'success' : 'OK',
