@@ -144,8 +144,13 @@ body {
 	width:85px;
 }
 
+#bottom-info {
+	position: relative;
+	top: 40px;
+	color: gray;
+}
+
 .centered {
   display: inline-block;
   vertical-align: middle;
- }​
-
+}​
