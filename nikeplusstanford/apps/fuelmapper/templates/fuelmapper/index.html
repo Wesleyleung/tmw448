@@ -69,6 +69,7 @@
           <div id="d3-graph"></div>
         </div>
       </div>
+      <div id="graph-info"></div>
       <div id="tray-full-wrapper">
         <div id="tray-play-wrapper" class="row-fluid">
           <div class="row-fluid">
@@ -166,7 +167,8 @@
       });
       var graph = new Graph ({
         graph: $("#d3-graph"),
-        graphDivName: "#d3-graph"
+        graphDivName: "#d3-graph",
+        graphInfo: $("#graph-info")
       });
       $(function() {
         $( "#start_date" ).datepicker().datepicker("setDate", new Date("2/1/2012"));

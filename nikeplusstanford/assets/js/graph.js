@@ -1,6 +1,9 @@
 function Graph(params) {
 	this.jqueryGraph = params.graph;
 	this.graphIDString = params.graphDivName;
+	this.graphInfo = params.graphInfo;
+
+	console.log(this.graphInfo);
 
 	this.barToShowIndex = 0;
 	this.barArray = [];
@@ -169,7 +172,6 @@ Graph.prototype = {
 		//Remove the old graph
 		if (this.svg) d3.select("svg").remove();
 		var data = JSON.parse( json );
-		console.log(data);
 
 		var margin = {top: 5, right: 0, bottom: 0, left: 0};
 			//this.numDays needs to be set beforehand
@@ -261,17 +263,21 @@ Graph.prototype = {
 		var date = new Date(d.date*1000);
 		var dateStr = month[date.getMonth()] + ", " + date.getDate() + " " + date.getFullYear();
 		console.log(dateStr);
-	    d3.select(this.parentNode.parentNode).insert("text", ":first-child")
-	        .attr("width", 100)
-	        .attr("height", 100)
-	        .attr("class", "infoBox")
-	        .text(dateStr + ": " + d.totalFuel + " fuel points earned")
-	        .attr("x", xcoord)
-	        .attr("y", ycoord);
+	    // d3.select(this.parentNode.parentNode).insert("rect", ":first-child")
+	    //     .attr("width", 100)
+	    //     .attr("height", 100)
+	    //     .attr("class", "infoBox")
+	    //     .text(dateStr + ": " + d.totalFuel + " fuel points earned")
+	    //     .attr("x", xcoord)
+	    //     .attr("y", ycoord);
+	    $('#graph-info').html(dateStr + ": " + d.totalFuel + " fuel points earned");
+	    $('#graph-info').css("background", "rgba(0, 0, 0, 0.7)");
 	},
 
 	out: function(d) {
 		d3.select(this.parentNode.parentNode).select(".infoBox").remove();
+		$('#graph-info').html("");
+		$('#graph-info').css("background", "none");
 	},
 
 	animateNextBar: function() {
