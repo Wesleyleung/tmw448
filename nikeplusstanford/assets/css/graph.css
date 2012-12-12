@@ -33,7 +33,6 @@ svg {
 
 .infoBox {
 	font: 16px Helvetica Neue;
-	z-index: 5;
 }
 
 .title {
@@ -43,7 +42,15 @@ svg {
 
 .day {
 	fill: #fff;
-	z-index: 4;
+}
+
+#graph-info {
+	position: absolute;
+	top: -100px;
+	height: 30px;
+	text-align: center;
+	padding: 10px;
+	color: white;
 }
 
 rect {

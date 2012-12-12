@@ -436,6 +436,7 @@ function generateHeatMap(data) {
 }
 
 function getHeatMapModel(callback) {
+
 	var start_time = new Date($("#start_date").val()).getTime()/1000;
 	var end_time = new Date($("#end_date").val()).getTime()/1000;
 
@@ -447,7 +448,8 @@ function getHeatMapModel(callback) {
     //check if heatmap is present. delete and redraw
     console.log(heatmap.getData().length);
     if(heatmap.getData().length > 0) {
-    	heatmap.setData([]);  
+    	heatMap.setMap(null);
+		heatMap.setMap(map); 
     }
    
 	//loadHeatmapData(start_time, end_time, center, radius, maxRows, 0, callback);
