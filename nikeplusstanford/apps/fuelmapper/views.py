@@ -114,6 +114,7 @@ def responseGenerator(request):
 			zip_index = day['zipkeys'].index(activity.postal_code)
 		day['zipcodes'][zip_index][activity.postal_code] = day['zipcodes'][zip_index][activity.postal_code] + activity.fuel_amt
 		activities_array.append(activity_JSON)
+		yield ' '
 
 	print 'FINISHED CALCULATING AGGREGATES'
 	if len(days) > 0:
