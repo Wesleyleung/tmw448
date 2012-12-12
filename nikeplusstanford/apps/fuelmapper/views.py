@@ -3,6 +3,7 @@ from django.shortcuts import render
 from django.conf import settings
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import condition
+from django.db.models import Count
 import json
 import math
 import httplib2 
@@ -39,7 +40,7 @@ def responseGenerator(request):
 		skip = request.GET['skip']
 		skip = int(skip)
 
-	zip_limit = 1000
+	zip_limit = 10000
 	if 'zip_limit' in request.GET:
 		zip_limit = request.GET['zip_limit']
 		zip_limit = int(zip_limit)
@@ -113,8 +114,10 @@ def responseGenerator(request):
 			zip_index = day['zipkeys'].index(activity.postal_code)
 		day['zipcodes'][zip_index][activity.postal_code] = day['zipcodes'][zip_index][activity.postal_code] + activity.fuel_amt
 		activities_array.append(activity_JSON)
+		yield ' '
 
 	print 'FINISHED CALCULATING AGGREGATES'
+	yield ' '
 	if len(days) > 0:
 		aggregates['maxFuelInRange'] = max_fuel_in_range
 		aggregates['startDate'] = days[0]
