@@ -422,6 +422,10 @@ function setMapZoom(zoom) {
 }
 
 function generateHeatMap(data) {
+	var start_time = new Date($("#start_date").val()).getTime()/1000;
+	var end_time = new Date($("#end_date").val()).getTime()/1000;
+
+
 	var heatMapData = heatmap.getData();
 	var length = global_heat_data.length;
 
@@ -430,9 +434,10 @@ function generateHeatMap(data) {
 	};	
 	heatmap.setData(heatMapData);
 	//console.log(data['data']['aggregates']);
-	graph.initGraphWithJsonObject(JSON.stringify(data['data']['aggregates']));
-	console.log("done");
-	tray.setProgressBarActiveState(true);
+	if (end_time - start_time > 604800) {
+		graph.initGraphWithJsonObject(JSON.stringify(data['data']['aggregates']));
+	}
+	tray.playAndPause(true);
 }
 
 function getHeatMapModel(callback) {
@@ -468,7 +473,6 @@ function getHeatMapModel(callback) {
 
 					var nelng = curActivity.postal_code.geometry.bounds.northeast.lng;
 					var swlng = curActivity.postal_code.geometry.bounds.southwest.lng;
-
 
 					var randomLat = nelat + (swlat-nelat)*Math.random();
 					var randomLng = nelng + (swlng-nelng)*Math.random();
