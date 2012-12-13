@@ -177,7 +177,7 @@ def zip_info(request):
 		zipcode = request.GET['zipcode']
 		try:
 			zip_obj = PostalCode.objects.get(postalcode=zipcode)
-			return HttpResponse(json.dumps(zip_obj.get_JSON), mimetype='application/json', status=200)
+			return HttpResponse(json.dumps(zip_obj.get_JSON()), mimetype='application/json', status=200)
 		except PostalCode.DoesNotExist:
 			responseDict = {'status' : 'ERROR',
 							'description' : 'Insufficient parameters.'}	
