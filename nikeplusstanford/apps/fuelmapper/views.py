@@ -79,7 +79,10 @@ def responseGenerator(request):
 	activities_found = NikeSportActivity.objects.filter(postal_code__in=zipcode_strings
 													).filter(start_time_local__gte=startTime_timedate
 													).filter(start_time_local__lte=endTime_timedate
-													).order_by('start_time_local')[skip:skip+limit]
+													).order_by('start_time_local'
+													).only('sport_activity_id', 'upm_user_id',
+														   'nike_plus_user_id', 'start_time_local',
+														   'fuel_amt', 'postal_code')[skip:skip+limit]
 	yield ' '
 	print 'ACTIVITIES SORTED IN DB'
 
