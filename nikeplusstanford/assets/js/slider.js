@@ -90,17 +90,4 @@ Slider.prototype =  {
 		return this.slider.slider('option', 'value');
 	},
 
-	//Fires every 5 ms while the slider is moving and returns the value of the slider
-	// readSliderWhileAnimating: function() {
-	// 	if (!this.slideElement.is(':animated')) {
-	// 		return;
-	// 	}
-	// 	setInterval(function() {
-	// 		var now = new Date().getTime();
-	// 		if (!this.slideElement.is(':animated')) {
-	// 			clearInterval();
-	// 			console.log(now - this.timeStartedAnimating);
-	// 		}
-	// 	}.bind(this), 10);
-	// }
 }

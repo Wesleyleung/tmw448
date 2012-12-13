@@ -114,17 +114,22 @@ class NikeSportActivity(models.Model):
 
 	def get_JSON(self):
 		output = {}
-		for field in NikeSportActivity._meta.fields:
-			output[field.name] = getattr(self, field.name)
+		fields_we_want = ['sport_activity_id', 'upm_user_id',
+						  'nike_plus_user_id',
+						  'fuel_amt', 'postal_code']
+		for field in fields_we_want:
+			output[field] = getattr(self, field)
+		# for field in NikeSportActivity._meta.fields:
+		# 	output[field.name] = getattr(self, field.name)
 		# Nike stores it's times as its server local times (Beaverton, OR)
 		nike_hour_offset = 8 * 3600
 		output['start_time_standard'] = time.mktime((self.start_time_local - timedelta(0, nike_hour_offset)).utctimetuple())
-		del output['start_time_local']
-		del output['dst_offset']
-		del output['nike_user']
-		del output['duration']
-		del output['id']
-		del output['timezone_name']
+		# del output['start_time_local']
+		# del output['dst_offset']
+		# del output['nike_user']
+		# del output['duration']
+		# del output['id']
+		# del output['timezone_name']
 		# output['postal_code'] = PostalCode.find_or_create_code(self.postal_code).get_JSON()
 		return output
 

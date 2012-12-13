@@ -21,14 +21,18 @@ svg {
 }
 
 .y.axis line {
-	stroke: #fff;
-	stroke-opacity: .2;
+	stroke: #000;
+	stroke-opacity: .3;
 	shape-rendering: crispEdges;
 }
 
 .y.axis .major line {
 	stroke: #000;
 	stroke-opacity: 1;
+}
+
+.infoBox {
+	font: 16px Helvetica Neue;
 }
 
 .title {
@@ -40,9 +44,19 @@ svg {
 	fill: #fff;
 }
 
+#graph-info {
+	position: absolute;
+	top: -100px;
+	height: 30px;
+	text-align: center;
+	padding: 10px;
+	color: white;
+}
+
 rect {
 	fill-opacity: .6;
-	fill: #e377c2;
+	fill: #0D8ECF;
+	cursor: pointer;
 }
 
 rect:first-child {
