@@ -29,23 +29,12 @@
     <script type="text/javascript">
       var static_file_url = "{{ STATIC_URL }}";
     </script>
-    {% if HEROKU %}
-      {% compress js %}
-        <script type="text/javascript"src="{{ STATIC_URL }}js/map.js"></script>
-        <script type="text/javascript"src="{{ STATIC_URL }}js/tray.js"></script>
-        <script type="text/javascript"src="{{ STATIC_URL }}js/rgb.js"></script>
-        <script type="text/javascript"src="{{ STATIC_URL }}js/slider.js"></script>
-        <script type="text/javascript"src="{{ STATIC_URL }}js/graph.js"></script>
-        <script type="text/javascript"src="{{ STATIC_URL }}js/modal.js"></script>
-      {% endcompress %}
-    {% else %}
-      <script type="text/javascript"src="{{ STATIC_URL }}js/map.js"></script>
-      <script type="text/javascript"src="{{ STATIC_URL }}js/tray.js"></script>
-      <script type="text/javascript"src="{{ STATIC_URL }}js/rgb.js"></script>
-      <script type="text/javascript"src="{{ STATIC_URL }}js/slider.js"></script>
-      <script type="text/javascript"src="{{ STATIC_URL }}js/graph.js"></script>
-      <script type="text/javascript"src="{{ STATIC_URL }}js/modal.js"></script>
-    {% endif %}
+    <script type="text/javascript"src="{{ STATIC_URL }}js/map.js"></script>
+    <script type="text/javascript"src="{{ STATIC_URL }}js/tray.js"></script>
+    <script type="text/javascript"src="{{ STATIC_URL }}js/rgb.js"></script>
+    <script type="text/javascript"src="{{ STATIC_URL }}js/slider.js"></script>
+    <script type="text/javascript"src="{{ STATIC_URL }}js/graph.js"></script>
+    <script type="text/javascript"src="{{ STATIC_URL }}js/modal.js"></script>
    <!-- <script type="text/javascript"src="{{ STATIC_URL }}js/jquery.joyride-2.0.2.js"></script> -->
 
     <script type="text/javascript">
