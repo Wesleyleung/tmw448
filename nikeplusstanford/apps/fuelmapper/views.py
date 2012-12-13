@@ -11,9 +11,11 @@ from urllib import urlencode
 from os import environ
 from datetime import datetime, timedelta
 from pytz import timezone, utc
+from django.views.decorators.cache import cache_page
 
 from apps.fuelmapper.models	import NikeSportActivity, NikeUser,PostalCode
 
+@cache_page(60 * 60 * 15)
 def index(request):
 	context = {}
 	return render(request, 'fuelmapper/index.html', context)
@@ -62,6 +64,8 @@ def responseGenerator(request):
 		zipcode_strings.append(zipcode.postalcode)
 		zipcode_objects[zipcode.postalcode] = zipcode
 		zipcodes_return[zipcode.postalcode] = zipcode.get_JSON()
+	zip_limit = int(limit / len(zipcode_strings))
+	zip_skip = int(skip / len(zipcode_strings))
 
 	yield ' '
 	print 'ZIP CODES FOUND LOCALLY'
@@ -77,6 +81,21 @@ def responseGenerator(request):
 													).filter(start_time_local__lte=endTime_timedate
 													).count()
 	yield ' '
+	# activities_found = []
+	# for zipcode in zipcode_strings:
+	# 	print 'query for : %s' % zipcode
+	# 	activities_here = NikeSportActivity.objects.filter(postal_code=zipcode
+	# 													).filter(start_time_local__gte=startTime_timedate
+	# 													).filter(start_time_local__lte=endTime_timedate
+	# 													).order_by('start_time_local'
+	# 													).only('sport_activity_id', 'upm_user_id',
+	# 														   'nike_plus_user_id', 'start_time_local',
+	# 														   'fuel_amt', 'postal_code')[zip_skip : zip_skip + zip_limit]
+	# 	# print activities_here
+	# 	print 'adding to array'
+	# 	for activity in activities_here:
+	# 		activities_found.append(activity)
+	# print activities_found
 	print 'STARTING DB REQUEST WITH SORT'
 	activities_found = NikeSportActivity.objects.filter(postal_code__in=zipcode_strings
 													).filter(start_time_local__gte=startTime_timedate
@@ -155,6 +174,7 @@ def responseGenerator(request):
 # radius = zip code search radius
 # startTime & endTime = unix encoded time values
 @condition(etag_func=None)
+@cache_page(60 * 60 * 15)
 def loadSportFromZipcodeViewJSON(request):
 	if not request.method == 'GET':
 		responseDict = {'status' : 'ERROR',
