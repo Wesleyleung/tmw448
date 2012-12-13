@@ -33,3 +33,4 @@ Modal.prototype = {
 	},
 
 }
+// collect static
