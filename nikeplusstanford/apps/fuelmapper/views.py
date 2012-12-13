@@ -15,7 +15,7 @@ from pytz import timezone, utc
 from apps.fuelmapper.models	import NikeSportActivity, NikeUser,PostalCode
 
 def index(request):
-	HEROKU = False
+	HEROKU = True
 	if environ.get('HEROKU') is 'yes':
 		HEROKU = True
 	context = {'HEROKU' : HEROKU}
