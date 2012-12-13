@@ -52,15 +52,16 @@ Tray.prototype =  {
 
 	//Takes an optional argument true or false to set isPaused to
 	playAndPause: function() {
+		if (!isPaused) return false;
 		var start_input = $("#start_date").val()
 		var end_input = $("#end_date").val()
 
 		if(!start_input|| !end_input) {
-				alert("Please enter a date range");
-				return false;
+			modal.showModal("Not a Valid Date", '<p>Please enter a date range.</p>');
+			return false;
 		}
-		start_date = new Date(start_input)
-		end_date = new Date(end_input)	
+		start_date = new Date(start_input);
+		end_date = new Date(end_input);
 		if(start_date >= end_date) {
 			modal.showModal("Not a Valid Date", '<p>Please select a start date after the end date.</p>');
 			return false;
@@ -71,14 +72,26 @@ Tray.prototype =  {
 		this.setProgressBarActiveState(isPaused);
 		if (!isPaused) {
 			this.playButton.html('<img src="' + static_file_url + 'img/pausebutton.png" />');
-			slider.animateProgressBar();
+			this.playButton.css('cursor', 'progress');
+			//slider.animateProgressBar();
 			//graphPaths from map.js
 			getHeatMapModel(generateHeatMap);
 			
 			graphPaths();
 		} else {
 			this.playButton.html('<img src="' + static_file_url + 'img/playbutton.png" />');
+			this.playButton.css('cursor', 'pointer');
 		}
+	},
+
+	//Returns in unixtime
+	getStartDate: function() {
+		return new Date($("#start_date").val()).getTime()/1000;
+	},
+
+	//Returns in unixtime
+	getEndDate: function() {
+		return new Date($("#end_date").val()).getTime()/1000;
 	},
 
 	//Only use this if numProgressIntervals and currentProgressInterval have been set
@@ -99,12 +112,17 @@ Tray.prototype =  {
 
 	//Takes a value true or false and sets the progress bar's activity state
 	setProgressBarActiveState: function(isPaused) {
+		console.log("here");
 		if (!isPaused) {
 			this.progressBarWrapper.addClass('progress-striped');
 			this.progressBarWrapper.addClass('active');
+			this.playButton.html('<img src="' + static_file_url + 'img/pausebutton.png" />');
+			this.playButton.css('cursor', 'progress');
 		} else {
 			this.progressBarWrapper.removeClass('progress-striped');
 			this.progressBarWrapper.removeClass('active');
+			this.playButton.html('<img src="' + static_file_url + 'img/playbutton.png" />');
+			this.playButton.css('cursor', 'pointer');
 		}
 	}
 };
