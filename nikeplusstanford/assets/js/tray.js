@@ -25,7 +25,7 @@ Tray.prototype =  {
 
 	initTray: function() {
 		this.tray.css('bottom', this.tray.height() * -1 + this.trayPlayControlsWrapper.height());
-		this.numProgressIntervals = 0;
+		this.numProgressIntervals = 150;
 		this.currentProgressInterval = 0;
 	},
 
