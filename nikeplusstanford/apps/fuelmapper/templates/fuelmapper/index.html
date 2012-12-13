@@ -35,7 +35,7 @@
     <script type="text/javascript" src="{{ STATIC_URL }}js/slider.js"></script>
     <script type="text/javascript" src="{{ STATIC_URL }}js/graph.js"></script>
     <script type="text/javascript"src="{{ STATIC_URL }}js/modal.js"></script>
-   <!-- <script type="text/javascript"src="{{ STATIC_URL }}js/jquery.joyride-2.0.2.js"></script> -->
+    <script type="text/javascript"src="{{ STATIC_URL }}js/jquery.joyride-2.0.2.js"></script> 
 
     <script type="text/javascript">
 
@@ -119,32 +119,19 @@
     </div>
 
     <div id="map_canvas"></div>
-
           <!-- Tip Content -->
     <ol id="joyRideTipContent">
-      <li data-button="Next">
-        <h2>Stop #4</h2>
-        <p>Modal Test</p>
+      <li data-id="search-input" data-text="Next" class="custom">
+        <h2>Welcome!</h2>
+        <p>To get started, search for a location of interest or pan around the map.</p>
       </li>
-
-      <li data-id="tray-handle" data-text="Next" class="custom">
-        <h2>Stop #1</h2>
-        <p>.dsfdsfsdfsdfsdfsdf</p>
+      <li data-button="Next" class="custom" date-options="tipLocation:bottom">
+        <p>Next, open the tray below to filter by date and press play when you're ready.</p>
       </li>
-      <li data-id="tray-play" data-button="Next" data-options="tipLocation:top;tipAnimation:fade">
-        <h2>Stop #2</h2>
-        <p>sdfsdfsdf!</p>
-      </li>
-      <li data-id="numero3" data-button="Next" data-options="tipLocation:right">
-        <h2>Stop #3</h2>
-        <p>It works right aligned.</p>
-      </li>
-      <li data-id="numero4" data-button="Close">
-        <h2>Stop #5</h2>
-        <p>Now what are you waiting for? Add this to your projects and get the most out of your apps!</p>
+      <li data-button="Close" class="custom" data-options="tipLocation:top">
+        <p>Once the query is done, a bar graph will appear below to show the total number of fuel points earned in your viewport for each day.</p>
       </li>
     </ol>
-
 
     <script type="text/javascript">
       var modal = new Modal ({
@@ -166,9 +153,11 @@
         $( "#end_date" ).datepicker().datepicker("setDate", new Date());
       });
     </script>
+
     <script>
       $(window).load(function() {
-        $('#joyRideTipContent').joyride();
+        $('#joyRideTipContent').joyride({
+        });
       });
     </script>
 

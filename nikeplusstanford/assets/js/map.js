@@ -407,8 +407,9 @@ function generateHeatMap(data) {
 	var start_time = new Date($("#start_date").val()).getTime()/1000;
 	var end_time = new Date($("#end_date").val()).getTime()/1000;
 
+	heatmap.setData([]);
 
-	var heatMapData = heatmap.getData();
+	var heatMapData = [];
 	var length = global_heat_data.length;
 
 	for (var i = 0; i < length; i++) {
@@ -434,11 +435,10 @@ function getHeatMapModel(callback) {
     var swLng = map.getBounds().getSouthWest().lng()
 
     //check if heatmap is present. delete and redraw
-    console.log(heatmap.getData().length);
-    if(heatmap.getData().length > 0) {
-    	heatMap.setMap(null);
-		heatMap.setMap(map); 
-    }
+    // console.log(heatmap.getData().length);
+    // if(heatmap.getData().length > 0) {
+    	
+    // }
    
 	//loadHeatmapData(start_time, end_time, center, radius, maxRows, 0, callback);
     $.get( "loadSportFromZipcodeViewJSON",
