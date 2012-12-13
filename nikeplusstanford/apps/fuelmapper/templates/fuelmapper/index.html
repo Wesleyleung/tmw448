@@ -34,7 +34,14 @@
     <script type="text/javascript"src="{{ STATIC_URL }}js/rgb.js"></script>
     <script type="text/javascript"src="{{ STATIC_URL }}js/slider.js"></script>
     <script type="text/javascript"src="{{ STATIC_URL }}js/graph.js"></script>
-    <script type="text/javascript"src="{{ STATIC_URL }}js/modal.js"></script>
+    <!-- // <script type="text/javascript"src="{{ STATIC_URL }}js/modal.js"></script> -->
+    {% if HEROKU %}
+      {% compress js %}
+        <script type="text/javascript"src="{{ STATIC_URL }}js/modal.js"></script>
+      {% endcompress %}
+    {% else %}
+      <script type="text/javascript"src="{{ STATIC_URL }}js/modal.js"></script>
+    {% endif %}
    <!-- <script type="text/javascript"src="{{ STATIC_URL }}js/jquery.joyride-2.0.2.js"></script> -->
 
     <script type="text/javascript">
