@@ -150,10 +150,6 @@ body {
 	color: gray;
 }
 
-.centered {
-  display: inline-block;
-  vertical-align: middle;
-}​
 #d3-graph-wrapper {
 	position: relative;
 	top: -225px;
