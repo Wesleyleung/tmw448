@@ -462,12 +462,12 @@ function getHeatMapModel(callback) {
 		    		for (var i = 0; i < activities.length; i++) {
 		    			var curActivity = activities[i];
 	    				var fuel_amt = curActivity.fuel_amt;
-	    				
-	    				var nelat = curActivity.postal_code.geometry.bounds.northeast.lat;
-						var swlat = curActivity.postal_code.geometry.bounds.southwest.lat;
+	    				var postal_code = data['parameters']['zipCodes'][curActivity.postal_code]
+	    				var nelat = postal_code.geometry.bounds.northeast.lat;
+						var swlat = postal_code.geometry.bounds.southwest.lat;
 
-						var nelng = curActivity.postal_code.geometry.bounds.northeast.lng;
-						var swlng = curActivity.postal_code.geometry.bounds.southwest.lng;
+						var nelng = postal_code.geometry.bounds.northeast.lng;
+						var swlng = postal_code.geometry.bounds.southwest.lng;
 
 						var randomLat = nelat + (swlat-nelat)*Math.random();
 						var randomLng = nelng + (swlng-nelng)*Math.random();

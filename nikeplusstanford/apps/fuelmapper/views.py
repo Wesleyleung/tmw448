@@ -57,9 +57,11 @@ def responseGenerator(request):
 	zipcodes_found = PostalCode.objects.filter(lat__gte=swLat).filter(lng__gte=swLng).filter(lat__lte=neLat).filter(lng__lte=neLng)[:zip_limit]
 	zipcode_strings = []
 	zipcode_objects = {}
+	zipcodes_return = {}
 	for zipcode in zipcodes_found:
 		zipcode_strings.append(zipcode.postalcode)
 		zipcode_objects[zipcode.postalcode] = zipcode
+		zipcodes_return[zipcode.postalcode] = zipcode.get_JSON()
 
 	yield ' '
 	print 'ZIP CODES FOUND LOCALLY'
@@ -96,7 +98,7 @@ def responseGenerator(request):
 	for activity in activities_found:
 		yield ' '
 		activity_JSON = activity.get_JSON()
-		activity_JSON['postal_code'] = zipcode_objects[activity.postal_code].get_JSON()
+		# activity_JSON['postal_code'] = zipcode_objects[activity.postal_code].get_JSON()
 		# if timedelta.days > 2:
 		index = 0
 		try:
@@ -132,7 +134,7 @@ def responseGenerator(request):
 
 	if len(activities_array) > 0:
 		responseDict = {'success' : 'OK',
-							'parameters' : {'zipCodes' : zipcode_strings,
+							'parameters' : {'zipCodes' : zipcodes_return,
 											'limit' : limit,
 											'skip' : skip,
 											'total' : activities_found_count},
