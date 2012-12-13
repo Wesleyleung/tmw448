@@ -174,7 +174,7 @@ def responseGenerator(request):
 # radius = zip code search radius
 # startTime & endTime = unix encoded time values
 @condition(etag_func=None)
-@cache_page(60 * 60 * 15)
+# @cache_page(60 * 60 * 15)
 def loadSportFromZipcodeViewJSON(request):
 	if not request.method == 'GET':
 		responseDict = {'status' : 'ERROR',
