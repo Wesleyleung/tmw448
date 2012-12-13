@@ -420,27 +420,36 @@ function generateHeatMap(data) {
 	if (end_time - start_time > 604800) {
 		graph.initGraphWithJsonObject(JSON.stringify(data['data']['aggregates']));
 	}
-
+	clearInterval(this.interval);
 	tray.setProgressBarActiveState(true);
+	tray.setProgressBarPercentage(100);
 }
 
 function getHeatMapModel(callback) {
+    tray.setCurrentProgressInterval(0);
+    tray.setProgressBarPercentage(0);
 
 	var start_time = new Date($("#start_date").val()).getTime()/1000;
 	var end_time = new Date($("#end_date").val()).getTime()/1000;
 
-    var neLat = map.getBounds().getNorthEast().lat()
-    var neLng = map.getBounds().getNorthEast().lng()
-    var swLat = map.getBounds().getSouthWest().lat()
-    var swLng = map.getBounds().getSouthWest().lng()
+    var neLat = map.getBounds().getNorthEast().lat();
+    var neLng = map.getBounds().getNorthEast().lng();
+    var swLat = map.getBounds().getSouthWest().lat();
+    var swLng = map.getBounds().getSouthWest().lng();
+
+    //reset heatmap and graph
+    heatmap.setData([]);
+    d3.select("svg").remove();
 
     //check if heatmap is present. delete and redraw
     // console.log(heatmap.getData().length);
     // if(heatmap.getData().length > 0) {
     	
     // }
-   
 	//loadHeatmapData(start_time, end_time, center, radius, maxRows, 0, callback);
+	this.interval = setInterval(function() {
+		tray.animateProgressBarByInterval(1);
+	}, 100);
     $.get( "loadSportFromZipcodeViewJSON",
     	{neLat: neLat, neLng: neLng, swLat: swLat, swLng: swLng, startTime: start_time, endTime: end_time, limit: 10000})
     	.success(
@@ -474,6 +483,7 @@ function getHeatMapModel(callback) {
 	    	function () {
 	    		modal.showModal("Request Failed", '<p>Please change your date range, location or try again later.</p><p>Make sure you are searching within the United States!</p>');
 				tray.setProgressBarActiveState(true);
+				clearInterval(this.interval);
 	    	}.bind(this)
 	    );
 }
@@ -481,6 +491,7 @@ function getHeatMapModel(callback) {
 function dataGetError() {
 	modal.showModal("Request Failed", '<p>Please change your date range, location or try again later.</p><p>Make sure you are searching within the United States!</p>');
 	tray.setProgressBarActiveState(true);
+	clearInterval(this.interval);
 }
 
 // function loadHeatmapData(start_time, end_time, center, radius, maxRows, skip, callback) {
