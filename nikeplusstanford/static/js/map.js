@@ -352,6 +352,8 @@ function searchLocation() {
 			} else {
 				setLocationOnMapByBounds(results[0].geometry.bounds);
 				setMarkerAtLatLng(LatLng);
+				map.setCenter(LatLng);
+				setMapZoom(map.getZoom() + 1);
 			}
 			
 		} else {
