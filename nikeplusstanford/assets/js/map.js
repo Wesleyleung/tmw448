@@ -432,10 +432,14 @@ function getHeatMapModel(callback) {
 	var start_time = new Date($("#start_date").val()).getTime()/1000;
 	var end_time = new Date($("#end_date").val()).getTime()/1000;
 
-    var neLat = map.getBounds().getNorthEast().lat()
-    var neLng = map.getBounds().getNorthEast().lng()
-    var swLat = map.getBounds().getSouthWest().lat()
-    var swLng = map.getBounds().getSouthWest().lng()
+    var neLat = map.getBounds().getNorthEast().lat();
+    var neLng = map.getBounds().getNorthEast().lng();
+    var swLat = map.getBounds().getSouthWest().lat();
+    var swLng = map.getBounds().getSouthWest().lng();
+
+    //reset heatmap and graph
+    heatmap.setData([]);
+    d3.select("svg").remove();
 
     //check if heatmap is present. delete and redraw
     // console.log(heatmap.getData().length);
