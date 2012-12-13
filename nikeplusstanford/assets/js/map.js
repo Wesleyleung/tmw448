@@ -167,20 +167,20 @@ function loadPathsFromJSON(path, minFuel, maxFuel) {
 
 function graphPaths() {
 	//Gets unix time from tray selector
-	console.log(start_date.getTime()/1000);
-	console.log(end_date.getTime()/1000);
+	// console.log(start_date.getTime()/1000);
+	// console.log(end_date.getTime()/1000);
 
-	var minFuel = 0;
-	var maxFuel = 600;
-	if (pathLocationsLoaded) {
-		if (visFullyComplete) resetAfterFullyVisualized();
-		for (var i = 0; i < totalRuns; i++) {
-			pathLocations = coordsToBeGraphed[i];
-			drawPath(pathLocations, i, minFuel, maxFuel);	
-		}
-	} else {
-		loadPathsFromJSON("loadStaticJSON?json_file=randomRuns.json", minFuel, maxFuel);
-	}
+	// var minFuel = 0;
+	// var maxFuel = 600;
+	// if (pathLocationsLoaded) {
+	// 	if (visFullyComplete) resetAfterFullyVisualized();
+	// 	for (var i = 0; i < totalRuns; i++) {
+	// 		pathLocations = coordsToBeGraphed[i];
+	// 		drawPath(pathLocations, i, minFuel, maxFuel);	
+	// 	}
+	// } else {
+	// 	loadPathsFromJSON("loadStaticJSON?json_file=randomRuns.json", minFuel, maxFuel);
+	// }
 }
 
 
