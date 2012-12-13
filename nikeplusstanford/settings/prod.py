@@ -109,7 +109,7 @@ STATIC_URL = 'https://%s.amazonaws.com/%s/' % (AWS_STORAGE_BUCKET_PREFIX, AWS_ST
 
 ########## COMPRESSION CONFIGURATION
 # See: http://django_compressor.readthedocs.org/en/latest/settings/#django.conf.settings.COMPRESS_OFFLINE
-COMPRESS_OFFLINE = False
+COMPRESS_OFFLINE = True
 
 # See: http://django_compressor.readthedocs.org/en/latest/settings/#django.conf.settings.COMPRESS_STORAGE
 COMPRESS_STORAGE = DEFAULT_FILE_STORAGE
