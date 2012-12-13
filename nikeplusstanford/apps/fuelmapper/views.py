@@ -170,3 +170,21 @@ def loadSportFromZipcodeViewJSON(request):
 	response = HttpResponse(responseGenerator(request), content_type='application/json')
 
 	return response
+
+
+def zip_info(request):
+	if request.method == 'GET':
+		zipcode = request.GET['zipcode']
+		try:
+			zip_obj = PostalCode.objects.get(postalcode=zipcode)
+			return HttpResponse(json.dumps(zip_obj.get_JSON), mimetype='application/json', status=200)
+		except PostalCode.DoesNotExist:
+			responseDict = {'status' : 'ERROR',
+							'description' : 'Insufficient parameters.'}	
+			return HttpResponse(json.dumps(responseDict), mimetype='application/json', status=400)
+	else:
+		responseDict = {'status' : 'ERROR',
+						'description' : 'Only GET supported.'}	
+		return HttpResponse(json.dumps(responseDict), mimetype='application/json', status=400)
+
+
