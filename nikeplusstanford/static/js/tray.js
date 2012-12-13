@@ -7,6 +7,8 @@ function Tray (params) {
 	this.progressBar = this.tray.find('#tray-progress-bar');
 	this.trayPlayControlsWrapper = this.tray.find('#tray-play-wrapper');
 
+	this.isGettingData = false;
+
 	this.trayButton.bind('click', function() {
 		this.showAndHide();
 	}.bind(this));
@@ -52,7 +54,8 @@ Tray.prototype =  {
 
 	//Takes an optional argument true or false to set isPaused to
 	playAndPause: function() {
-		if (!isPaused) return false;
+		console.log("play pressed");
+		if (this.isGettingData) return false;
 		var start_input = $("#start_date").val()
 		var end_input = $("#end_date").val()
 
@@ -66,22 +69,19 @@ Tray.prototype =  {
 			modal.showModal("Not a Valid Date", '<p>Please select a start date after the end date.</p>');
 			return false;
 		}
-		//If an argument is passed in, use it to set isPaused
-		if (arguments.length == 0) isPaused = !isPaused;
-		else isPaused = arguments[0];
-		this.setProgressBarActiveState(isPaused);
-		if (!isPaused) {
-			this.playButton.html('<img src="' + static_file_url + 'img/pausebutton.png" />');
-			this.playButton.css('cursor', 'progress');
-			//slider.animateProgressBar();
-			//graphPaths from map.js
-			getHeatMapModel(generateHeatMap);
-			
-			graphPaths();
-		} else {
-			this.playButton.html('<img src="' + static_file_url + 'img/playbutton.png" />');
-			this.playButton.css('cursor', 'pointer');
-		}
+
+		this.playButton.html('<img src="' + static_file_url + 'img/pausebutton.png" />');
+		this.playButton.css('cursor', 'progress');
+		//slider.animateProgressBar();
+		//graphPaths from map.js
+		this.setProgressBarActiveState(this.isGettingData);
+
+		this.isGettingData = true;
+
+
+		getHeatMapModel(generateHeatMap);
+		
+		graphPaths();
 	},
 
 	//Returns in unixtime
@@ -118,11 +118,13 @@ Tray.prototype =  {
 			this.progressBarWrapper.addClass('active');
 			this.playButton.html('<img src="' + static_file_url + 'img/pausebutton.png" />');
 			this.playButton.css('cursor', 'progress');
+			this.isGettingData = true;
 		} else {
 			this.progressBarWrapper.removeClass('progress-striped');
 			this.progressBarWrapper.removeClass('active');
 			this.playButton.html('<img src="' + static_file_url + 'img/playbutton.png" />');
 			this.playButton.css('cursor', 'pointer');
+			this.isGettingData = false;
 		}
 	}
 };

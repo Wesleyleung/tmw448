@@ -446,7 +446,7 @@ function getHeatMapModel(callback) {
     	.success(
 	    	function(data) {
 	    		if(data.success == "OK" && (data.data.count > 0 || data.data == null)) {  
-	    			console.log(data['data']['activities']); 	
+	    			//console.log(data['data']['activities']); 	
 		    		var activities = data['data']['activities'];
 		    		for (var i = 0; i < activities.length; i++) {
 		    			var curActivity = activities[i];
@@ -472,13 +472,14 @@ function getHeatMapModel(callback) {
 	    	}
 	    ).error(
 	    	function () {
-	    		dateGetError();
-	    	}
+	    		modal.showModal("Request Failed", '<p>Please change your date range, location or try again later.</p><p>Make sure you are searching within the United States!</p>');
+				tray.setProgressBarActiveState(true);
+	    	}.bind(this)
 	    );
 }
 
 function dataGetError() {
-	modal.showModal("Request Failed", '<p>Please change your date range, location or try again later.</p>');
+	modal.showModal("Request Failed", '<p>Please change your date range, location or try again later.</p><p>Make sure you are searching within the United States!</p>');
 	tray.setProgressBarActiveState(true);
 }
 
