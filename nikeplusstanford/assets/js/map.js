@@ -88,15 +88,15 @@ function calculateStats(json) {
 			if (j != 0) numProgressIntervals ++;
 		}
 	}
-	tray.setNumProgressIntervals(numProgressIntervals);
-	tray.setCurrentProgressInterval(0);
+	//tray.setNumProgressIntervals(numProgressIntervals);
+	//tray.setCurrentProgressInterval(0);
 }
 
 function resetAfterFullyVisualized() {
 	resetPolylines();
-	tray.setNumProgressIntervals(numProgressIntervals);
-	tray.setCurrentProgressInterval(0);
-	tray.setProgressBarPercentage(0);
+	//tray.setNumProgressIntervals(numProgressIntervals);
+	//tray.setCurrentProgressInterval(0);
+	//tray.setProgressBarPercentage(0);
 	runVisualizationsEnded = 0;
 	visFullyComplete = false;
 }
@@ -231,7 +231,7 @@ function drawPath(pathLocations, runNum, minFuel, maxFuel) {
 		pathPolyline.setPath(thisPathArray);
 		var incr = 1;
 		if (thisPathArray.length < 2) incr = 0;
-		tray.animateProgressBarByInterval(incr);
+		//tray.animateProgressBarByInterval(incr);
 	};
 
 	function animationLoop() {
@@ -251,7 +251,7 @@ function drawPath(pathLocations, runNum, minFuel, maxFuel) {
 					if (runVisualizationsEnded == totalRuns) {
 						//All runs have ended
 						//set tray's play button to be paused
-						tray.playAndPause(true);
+						//tray.playAndPause(true);
 						visFullyComplete = true;
 					}
 				}
@@ -261,7 +261,7 @@ function drawPath(pathLocations, runNum, minFuel, maxFuel) {
 			coordsToBeGraphed[runNum] = pathLocations;
 		}
 	}
-	tray.setProgressBarPercentage(0);
+	//tray.setProgressBarPercentage(0);
 	animationLoop();
 }
 
@@ -301,24 +301,6 @@ function polyClick (event, path) {
 	infowindow.open(map);
 }
 
-// function generateBoundaries() {
-// 	$.getJSON("js/zipcodes.json", function(json) {
-// 		for(var i = 0; i < json.zipcodes.length; i++) {
-// 			var zipcode = json.zipcodes[i];
-// 			var requestUrl = "http://www.propertymaps.com/maps/xml/county.php?zip=" + zipcode;
-// 			$.ajax(requestUrl, {
-// 				dataType: "xml",
-// 				//data: data,
-// 				success: function(data) {
-// 					console.log(data);
-// 				},
-// 				error: function() {
-// 					//alert("Oops something went wrong.");
-// 				}
-// 			});
-// 		}
-// 	});
-// }
 function toggleHeatmap() {
  		console.log("heat map toggled");
         heatmap.setMap(heatmap.getMap() ? null : map);    
@@ -437,7 +419,8 @@ function generateHeatMap(data) {
 	if (end_time - start_time > 604800) {
 		graph.initGraphWithJsonObject(JSON.stringify(data['data']['aggregates']));
 	}
-	tray.playAndPause(true);
+
+	tray.setProgressBarActiveState(true);
 }
 
 function getHeatMapModel(callback) {
@@ -459,32 +442,44 @@ function getHeatMapModel(callback) {
    
 	//loadHeatmapData(start_time, end_time, center, radius, maxRows, 0, callback);
     $.get( "loadSportFromZipcodeViewJSON",
-    	{neLat: neLat, neLng: neLng, swLat: swLat, swLng: swLng, startTime: start_time, endTime: end_time, limit: 10000},
-    	function(data) {
-    		if(data.success == "OK" && data.data.count > 0) {  
-    			console.log(data['data']['activities']); 	
-	    		var activities = data['data']['activities'];
-	    		for (var i = 0; i < activities.length; i++) {
-	    			var curActivity = activities[i];
-    				var fuel_amt = curActivity.fuel_amt;
-    				
-    				var nelat = curActivity.postal_code.geometry.bounds.northeast.lat;
-					var swlat = curActivity.postal_code.geometry.bounds.southwest.lat;
+    	{neLat: neLat, neLng: neLng, swLat: swLat, swLng: swLng, startTime: start_time, endTime: end_time, limit: 10000})
+    	.success(
+	    	function(data) {
+	    		if(data.success == "OK" && (data.data.count > 0 || data.data == null)) {  
+	    			console.log(data['data']['activities']); 	
+		    		var activities = data['data']['activities'];
+		    		for (var i = 0; i < activities.length; i++) {
+		    			var curActivity = activities[i];
+	    				var fuel_amt = curActivity.fuel_amt;
+	    				
+	    				var nelat = curActivity.postal_code.geometry.bounds.northeast.lat;
+						var swlat = curActivity.postal_code.geometry.bounds.southwest.lat;
 
-					var nelng = curActivity.postal_code.geometry.bounds.northeast.lng;
-					var swlng = curActivity.postal_code.geometry.bounds.southwest.lng;
+						var nelng = curActivity.postal_code.geometry.bounds.northeast.lng;
+						var swlng = curActivity.postal_code.geometry.bounds.southwest.lng;
 
-					var randomLat = nelat + (swlat-nelat)*Math.random();
-					var randomLng = nelng + (swlng-nelng)*Math.random();
+						var randomLat = nelat + (swlat-nelat)*Math.random();
+						var randomLng = nelng + (swlng-nelng)*Math.random();
 
-					var LatLng = new google.maps.LatLng(randomLat, randomLng);
-					var dict = {location: LatLng, weight: fuel_amt};
-	    			global_heat_data.push(dict);
-	    		};
-	    		callback(data);
-    		}
-    	}
-    );
+						var LatLng = new google.maps.LatLng(randomLat, randomLng);
+						var dict = {location: LatLng, weight: fuel_amt};
+		    			global_heat_data.push(dict);
+		    		};
+		    		callback(data);
+	    		} else {
+	    			dataGetError();
+	    		}
+	    	}
+	    ).error(
+	    	function () {
+	    		dateGetError();
+	    	}
+	    );
+}
+
+function dataGetError() {
+	modal.showModal("Request Failed", '<p>Please change your date range, location or try again later.</p>');
+	tray.setProgressBarActiveState(true);
 }
 
 // function loadHeatmapData(start_time, end_time, center, radius, maxRows, skip, callback) {

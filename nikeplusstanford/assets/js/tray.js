@@ -112,6 +112,7 @@ Tray.prototype =  {
 
 	//Takes a value true or false and sets the progress bar's activity state
 	setProgressBarActiveState: function(isPaused) {
+		console.log("here");
 		if (!isPaused) {
 			this.progressBarWrapper.addClass('progress-striped');
 			this.progressBarWrapper.addClass('active');
